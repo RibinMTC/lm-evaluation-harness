@@ -1,7 +1,9 @@
 {
   "stabilityai/StableBeluga": {
     "1": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can. Reply only German.\n\n### User: Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\n\n### Assistant:\n",
-    "hallucination": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can. Reply only German.\n\n### User: Given the news article and its reference summary, subtly alter every sentence of the summary to introduce varied misrepresentations—such as incorrect entities, dates, or details without diverging drastically from the original structure.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n"
+    "hallucination": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can. Reply only German.\n\n### User: Given the news article and its reference summary, subtly alter every sentence of the summary to introduce varied misrepresentations—such as incorrect entities, dates, or details without diverging drastically from the original structure.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n",
+    "extrinsic-hallucination": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can. Reply only German.\n\n### User: Given the provided news article and reference summary, subtly alter every sentence of the summary by adding new, concise and extrinsic details not found in the original article. The additions must not contradict the news article.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n"
+
   },
   "google/flan-t5": {
     "1": "Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\nSummary:\n",
