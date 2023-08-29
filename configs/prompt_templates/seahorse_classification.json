@@ -1,12 +1,12 @@
 {
   "stabilityai/StableBeluga": {
-    "attribution_1": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can.\n\n### User: Given an article and its summary in {lang}, determine if all information in the summary is sourced from the article. Return True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n",
+    "attribution_1": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can.\n\n### User: Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Return True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n",
     "attribution_2": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can.\n\n### User: Given an article and its corresponding summary in {lang}, reply with True if all information in the summary originates from the article and reply False otherwise.\nArticle: {article}\nSummary: {summary}\n\n### Assistant:\n"
   },
   "tiiuae/falcon": {
-    "attribution_1": "Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Reply with True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\nLabel:"
+    "attribution_1": "Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Reply with True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\n"
   },
   "google/flan-ul2": {
-    "attribution_1": "Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Reply with True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\nLabel:"
+    "attribution_1": "Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Reply with True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\n"
   }
 }

@@ -39,7 +39,7 @@ class SwissText23SummarizationTask(Task):
 
     default_prompt_template = (
         f"Generate a summary in German for the following article. The summary should be around 2 to 3 "
-        f"sentences.\nArticle: {{article}}\n\nSummary:\n")
+        f"sentences.\nArticle: {{article}}\nSummary:{{summary}}\n\nAssistant:\n")
 
     def has_training_docs(self):
         return True
@@ -68,10 +68,14 @@ class SwissText23SummarizationTask(Task):
             return self.dataset["test"]
 
     def doc_to_text(self, doc):
-        if self.prompt_template:
-            prompt = self.prompt_template.format(article=doc['article'])
+        if self.prompt_template is None:
+            self.prompt_template = self.default_prompt_template
+
+        if "{summary}" in self.prompt_template:
+            prompt = self.prompt_template.format(article=doc['article'], summary=doc['summary'])
         else:
-            prompt = self.default_prompt_template.format(article=doc['article'])
+            prompt = self.prompt_template.format(article=doc['article'])
+
         return prompt
 
     def doc_to_target(self, doc):
