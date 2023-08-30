@@ -2,7 +2,10 @@
 
 # Provide as optional second argument the path to the inference prompt file
 
-# example: bash run_euler.sh configs/flan_t5_inference_config.json data/inference.json
+# original example: bash run_euler.sh configs/flan_t5_inference_config.json data/inference.json
+
+# example: start locally (not on euler) inside the `euler_scripts` folder, and execute: (no need for an inference.json)
+# bash run_euler.sh lm_eval_euler_config.json
 
 if [ -z "$1" ]
   then
@@ -30,10 +33,13 @@ CONFIG_FILE=$(python3 utils/euler_config_parser.py \
 
 scp "$1" euler:$CODE_PATH/euler_scripts
 #scp utils/bash_euler_commands_helper.py euler:$CODE_PATH/euler_scripts/utils/bash_euler_commands_helper.py
-scp ../lm_eval/tasks/xsum_faith_hallucination_classification.py euler:$CODE_PATH/lm_eval/tasks/xsum_faith_hallucination_classification.py
+#scp ../lm_eval/tasks/xsum_faith_hallucination_classification.py euler:$CODE_PATH/lm_eval/tasks/xsum_faith_hallucination_classification.py
+scp ../lm_eval/tasks/llm_summarization_mt.py euler:$CODE_PATH/lm_eval/tasks/llm_summarization_mt.py
 #scp ../lm_eval/models/huggingface.py euler:$CODE_PATH/lm_eval/models/huggingface.py
 #scp ../main.py euler:$CODE_PATH/main.py
 scp ../"$CONFIG_FILE" euler:$CODE_PATH/$CONFIG_FILE
+# sync the whole configs folder using rsync
+rsync -r "../configs/" "euler:${CODE_PATH}/configs/"
 
 if [ -z "$2" ]
   then

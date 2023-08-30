@@ -70,6 +70,7 @@ from . import factcc_hallucination_classification
 from . import frank_hallucination_classification
 from . import xsum_faith_hallucination_classification
 from . import swisstext23_summarization
+from . import llm_summarization_mt
 from . import seahorse_classification
 
 ########################################
@@ -331,6 +332,16 @@ TASK_REGISTRY = {
     "frank_hallucination_classification": frank_hallucination_classification.FrankHallucinationClassificationTask,
     "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
+    "SummarizationTask_20Minuten": llm_summarization_mt.SummarizationTask_20Minuten,
+    "SummarizationTask_20Minuten_1": llm_summarization_mt.SummarizationTask_20Minuten_1,
+    "SummarizationTask_20Minuten_2": llm_summarization_mt.SummarizationTask_20Minuten_2,
+    "SummarizationTask_20Minuten_3": llm_summarization_mt.SummarizationTask_20Minuten_3,
+    "SummarizationTask_20Minuten_4": llm_summarization_mt.SummarizationTask_20Minuten_4,
+    "SummarizationTask_20Minuten_5": llm_summarization_mt.SummarizationTask_20Minuten_5,
+    "SummarizationTask_20Minuten_6": llm_summarization_mt.SummarizationTask_20Minuten_6,
+    "SummarizationTask_20Minuten_7": llm_summarization_mt.SummarizationTask_20Minuten_7,
+    "SummarizationTask_20Minuten_8": llm_summarization_mt.SummarizationTask_20Minuten_8,
+    "SummarizationTask_20Minuten_9": llm_summarization_mt.SummarizationTask_20Minuten_9,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,

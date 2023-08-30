@@ -1,8 +1,12 @@
 model: hf-causal-experimental #hf-seq2seq #hf-causal-experimental
 #tiiuae-falcon-7b tiiuae/falcon-40b-instruct google/flan-ul2 psmathur/orca_mini_13b mosaicml/mpt-30b-instruct h2oai/h2ogpt-gm-oasst1-en-2048-falcon-40b-v2 huggyllama/llama-30b h2oai/h2ogpt-gm-oasst1-en-2048-open-llama-7b
-model_args: "pretrained=DAMO-NLP-MT/polylm-13b,trust_remote_code=True,use_accelerate=True" #,load_in_8bit=True"#,do_sample=True,temperature=0.2"
-tasks: "newsum2021_summarization" #"germanquad_open_qa,x_stance_de,pawsx_de"
-prompt_version_per_task: "1"
+#bigscience/bloomz-7b1-mt bigscience/bloomz-7b1
+#meta-llama/Llama-2-7b-chat-hf
+#tiiuae/falcon-7b-instruct (chat), tiiuae-falcon-7b (only pre-trained)
+#google/flan-t5-xl (3B parameters), google/flan-t5-xxl (11B parameters)
+model_args: "pretrained=meta-llama/Llama-2-7b-chat-hf,trust_remote_code=True,use_accelerate=True" #,load_in_8bit=True"#,do_sample=True,temperature=0.2"
+tasks: "SummarizationTask_20Minuten_1,SummarizationTask_20Minuten_2"
+prompt_version_per_task: "1,2" # "1,2,3,4,5,6,7,8,9" # also allows multiple values, e.g. "1,2,3"
 num_fewshot: 0
 batch_size: "1"
 device: null
@@ -13,6 +17,6 @@ no_cache: true
 decontamination_ngrams_path: null
 description_dict_path: null
 check_integrity: false
-write_out: true
-output_base_path: "results"
+write_out: true # true = dump JSON with prompts and completions
+output_base_path: "results" # location of JSON dump with predictions+prompts
 wandb_on: true

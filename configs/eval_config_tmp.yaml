@@ -1,0 +1,17 @@
+model: hf-causal-experimental
+model_args: pretrained=meta-llama/Llama-2-7b-chat-hf,trust_remote_code=True,use_accelerate=True
+tasks: SummarizationTask_20Minuten_1,SummarizationTask_20Minuten_2
+prompt_version_per_task: 1,2
+num_fewshot: 0
+batch_size: '1'
+device: null
+output_path: null
+limit: null
+data_sampling: null
+no_cache: true
+decontamination_ngrams_path: null
+description_dict_path: null
+check_integrity: false
+write_out: true
+output_base_path: results
+wandb_on: true

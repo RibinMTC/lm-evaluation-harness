@@ -120,7 +120,8 @@ def main():
         [tasks_string, model_string, few_shot_string])
 
     wandb_run_group_name = f"llm_leaderboard_{tasks_string}_group"
-    wandb.init(project="llm_leaderboard", entity="background-tool", config=vars(args), name=wandb_run_name,
+    # entity="background-tool",
+    wandb.init(project="llm_leaderboard", config=vars(args), name=wandb_run_name,
                mode=wandb_mode, group=wandb_run_group_name)
 
     results = evaluator.simple_evaluate(
