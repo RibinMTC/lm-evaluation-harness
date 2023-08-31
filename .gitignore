@@ -7,3 +7,10 @@ lm_cache
 /wandb/
 /tests/testdata/
 /germanquad_results/
+/useful_commands.md
+/results/
+/results_bag/
+/euler_outputs/
+/report/reports/
+report/.DS_Store
+.DS_Store
