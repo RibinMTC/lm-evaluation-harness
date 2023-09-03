@@ -77,7 +77,7 @@ def save_dataframe(df, experiment_name):
 
 
 # Function to make plots and create an overview report
-def create_report(df, experiment_name, metric_names, prompts):
+def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
     experiment_path = os.path.join("reports", experiment_name)
 
     templateLoader = jinja2.FileSystemLoader(searchpath="./templates")
@@ -101,8 +101,9 @@ def create_report(df, experiment_name, metric_names, prompts):
     # Calculate the language of the predicted text using spacy language detection
     # ... create a new column in the dataframe containing the predicted language
     # ... make a plot showing the distribution of the predicted languages per model and prompt
-    df = lang_detect(df, "logit_0")
-    df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, prompts, groupbyList=["model", "promptVersion"])
+    if not skip_lang:
+        df = lang_detect(df, "logit_0")
+        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, prompts, groupbyList=["model", "promptVersion"])
 
     # create the statistics for the token lengths and number of sentences
     df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=["model", "promptVersion"], approximation=True)
@@ -125,19 +126,29 @@ def create_report(df, experiment_name, metric_names, prompts):
 
     # Save all stuff
     print("Saving results...")
+
     df.to_csv(os.path.join(experiment_path, "df_all.csv"), index=False)
     df_empty_stat.to_csv(os.path.join(experiment_path, "df_empty_stat.csv"), index=False)
-    df_lang_stat.to_csv(os.path.join(experiment_path, "df_lang_stat.csv"), index=False)
-    df_non_german.to_csv(os.path.join(experiment_path, "df_non_german.csv"), index=False)
     df_num_empty_docs.to_csv(os.path.join(experiment_path, "df_num_empty_docs.csv"), index=False)
     df_num_empty_prompts.to_csv(os.path.join(experiment_path, "df_num_empty_prompts.csv"), index=False)
-    df_prompt_lang_effect.to_csv(os.path.join(experiment_path, "df_prompt_lang_effect.csv"), index=False)
+    worst_empty_docs.to_csv(os.path.join(experiment_path, "worst_empty_docs.csv"), index=False)
+    worst_empty_promptVersions.to_csv(os.path.join(experiment_path, "worst_empty_promptVersions.csv"), index=False)
+
+    if not skip_lang:
+        df_lang_stat.to_csv(os.path.join(experiment_path, "df_lang_stat.csv"), index=False)
+        df_prompt_lang_effect.to_csv(os.path.join(experiment_path, "df_prompt_lang_effect.csv"), index=False)
+        df_non_german.to_csv(os.path.join(experiment_path, "df_non_german.csv"), index=False)
+
     df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
-    for model in inspect_examples:
-        inspect_examples[model].to_csv(os.path.join(experiment_path, f"inspect_examples_{model}.csv"), index=False)
 
+    for table in tables_overview:
+        table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
+    for table in tables_detail:
+        table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
 
-    # TODO: Use prompts
+    # save inspect examples in JSON
+    with open(os.path.join(experiment_path, "inspect_examples.json"), "w") as f:
+        json.dump(inspect_examples, f)
 
 
 def empty_statistics(df, groupbyList=["model", "promptVersion"], text_col="logit_0", topN=5, docCol="doc_id", promptCol="promptVersion") -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -338,12 +349,27 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     plt.savefig(token_distr_plot_path)
     plt.close()
 
+    # make the same plot as violin plot
+    token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+    token_distr_plot.map(sns.violinplot, "num_tokens", bins=20)
+    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot_violin.png")
+    plt.savefig(token_distr_plot_path)
+    plt.close()
+
+
     # make a subplot grid with one plot for each dimension in the group-by list
     sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     # plot the distribution of the number of sentences in each group
     sent_distr_plot.map(sns.histplot, "num_sentences", bins=20)
     # save
     sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot.png")
+    plt.savefig(sent_distr_plot_path)
+    plt.close()
+
+    # make the same plot as violin plot
+    sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+    sent_distr_plot.map(sns.violinplot, "num_sentences", bins=20)
+    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot_violin.png")
     plt.savefig(sent_distr_plot_path)
     plt.close()
 
@@ -438,6 +464,9 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
     for model in df["model"].unique():
         # get the df for the current model
         df_model = df[df["model"] == model]
+        # if empty, skip
+        if df_model.shape[0] == 0:
+            continue
         # in general, compute the percentiles for each metric and sample the examples
         for metric_name in metric_names:
             for cat in out[model]["general"][metric_name]:
@@ -448,11 +477,14 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
                 sample_population = df_model[(df_model[metric_name] >= percentile_values[0]) & (df_model[metric_name] <= percentile_values[1])]
                 df_sample = sample_population.sample(min(sample_population.shape[0], numExamples))
                 # add the examples to the dict
-                out[model]["general"][metric_name][cat] = df_sample
+                out[model]["general"][metric_name][cat] = df_sample.to_dict(orient="records")
         # for each prompt, compute the percentiles for each metric and sample the examples
         for promptVersion in df["promptVersion"].unique():
             # get the df for the current prompt
             df_prompt = df_model[df_model["promptVersion"] == promptVersion]
+            # if empty, skip
+            if df_prompt.shape[0] == 0:
+                continue
             for metric_name in metric_names:
                 for cat in out[model][promptVersion][metric_name]:
                     # calculate the percentiles
@@ -462,7 +494,7 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
                     sample_population = df_prompt[(df_prompt[metric_name] >= percentile_values[0]) & (df_prompt[metric_name] <= percentile_values[1])]
                     df_sample = sample_population.sample(min(sample_population.shape[0], numExamples))
                     # add the examples to the dict
-                    out[model][promptVersion][metric_name][cat] = df_sample
+                    out[model][promptVersion][metric_name][cat] = df_sample.to_dict(orient="records")
 
     return out
 
