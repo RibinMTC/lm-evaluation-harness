@@ -13,6 +13,11 @@ models = [
 ]
 indices = [1, 2, 3, 5, 20]
 temperatures = ["_T01", "_T05", "_T10"]
+temperatureValMap = {
+    "_T01": 0.1,
+    "_T05": 0.5,
+    "_T10": 1.0,
+}
 
 for model in models:
     for j in indices:
@@ -58,7 +63,8 @@ for model in models:
                 # Update tasks and prompt_version_per_task values
                 y["tasks"] = new_config_task_names
                 y["prompt_version_per_task"] = new_config_prompt_versions
-                y["model_args"] = f"pretrained={model},trust_remote_code=True,use_accelerate=True"
+                temperatureVal = temperatureValMap[temperature]
+                y["model_args"] = f"pretrained={model},trust_remote_code=True,use_accelerate=True,do_sample=True,temperature={temperatureVal}"
                 # Write the updated config to the new file
                 with open(f"../{new_config}", "w") as new_f:
                     yaml.dump(y, new_f, default_flow_style=False, sort_keys=False)
