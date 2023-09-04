@@ -6,8 +6,12 @@ import subprocess
 import random, string
 
 # ["meta-llama/Llama-2-7b-chat-hf", ]
-models = ["meta-llama/Llama-2-7b-chat-hf", "bigscience/bloomz-7b1-mt", "tiiuae/falcon-7b-instruct"]  # [, "google/flan-t5-xl"]
-indices = [1, 2, 5, 3, 4, 6, 7, 12, 18]
+models = [
+    "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
+    "bigscience/bloomz-7b1-mt",
+    "tiiuae/falcon-7b-instruct",
+]
+indices = [1, 2, 3, 5, 20]
 temperatures = ["_T01", "_T05", "_T10"]
 
 for model in models:

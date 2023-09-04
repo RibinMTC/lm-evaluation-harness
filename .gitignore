@@ -12,5 +12,6 @@ lm_cache
 /results_bag/
 /euler_outputs/
 /report/reports/
+/configs/prompt_templates/SummarizationTask_20Minuten_*.json
 report/.DS_Store
 .DS_Store

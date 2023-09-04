@@ -78,6 +78,8 @@ def save_dataframe(df, experiment_name):
 
 # Function to make plots and create an overview report
 def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
+    sns.set_theme(style="darkgrid")
+
     experiment_path = os.path.join("reports", experiment_name)
 
     templateLoader = jinja2.FileSystemLoader(searchpath="./templates")
@@ -103,7 +105,9 @@ def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
     # ... make a plot showing the distribution of the predicted languages per model and prompt
     if not skip_lang:
         df = lang_detect(df, "logit_0")
-        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, prompts, groupbyList=["model", "promptVersion"])
+        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, experiment_path, prompts, groupbyList=["model", "promptVersion"])
+        # Filter out the non-german predictions
+        df = df[df["lang"] == "de"]
 
     # create the statistics for the token lengths and number of sentences
     df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=["model", "promptVersion"], approximation=True)
@@ -216,7 +220,7 @@ def lang_detect(df, col_name):
     return df
 
 
-def language_statistics(df, prompts, groupbyList=["model", "promptVersion"], promptVersionCol="promptVersion"):
+def language_statistics(df, experiment_path, prompts, groupbyList=["model", "promptVersion"], promptVersionCol="promptVersion", modelCol="model"):
     print("Calculating language statistics...")
 
     # get the languages of each prompt
@@ -232,9 +236,53 @@ def language_statistics(df, prompts, groupbyList=["model", "promptVersion"], pro
 
     # calculate the effect of the prompt being in the target language (german) on the target language being the same (german)
     df_prompt_langs = df.copy()
-    df_prompt_langs['prompt_lang'] = df_prompt_langs['promptVersion'].map(prompt_langs)
+    df_prompt_langs['prompt_lang'] = df_prompt_langs.apply(lambda row: prompt_langs[f"{row[promptVersionCol]}"], axis=1)
     groupbyListLangEffect = [col for col in groupbyList if col != promptVersionCol]  # exclude promptVersion from groupbyList
     df_prompt_lang_effect = df_prompt_langs.groupby(groupbyListLangEffect + ["prompt_lang", "lang"]).agg({"logit_0": "count"}).reset_index()
+
+    # Make a language effect plot, showing the effect of the prompt language on the predicted language (for each model)
+    # Grouping all other languages together
+    df_prompt_lang_effect_plot = df_prompt_lang_effect.copy()
+    df_prompt_lang_effect_plot["lang"] = df_prompt_lang_effect_plot["lang"].apply(lambda x: "other" if x != "de" else x)
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.groupby([modelCol, "prompt_lang", "lang"]).agg({"logit_0": "sum"}).reset_index()
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.rename(columns={"logit_0": "count"})
+    df_prompt_lang_effect_plot["count"] = df_prompt_lang_effect_plot["count"].astype(int)
+    # Make the actual plot
+    lang_effect_plot = sns.FacetGrid(df_prompt_lang_effect_plot, col="prompt_lang", row=modelCol, height=3, aspect=1.5)
+    lang_effect_plot.map(sns.barplot, "lang", "count")
+    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_plot.png")
+    plt.savefig(token_distr_plot_path)
+    plt.close()
+    #
+    # sns.set_theme(style="whitegrid")
+    # g = sns.catplot(
+    #     data=df_prompt_lang_effect_plot, kind="bar",
+    #     x="prompt_lang", y="count", hue="lang",
+    #     ci="sd", palette="dark", alpha=.6, height=6
+    # )
+    # g.despine(left=True)
+    # g.set_axis_labels("", "Count")
+    # g.legend.set_title("Predicted Language")
+    # g.savefig(os.path.join(experiment_path, "prompt_lang_effect_plot.png"))
+
+    # Language effect plot, showing the distribution of the predicted languages per model and prompt (with the prompt language as hue) ->
+    df_prompt_lang_effect_plot = df_prompt_lang_effect.copy()
+    plot_langs = ["de", "en", "af", "other"]
+    # map languages not in plot_langs to "other"
+    df_prompt_lang_effect_plot["lang"] = df_prompt_lang_effect_plot["lang"].apply(lambda x: "other" if x not in plot_langs else x)
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.groupby(["model", "prompt_lang", "lang"]).agg({"logit_0": "sum"}).reset_index()
+    # fill missing combinations with 0 value (issue with plotting)
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.groupby(["model", "prompt_lang", "lang"]).agg({"logit_0": "sum"}).reset_index()
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.pivot(index=["model", "prompt_lang"], columns="lang", values="logit_0").reset_index()
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.fillna(0)
+    df_prompt_lang_effect_plot = df_prompt_lang_effect_plot.melt(id_vars=["model", "prompt_lang"], var_name="lang", value_name="logit_0")
+    df_prompt_lang_effect_plot["logit_0"] = df_prompt_lang_effect_plot["logit_0"].astype(int)
+    # plot
+    lang_effect_distr_plot = sns.FacetGrid(df_prompt_lang_effect_plot, col="prompt_lang", row=modelCol, height=3, aspect=1.5, sharex=True)
+    lang_effect_distr_plot.map(sns.barplot, "lang", "logit_0")
+    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_lang_distr_plot.png")
+    plt.savefig(token_distr_plot_path)
+    plt.close()
 
     # extract all non-german predictions
     df_non_german = df[df["lang"] != "de"]
@@ -506,13 +554,17 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     prompt_plot_paths = []
     model_plot_paths = []
 
+    # sorted prompt versions (ordered as numbers, not strings)
+    promptVersions = df["promptVersion"].unique().tolist()
+    promptVersions.sort(key=lambda x: int(x))
+
     # Loop over the models -> making 1 figure per metric, comparing the prompts (on the same model)
     for model_name in df["model"].unique():
         out_paths = []
         df_model = df[df["model"] == model_name]
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each prompt
-            violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name)
+            violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=promptVersions)
             # save
             violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
             plt.savefig(violin_plot_path)
@@ -526,7 +578,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         df_prompt = df[df["promptVersion"] == promptVersion]
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each model
-            violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
+            violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name, order=promptVersions)
             # save
             violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
             plt.savefig(violin_plot_path)
@@ -545,7 +597,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         metric_names: List of metric names
         metric_ordering: Dictionary mapping each metric name a boolean indicating whether a larger metric value is better or not
     """
-    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname']
+    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang']
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
         "rouge1": True,
@@ -562,18 +614,19 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     return metric_names, {metric_name: metric_ordering_all[metric_name] for metric_name in metric_names}
 
 
+experiment_name = "base-experiment"
+models = ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"]  # List of LLM models
+# "bigscience/bloomz-7b1-mt", "tiiuae/falcon-7b-instruct", "google/flan-t5-xl" "meta-llama/Llama-2-7b-chat-hf"
+
+# NOTE: left-hand-name must replace '/' with '-' to be a valid filename
+shortNames = {
+    "meta-llama-Llama-2-7b-chat-hf": "Llama-2 7b",
+    "tiiuae-falcon-7b-instruct": "Falcon 7b",
+    "bigscience-bloomz-7b1-mt": "BloomZ 7b",
+}
+
 # Main function
 def main():
-    experiment_name = "base-experiment"
-    models = ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"]  # List of LLM models
-    # "bigscience/bloomz-7b1-mt", "tiiuae/falcon-7b-instruct", "google/flan-t5-xl" "meta-llama/Llama-2-7b-chat-hf"
-
-    # NOTE: left-hand-name must replace '/' with '-' to be a valid filename
-    shortNames = {
-        "meta-llama-Llama-2-7b-chat-hf": "Llama-2 7b",
-        "tiiuae-falcon-7b-instruct": "Falcon 7b",
-        "bigscience-bloomz-7b1-mt": "BloomZ 7b",
-    }
 
     # Aggregate results and create DataFrame
     df = load_all_results(models, shortNames)
@@ -593,10 +646,34 @@ def main():
     datasets = df["dataset"].unique()
     for dataset in datasets:
         df_dataset = df[df["dataset"] == dataset]
-        create_report(df_dataset, f"{experiment_name}-{dataset}", metric_names, prompts)
+        create_report(df_dataset, f"{experiment_name}-{dataset}", metric_names, prompts, skip_lang=False)
 
     # create_report(df, experiment_name, metric_names)
 
+def make_report_plots():
+    datasets = ["20Minuten"]
+
+    # Get the prompts from the prompts_bag.json file for the given experiment
+    prompts_bag_path = f"prompts_bag.json"
+    with open(prompts_bag_path, "r") as f:
+        prompts_bag = json.load(f)
+        prompts = prompts_bag[experiment_name]
+
+    for dataset in datasets:
+        experiment_path = os.path.join("reports", f"{experiment_name}-{dataset}")
+
+        # Load all prepared data
+        df = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
+        df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
+
+        df_all = pd.concat([df, df_non_german])
+
+        metric_names, _ = get_metrics_info(df)
+
+        # Make Language Effect plot
+        _ = language_statistics(df_all, experiment_path, prompts)
+        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
 
 if __name__ == "__main__":
-    main()
+    # main()
+    make_report_plots()

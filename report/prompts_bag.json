@@ -18,6 +18,7 @@
     "16": "Imagine you are explaining the contents of the news article below to a friend who is not familiar with the subject. Your friend is interested in a short and consise summary but is lacking specialized knowledge. Write a summary that conveys the main ideas and relevant facts in an easy-to-understand manner.\n\n{article}",
     "17": "Stellen Sie sich vor, Sie erklären einem Freund, der mit dem Thema nicht vertraut ist, den Inhalt des unten stehenden Nachrichtenartikels. Ihr Freund ist an einer kurzen und prägnanten Zusammenfassung interessiert, verfügt aber nicht über das nötige Fachwissen. Schreiben Sie eine Zusammenfassung, die die wichtigsten Ideen und relevanten Fakten auf leicht verständliche Weise vermittelt.\n\n{article}",
     "18": "Summarize the main points of the following text maintaining the original tone.\n\n{article}",
-    "19": "Fassen Sie die wichtigsten Punkte des folgenden Textes zusammen und behalten Sie dabei den Originalton bei.\n\n{article}"
+    "19": "Fassen Sie die wichtigsten Punkte des folgenden Textes zusammen und behalten Sie dabei den Originalton bei.\n\n{article}",
+    "20": "Summarize this in German like I’m a 5 years old, in a few sentences.\n\n{article}",
   }
 }
