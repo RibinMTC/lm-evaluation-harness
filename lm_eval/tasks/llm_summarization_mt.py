@@ -199,6 +199,58 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
     # DATASET_PATH = "roysc/20minuten_sample_250"
 
 
+class SummLtM_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20minuten_sample_250"
+
+    def construct_requests(self, doc, ctx):
+        cont_request = rf.greedy_until(ctx, {"until": ["\n[TASK]", "\n[END]"]})
+        return cont_request
+
+    def process_results(self, doc, results):
+        """Take a single document and the LM results and evaluates, returning a
+        dict where keys are the names of submetrics and values are the values of
+        the metric for that one document
+
+        :param doc:
+            The document as returned from training_docs, validation_docs, or test_docs.
+        :param results:
+            The results of the requests created in construct_requests.
+        """
+        # TODO: Make this work for multiple results
+        # take the last result for score processing if there are multiple ones
+        if len(results) > 1:
+            results = [results[-1]]
+        assert len(results) == 1
+
+        prediction, reference = self.postprocess_text(results[0], doc["summary"])
+        article = doc["article"]
+        fragment = Fragments(article, prediction, language=self.LANGUAGE)
+
+        bertscore_result = _bertscore_metric(prediction, reference)
+
+        return {
+            "rouge1": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge1")),
+            "rouge2": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge2")),
+            "rougeL": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rougeL")),
+            "bertscore_precision": self.round_to_3_decimals(np.mean(bertscore_result["precision"])),
+            "bertscore_recall": self.round_to_3_decimals(np.mean(bertscore_result["recall"])),
+            "bertscore_f1": self.round_to_3_decimals(np.mean(bertscore_result["f1"])),
+            'coverage': self.round_to_3_decimals(fragment.coverage()),
+            'density': self.round_to_3_decimals(fragment.density()),
+            'compression': self.round_to_3_decimals(fragment.compression())
+        }
+
+
+class SummLtMDe_20Minuten(SummLtM_20Minuten):
+    VERSION = 0
+
+    def construct_requests(self, doc, ctx):
+        cont_request = rf.greedy_until(ctx, {"until": ["\n[AUFGABE]", "\n[ENDE]"]})
+        return cont_request
+
+
 class SummarizationTask_Klexikon(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/Klexikon_sample_250"

@@ -6,18 +6,24 @@ import subprocess
 import random, string
 
 # ["meta-llama/Llama-2-7b-chat-hf", ]
+# models = [
+#     "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
+#     "bigscience/bloomz-7b1-mt",
+#     "tiiuae/falcon-7b-instruct",
+# ]
+# indices = [1, 2, 3, 5, 20]
+# temperatures = ["_T01", "_T05", "_T10"]
+# temperatureValMap = {
+#     "_T01": 0.1,
+#     "_T05": 0.5,
+#     "_T10": 1.0,
+# }
+
 models = [
-    "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
-    "bigscience/bloomz-7b1-mt",
-    "tiiuae/falcon-7b-instruct",
+    "meta-llama/Llama-2-7b-chat-hf"
 ]
-indices = [1, 2, 3, 5, 20]
-temperatures = ["_T01", "_T05", "_T10"]
-temperatureValMap = {
-    "_T01": 0.1,
-    "_T05": 0.5,
-    "_T10": 1.0,
-}
+indices = [21]
+temperatures = [""]
 
 for model in models:
     for j in indices:
@@ -27,7 +33,11 @@ for model in models:
             # Definitions
             BASE_PROMPT_TEMPLATE = "configs/prompt_templates/summarization_base.json"
             DATASET_NAME = "20Minuten"
-            TASK_BASE_NAME = f"SummarizationTask_{DATASET_NAME}{temperature}_"
+            # TASK_BASE_NAME = f"SummarizationTask_{DATASET_NAME}{temperature}_"
+            TASK_BASE_NAME = f"SummLtM_20Minuten"
+
+            # SummLtM_20Minuten
+            # SummLtMDe_20Minuten
 
             # Make two lists: one for the task names, one for the prompt versions
             TASK_NAMES = []
@@ -38,11 +48,13 @@ for model in models:
 
             i = j
             # Append the task name and the prompt version to the lists
-            TASK_NAMES.append(f"{TASK_BASE_NAME}{i}")
+            # TASK_NAMES.append(f"{TASK_BASE_NAME}{i}")
+            TASK_NAMES.append(f"{TASK_BASE_NAME}")
             PROMPT_VERSIONS.append(str(i))
 
             # Generate the new prompt template file by copying the base template
-            new_prompt_template = f"../configs/prompt_templates/{TASK_BASE_NAME}{i}.json"
+            # new_prompt_template = f"../configs/prompt_templates/{TASK_BASE_NAME}{i}.json"
+            new_prompt_template = f"../configs/prompt_templates/{TASK_BASE_NAME}.json"
             shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", new_prompt_template)
 
             # print(TASK_NAMES)
@@ -63,8 +75,8 @@ for model in models:
                 # Update tasks and prompt_version_per_task values
                 y["tasks"] = new_config_task_names
                 y["prompt_version_per_task"] = new_config_prompt_versions
-                temperatureVal = temperatureValMap[temperature]
-                y["model_args"] = f"pretrained={model},trust_remote_code=True,use_accelerate=True,do_sample=True,temperature={temperatureVal}"
+                # temperatureVal = temperatureValMap[temperature]
+                y["model_args"] = f"pretrained={model},trust_remote_code=True,use_accelerate=True" # ,do_sample=True,temperature={temperatureVal}"
                 # Write the updated config to the new file
                 with open(f"../{new_config}", "w") as new_f:
                     yaml.dump(y, new_f, default_flow_style=False, sort_keys=False)
