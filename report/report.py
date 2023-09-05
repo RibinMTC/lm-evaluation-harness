@@ -578,7 +578,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         df_prompt = df[df["promptVersion"] == promptVersion]
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each model
-            violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name, order=promptVersions)
+            violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
             # save
             violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
             plt.savefig(violin_plot_path)
@@ -671,8 +671,8 @@ def make_report_plots():
         metric_names, _ = get_metrics_info(df)
 
         # Make Language Effect plot
-        _ = language_statistics(df_all, experiment_path, prompts)
         _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
+        _ = language_statistics(df_all, experiment_path, prompts)
 
 if __name__ == "__main__":
     # main()

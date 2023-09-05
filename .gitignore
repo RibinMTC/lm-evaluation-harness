@@ -13,5 +13,7 @@ lm_cache
 /euler_outputs/
 /report/reports/
 /configs/prompt_templates/SummarizationTask_20Minuten_*.json
+/configs/eval_config_*.yaml
 report/.DS_Store
 .DS_Store
+euler_scripts/tmp_euler_config.json

@@ -4,11 +4,11 @@
     "code_path": "/cluster/home/roysc/roysc/lm-evaluation-harness",
     "log_file_path": "/cluster/home/roysc/roysc/lm-evaluation-harness/euler_outputs/",
     "num_cpus": 4,
-    "run_duration_hours": "04:00",
+    "run_duration_hours": "08:00",
     "shareholder_group": "es_icp",
     "memory_per_cpu_gb": 8,
     "gpu": "a100-pcie-40gb",
     "num_gpus": 1,
-    "config_file": "configs/eval_config_whrbbqihob.yaml",
+    "config_file": "configs/eval_config_rflrmtowrj.yaml",
     "main_command": "python3 main.py --config "
 }
