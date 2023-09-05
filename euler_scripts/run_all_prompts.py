@@ -3,95 +3,181 @@ import shutil
 import yaml
 import json
 import subprocess
+import pprint
+import itertools
 import random, string
 
-# ["meta-llama/Llama-2-7b-chat-hf", ]
-# models = [
-#     "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
-#     "bigscience/bloomz-7b1-mt",
-#     "tiiuae/falcon-7b-instruct",
-# ]
-# indices = [1, 2, 3, 5, 20]
-# temperatures = ["_T01", "_T05", "_T10"]
-# temperatureValMap = {
-#     "_T01": 0.1,
-#     "_T05": 0.5,
-#     "_T10": 1.0,
-# }
-
+"""
+    Experiment Combination Parameters
+"""
 models = [
-    "meta-llama/Llama-2-7b-chat-hf"
+    "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
 ]
-indices = [21]
-temperatures = [""]
+temperature_values = [0, 0.1, 0.5, 1.0]
+precision_values = ["", ",load_in_8bit=True"]
+dataset_names = ["20Minuten"]
+prompt_versions = [1, 2, 3]
+task_base_names = ["SummLtM_", "SummLtMDe_"]
 
-for model in models:
-    for j in indices:
-        for temperature in temperatures:
-            print(f"Scheduling {model} with prompt index {j}...\n")
+"""
+    Definitions
+"""
+inferable_args = {
+    "model": {
+        "default": "hf-causal-experimental",
+        "meta-llama/Llama-2-7b-chat-hf": "hf-causal-experimental",
+        "meta-llama/Llama-2-13b-chat-hf": "hf-causal-experimental",
+        "meta-llama/Llama-2-70b-chat-hf": "hf-causal-experimental",
+        "bigscience/bloomz-7b1-mt": "hf-causal-experimental",
+        "tiiuae/falcon-7b-instruct": "hf-causal-experimental",
+    },
+    "task_temp_suffix": {
+        "default": "",
+        0: "",
+        0.1: "_T01",
+        0.5: "_T05",
+        1.0: "_T10",
+    },
+    "run_duration_hours": {
+        "default": "04:00",
+        "meta-llama/Llama-2-7b-chat-hf": "02:00",
+        "meta-llama/Llama-2-13b-chat-hf": "02:00",
+        "meta-llama/Llama-2-70b-chat-hf": "04:00",
+        "bigscience/bloomz-7b1-mt": "04:00",
+        "tiiuae/falcon-7b-instruct": "04:00",
+    },
+    "gpu": {
+        "default": "rtx_3090",
+        "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
+        "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
+        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
+        "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
+        "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
+        "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
+    },
+    "num_gpus": {
+        "default": 1,
+        "meta-llama/Llama-2-7b-chat-hf": 1,
+        "meta-llama/Llama-2-13b-chat-hf": 1,
+        "meta-llama/Llama-2-70b-chat-hf": 1,
+        "bigscience/bloomz-7b1-mt": 1,
+        "tiiuae/falcon-7b-instruct": 1,
+        "tiiuae/falcon-40b-instruct": 2,
+    }
+}
+BASE_PROMPT_TEMPLATE = "configs/prompt_templates/summarization_base.json"
+TMP_PROMPT_TEMPLATE = "configs/prompt_templates/{name}.json"
+BASE_CONFIG = "configs/eval_config.yaml"
+NEW_CONFIG_PATTERN = "configs/eval_config_{random_string}.yaml"
+BASE_EULER_CONFIG = "lm_eval_euler_config.json"
+TMP_EULER_CONFIG = "tmp_euler_config.json"
 
-            # Definitions
-            BASE_PROMPT_TEMPLATE = "configs/prompt_templates/summarization_base.json"
-            DATASET_NAME = "20Minuten"
-            # TASK_BASE_NAME = f"SummarizationTask_{DATASET_NAME}{temperature}_"
-            TASK_BASE_NAME = f"SummLtM_20Minuten"
+task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}"
+model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}"
 
-            # SummLtM_20Minuten
-            # SummLtMDe_20Minuten
+"""
+    Build the configurations
+"""
+# Create a list of all possible combinations of the parameters
+combinations = list(itertools.product(models, temperature_values, precision_values, dataset_names, prompt_versions, task_base_names))
+config_list = []
 
-            # Make two lists: one for the task names, one for the prompt versions
-            TASK_NAMES = []
-            PROMPT_VERSIONS = []
+# Iterate over each combination and create a config dictionary
+for combination in combinations:
+    model, tempVal, precision, dataset, promptVersion, taskBaseName = combination
 
-            # Loop through indices 1 to 9
-            # for i in [1,2]:  # range(1, 10): # 1,10
+    # prepare the values
+    task_temp_suffix = inferable_args["task_temp_suffix"][tempVal] if tempVal in inferable_args["task_temp_suffix"] else inferable_args["task_temp_suffix"]["default"]
+    if tempVal == 0:
+        temp_suffix_model_args = ""
+    else:
+        temp_suffix_model_args = f",do_sample=True,temperature={tempVal}"
 
-            i = j
-            # Append the task name and the prompt version to the lists
-            # TASK_NAMES.append(f"{TASK_BASE_NAME}{i}")
-            TASK_NAMES.append(f"{TASK_BASE_NAME}")
-            PROMPT_VERSIONS.append(str(i))
+    # Build the arguments (eval_config)
+    model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
+    model_args = model_args_schema.format(model=model_config, temperature_suffix=temp_suffix_model_args)
+    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}")
+    # Build the arguments (euler_config)
+    run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
+    gpu = inferable_args["gpu"][model] if model in inferable_args["gpu"] else inferable_args["gpu"]["default"]
+    num_gpus = inferable_args["num_gpus"][model] if model in inferable_args["num_gpus"] else inferable_args["num_gpus"]["default"]
 
-            # Generate the new prompt template file by copying the base template
-            # new_prompt_template = f"../configs/prompt_templates/{TASK_BASE_NAME}{i}.json"
-            new_prompt_template = f"../configs/prompt_templates/{TASK_BASE_NAME}.json"
-            shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", new_prompt_template)
+    # Create the config dictionary for this combination
+    config = {
+        "model": model_config,
+        "model_args": model_args,
+        "tasks": task_name,
+        "prompt_version_per_task": f"{promptVersion}",
+        "run_duration_hours": run_duration_hours,
+        "gpu": gpu,
+        "num_gpus": num_gpus,
+    }
 
-            # print(TASK_NAMES)
-            # print(PROMPT_VERSIONS)
+    # Append the config dictionary to the list
+    config_list.append(config)
 
-            # generate a random 6 character long string
-            random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+# Print configuration combinations
+for config in config_list:
+    pprint.pprint(config)
 
-            # Create the new config file
-            old_config = "configs/eval_config.yaml"
-            new_config = f"configs/eval_config_{random_string}.yaml"
-            # Concatenate the two lists into a comma-separated string
-            new_config_task_names = ",".join(TASK_NAMES)
-            new_config_prompt_versions = ",".join(PROMPT_VERSIONS)
-            # Load the old config
-            with open(f"../{old_config}") as f:
-                y = yaml.safe_load(f)
-                # Update tasks and prompt_version_per_task values
-                y["tasks"] = new_config_task_names
-                y["prompt_version_per_task"] = new_config_prompt_versions
-                # temperatureVal = temperatureValMap[temperature]
-                y["model_args"] = f"pretrained={model},trust_remote_code=True,use_accelerate=True" # ,do_sample=True,temperature={temperatureVal}"
-                # Write the updated config to the new file
-                with open(f"../{new_config}", "w") as new_f:
-                    yaml.dump(y, new_f, default_flow_style=False, sort_keys=False)
+# Ask the user if they want to continue
+user_input = input(f"\n{len(config_list)} configurations are built. Do you want to continue? (Yes/No): ")
 
-            # Create the temporary lm-evaluation-config file using pyjq
-            with open("lm_eval_euler_config.json") as f:
-                old_config_data = json.load(f)
-                old_config_data["config_file"] = new_config
+while user_input.lower() not in ["yes", "y", "no", "n"]:
+    user_input = input("Please enter a valid input (Yes/No): ")
 
-            with open("tmp_euler_config.json", "w") as new_f:
-                json.dump(old_config_data, new_f, indent=4)
+if user_input.lower() in ["yes", "y"]:
+    print("Execution continues.")
+else:
+    print("Execution stopped.")
+    exit(0)
 
-            # Run the command with the updated config
-            os.system("bash run_euler.sh tmp_euler_config.json")
+"""
+    Schedule the tasks
+"""
+for config in config_list:
+    print(f"Scheduling\n")
+    pprint.pprint(config)
 
-            # Remove the temporary config files
-            os.remove("tmp_euler_config.json")
-            # os.remove(f"../{new_config}")
+    new_prompt_template = TMP_PROMPT_TEMPLATE.format(name=f"{config['tasks']}.json")
+    shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", f"../{new_prompt_template}")
+
+    """
+    Load the old eval_config and update the values, and write it to the new temporary file
+    """
+    # generate a random 10 character long string for the config file name
+    random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    new_config = NEW_CONFIG_PATTERN.format(random_string=random_string)
+
+    with open(f"../{BASE_CONFIG}") as f:
+        y = yaml.safe_load(f)
+    y["model"] = config["model"]
+    y["model_args"] = config["model_args"]
+    y["tasks"] = config["tasks"]
+    y["prompt_version_per_task"] = config["prompt_version_per_task"]
+
+    with open(f"../{new_config}", "w") as new_f:
+        yaml.dump(y, new_f, default_flow_style=False, sort_keys=False)
+
+    """
+    Generate the temporary euler-config-file
+    """
+    with open(BASE_EULER_CONFIG) as f:
+        old_config_data = json.load(f)
+    old_config_data["run_duration_hours"] = config["run_duration_hours"]
+    old_config_data["gpu"] = config["gpu"]
+    old_config_data["num_gpus"] = config["num_gpus"]
+    old_config_data["config_file"] = new_config
+
+    with open(TMP_EULER_CONFIG, "w") as new_f:
+        json.dump(old_config_data, new_f, indent=4)
+
+    """
+    Schedule the experiment
+    """
+    # Run the command with the updated config
+    os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
+
+    # Remove the temporary config files
+    os.remove(f"tmp_euler_config.json")
+    # os.remove(f"../{new_config}")

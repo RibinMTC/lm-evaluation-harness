@@ -247,7 +247,7 @@ class SummLtMDe_20Minuten(SummLtM_20Minuten):
     VERSION = 0
 
     def construct_requests(self, doc, ctx):
-        cont_request = rf.greedy_until(ctx, {"until": ["\n[AUFGABE]", "\n[ENDE]"]})
+        cont_request = rf.greedy_until(ctx, {"until": ["\n"]})
         return cont_request
 
 
