@@ -111,11 +111,12 @@ for combination in combinations:
     else:
         temp_suffix_model_args = f",do_sample=True,temperature={tempVal}"
     precision_suffix = inferable_args["precision"][precision] if precision in inferable_args["precision"] else inferable_args["precision"]["default"]
+    precision_task_suffix = "" if precision == "" else f"_{precision}"
 
     # Build the arguments (eval_config)
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
     model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
-    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}", precision=f"{precision}")
+    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}", precision=f"{precision_task_suffix}")
     # Build the arguments (euler_config)
     run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
     gpu = inferable_args["gpu"][model] if model in inferable_args["gpu"] else inferable_args["gpu"]["default"]
