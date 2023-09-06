@@ -183,7 +183,7 @@ for config in config_list:
     Schedule the experiment
     """
     # Run the command with the updated config
-    # os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
+    os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
 
     # Remove the temporary config files
     os.remove(f"tmp_euler_config.json")
