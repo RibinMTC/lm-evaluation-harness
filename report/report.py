@@ -11,6 +11,7 @@ import seaborn as sns
 import pathlib
 import jinja2
 from typing import List, Dict, Union, Callable, Tuple
+import fasttext
 import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
@@ -49,7 +50,7 @@ def extract_dataset_and_task_name(filename):
 # Function to load results from JSON files to a dataframe
 def load_results(model_name):
     model_name = rename_hf_model(model_name)
-    results_path = f"../results/{model_name}"
+    results_path = f"../{RESULTS_PATH}/{model_name}"
     result_files = [f for f in os.listdir(results_path) if f.endswith(".json")]
 
     # Load the results from all JSON files and extend their fields as needed
@@ -78,6 +79,9 @@ def load_all_results(model_names, shortNames):
         df = load_results(model_name)
         dfs.append(df)
 
+    # prepare shotNames map -> replace / with -
+    shortNames = {rename_hf_model(model_name): shortNames[model_name] for model_name in shortNames}
+
     df = pd.concat(dfs)
     df.rename(columns={"model": "model-fullname"}, inplace=True)
     df["model"] = df["model-fullname"].map(shortNames)
@@ -99,37 +103,45 @@ def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_
 
     experiment_path = os.path.join("reports", experiment_name)
 
-    templateLoader = jinja2.FileSystemLoader(searchpath="./templates")
-    templateEnv = jinja2.Environment(loader=templateLoader)
-    TEMPLATE_FILE = "report_template.html"
-    template = templateEnv.get_template(TEMPLATE_FILE)
-    outputText = template.render()
+    # templateLoader = jinja2.FileSystemLoader(searchpath="./templates")
+    # templateEnv = jinja2.Environment(loader=templateLoader)
+    # TEMPLATE_FILE = "report_template.html"
+    # template = templateEnv.get_template(TEMPLATE_FILE)
+    # outputText = template.render()
     # {% include ['my_template.html', 'another_template.html'] %}
 
     # prepare the subfolder for the given report to save the plots and the overview report to
     report_folder = "reports"
     pathlib.Path(os.path.join(report_folder, experiment_name)).mkdir(parents=True, exist_ok=True)
 
+    # Calculate the languages
+    if not skip_lang:
+        df = lang_detect(df, "logit_0")
+    # before filtering out any rows -> save
+    df.to_csv(os.path.join(experiment_path, "df_all.csv"), index=False)
+
     # create the statistics for the empty predictions
     # ... calculate the success rate per prompt
     # ... calculate the top 5 documents with the worst success rate
     df_empty_stat, df_num_empty_docs, df_num_empty_prompts, worst_empty_docs, worst_empty_promptVersions = empty_statistics(df, groupbyList=groupByList)
     # Filter out the empty predictions
+    df_empty = df[df["logit_0"] == ""]
     df = df[df["logit_0"] != ""]
 
     # Calculate the language of the predicted text using spacy language detection
     # ... create a new column in the dataframe containing the predicted language
     # ... make a plot showing the distribution of the predicted languages per model and prompt
     if not skip_lang:
-        df = lang_detect(df, "logit_0")
-        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, experiment_path, prompts, groupbyList=groupByList)
+        df_lang_stat, df_prompt_lang_effect = language_statistics(df, experiment_path, prompts, groupbyList=groupByList)
         # Filter out the non-german predictions
+        df_non_german = df[df["lang"] != "de"]
         df = df[df["lang"] == "de"]
 
     # Save all stuff
     print("Saving results...")
 
-    df.to_csv(os.path.join(experiment_path, "df_all.csv"), index=False)
+    df.to_csv(os.path.join(experiment_path, "df_filtered.csv"), index=False)
+    df_empty.to_csv(os.path.join(experiment_path, "df_empty.csv"), index=False)
     df_empty_stat.to_csv(os.path.join(experiment_path, "df_empty_stat.csv"), index=False)
     df_num_empty_docs.to_csv(os.path.join(experiment_path, "df_num_empty_docs.csv"), index=False)
     df_num_empty_prompts.to_csv(os.path.join(experiment_path, "df_num_empty_prompts.csv"), index=False)
@@ -169,6 +181,48 @@ def empty_statistics(df, groupbyList=["model", "promptVersion"], text_col="logit
     return df_empty_stat, df_num_empty_docs, df_num_empty_prompts, worst_empty_docs, worst_empty_promptVersions
 
 
+def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "promptVersion"], x_group="temperature", text_col="logit_0", langCol="lang", docCol="doc_id", promptCol="promptVersion"):
+    assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
+    assert x_group not in groupbyList, "x_group must not be in groupbyList"
+
+    # map all float nan values in logit_0 to empty strings
+    df_all[text_col] = df_all[text_col].apply(lambda x: "" if isinstance(x, float) and math.isnan(x) else x)
+
+    def get_failure(row):
+        if row[text_col] == "":
+            return "empty"
+        elif row[langCol] != "de":
+            return "non-german"
+        else:
+            return "ok"
+
+    # Calculate the failures
+    df_failures = df_all.copy()
+    df_failures["failure"] = df_failures.apply(lambda x: get_failure(x), axis=1)
+    df_failures['failure'] = df_failures['failure'].astype('category')
+
+    # Aggregate the success rates per model and prompt (by category)
+    df_failure_stat = df_failures.groupby(groupbyList + ["failure", x_group]).agg({"logit_0": "count"}).reset_index()
+    df_failure_stat = df_failure_stat.rename(columns={"logit_0": "count"})
+    df_failure_stat = df_failure_stat.reset_index(drop=True)
+
+    # Make a facet-grid plot
+    # make 1 plot per x_group value
+    for x_group_val in df_failure_stat[x_group].unique():
+        df_failure_stat_x_group = df_failure_stat[df_failure_stat[x_group] == x_group_val]
+        failure_plot = sns.FacetGrid(df_failure_stat_x_group, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+        failure_plot.map(sns.barplot, 'failure', 'count')
+        failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.png")
+        plt.savefig(failure_plot_path)
+        plt.close()
+
+    failure_plot = sns.FacetGrid(df_failure_stat, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+    failure_plot.map(sns.barplot, 'failure', 'count')
+    failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.png")
+    plt.savefig(failure_plot_path)
+    plt.close()
+
+
 def get_lang_detector(nlp, name):
     return LanguageDetector()
 
@@ -196,17 +250,43 @@ def get_lang_from_detector(lang_detector, text, threshold, empty_val) -> str:
         return lang
 
 
-def lang_detect(df, col_name):
-    print("Detecting Languages...")
-    lang_detector = get_de_lang_detector()
-    threshold = 0.5
-    empty_val = "other"
+def lang_detect(df, col_name, fast=True):
+    """
+    Detect the language of the text in the given column of the dataframe and add a new column containing the language
+    :param df: dataframe containing the text to be analyzed
+    :param col_name: name of the column containing the text to be analyzed
+    :param fast: if True, use fasttext language detection, otherwise use spacy language detection
+    """
+    print(f"Detecting Languages... [{'fasttext' if fast else 'spacy'}]")
 
-    tqdm.pandas()
+    if fast:
+        # Use Fasttext Language Detection
+        pretrained_model_path = './resources/lid.176.bin'
+        fast_lang_detector = fasttext.load_model(pretrained_model_path)
 
-    # generate dataframe column by df.apply
-    df["lang"] = df[col_name].progress_apply(lambda x: get_lang_from_detector(lang_detector, x, threshold, empty_val))
-    return df
+        # Predict
+        predictions = fast_lang_detector.predict(df[col_name].tolist())
+        post_preds = [(t[0][0].replace('__label__', ''), t[1][0]) for t in zip(predictions[0], predictions[1])]
+
+        # Postprocess
+        threshold = 0.5
+        empty_val = "other"
+        # compute the predicted language and assign it to the dataframe
+        df["lang"] = [lang if score >= threshold else empty_val for lang, score in post_preds]
+        df["lang_score"] = [score for lang, score in post_preds]
+        return df
+
+    else:
+        # Use Spacy Language Detection
+        lang_detector = get_de_lang_detector()
+        threshold = 0.5
+        empty_val = "other"
+
+        tqdm.pandas()
+
+        # generate dataframe column by df.apply
+        df["lang"] = df[col_name].progress_apply(lambda x: get_lang_from_detector(lang_detector, x, threshold, empty_val))
+        return df
 
 
 def language_statistics(df, experiment_path, prompts, groupbyList=["model", "promptVersion"], promptVersionCol="promptVersion", modelCol="model"):
@@ -273,10 +353,7 @@ def language_statistics(df, experiment_path, prompts, groupbyList=["model", "pro
     plt.savefig(token_distr_plot_path)
     plt.close()
 
-    # extract all non-german predictions
-    df_non_german = df[df["lang"] != "de"]
-
-    return df_lang_stat, df_prompt_lang_effect, df_non_german
+    return df_lang_stat, df_prompt_lang_effect
 
 
 WORD = re.compile('r\w+')
@@ -607,7 +684,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         metric_names: List of metric names
         metric_ordering: Dictionary mapping each metric name a boolean indicating whether a larger metric value is better or not
     """
-    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'temperature']
+    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score', 'temperature']
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
         "rouge1": True,
@@ -624,19 +701,62 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     return metric_names, {metric_name: metric_ordering_all[metric_name] for metric_name in metric_names}
 
 
-experiment_name = "base-experiment-temperature"
-groupByList = ["promptVersion", "temperature"]
-models = ["meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf"]  # , "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"]  # List of LLM models
-# "bigscience/bloomz-7b1-mt", "tiiuae/falcon-7b-instruct", "google/flan-t5-xl" "meta-llama/Llama-2-7b-chat-hf"
-datasets = ["20Minuten"]
+"""
+    SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
+"""
+# TODO
+experiment_name = "base-experiment"
 
-# NOTE: left-hand-name must replace '/' with '-' to be a valid filename
+"""
+    ADD NEW EXPERIMENTS HERE
+"""
+experiment_config = {
+    "base-experiment": {
+        "groupByList": ["promptVersion", "model"],
+        "models": ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"],
+        "datasets": ["20Minuten"]
+    },
+    "base-experiment-temperature": {
+        "groupByList": ["promptVersion", "temperature"],
+        "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-13b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            "tiiuae/falcon-7b-instruct",
+            "tiiuae/falcon-40b-instruct",
+            "bigscience/bloomz-7b1-mt"
+        ],
+        "datasets": ["20Minuten"]
+    },
+    "experiment-sizes": {
+        "groupByList": ["promptVersion", "model"],
+        "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-13b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "datasets": ["20Minuten"]
+    },
+    "tmp": {}
+}
+
+RESULTS_BASE_PATH = 'results_bag'
+
+groupByList = experiment_config[experiment_name]["groupByList"]
+models = experiment_config[experiment_name]["models"]
+datasets = experiment_config[experiment_name]["datasets"]
+RESULTS_PATH = os.path.join(RESULTS_BASE_PATH, experiment_name)
 shortNames = {
-    "meta-llama-Llama-2-7b-chat-hf": "Llama-2 7b",
+    "meta-llama/Llama-2-7b-chat-hf": "Llama-2  7b",
     "meta-llama/Llama-2-13b-chat-hf": "Llama-2 13b",
     "meta-llama/Llama-2-70b-chat-hf": "Llama-2 70b",
-    "tiiuae-falcon-7b-instruct": "Falcon 7b",
-    "bigscience-bloomz-7b1-mt": "BloomZ 7b",
+    "tiiuae/falcon-7b-instruct": "Falcon  7b",
+    "tiiuae/falcon-40b-instruct": "Falcon 40b",
+    "bigscience/bloomz-7b1-mt": "BloomZ  7b",
+    "fangloveskari/ORCA_LLaMA_70B_QLoRA": "OrcaLlama2 70B",
+    "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
 }
 
 
@@ -646,8 +766,7 @@ def main():
     df = load_all_results(models, shortNames)
 
     # TODO: Adapt here
-    # Filter to only consider prompts 1,2,3
-    df = df[df["promptVersion"].isin(["1", "2", "3", "5", "20"])]
+    # df = df[df["promptVersion"].isin(["1", "2", "3", "5", "20"])]
 
     # Save DataFrame as CSV
     save_dataframe(df, experiment_name)
@@ -673,7 +792,6 @@ def main():
 
 
 def make_report_plots():
-
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
     with open(prompts_bag_path, "r") as f:
@@ -684,12 +802,19 @@ def make_report_plots():
         experiment_path = os.path.join("reports", f"{experiment_name}-{dataset}")
 
         # Load all prepared data
-        df = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
+        df = pd.read_csv(os.path.join(experiment_path, "df_filtered.csv"))
+        df_all = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
         df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
+        df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
 
-        df_all = pd.concat([df, df_non_german])
+        df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
+
+        # Make plots showing the failure rate
+        failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'model'], x_group="temperature")
+        failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'temperature'], x_group="model")
+        failure_statistics_plot(df_all, experiment_path, groupbyList=['temperature', 'model'], x_group="promptVersion")
 
         # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
         # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
@@ -699,7 +824,7 @@ def make_report_plots():
         tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
 
         # re-do language statistics plots
-        _ = language_statistics(df_all, experiment_path, prompts)
+        _ = language_statistics(df_all_langs, experiment_path, prompts)
 
         # create the statistics for the token lengths and number of sentences
         df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=groupByList, approximation=True)

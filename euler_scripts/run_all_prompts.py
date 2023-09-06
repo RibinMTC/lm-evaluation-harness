@@ -11,11 +11,14 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    # garage-bAInd/Platypus2-70B-instruct
-    "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-7b-chat-hf",
+    "meta-llama/Llama-2-13b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
+    "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+    "garage-bAInd/Platypus2-70B-instruct",
 ]
-temperature_values = [0] # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", ",load_in_8bit=True"]
+temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
+precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20Minuten"]
 prompt_versions = [1, 2, 3, 5, 20]
 task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_"]
@@ -32,6 +35,8 @@ inferable_args = {
         "bigscience/bloomz-7b1-mt": "hf-causal-experimental",
         "tiiuae/falcon-7b-instruct": "hf-causal-experimental",
         "tiiuae/falcon-40b-instruct": "hf-causal-experimental",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "hf-causal-experimental",
+        "garage-bAInd/Platypus2-70B-instruct": "hf-causal-experimental",
     },
     "task_temp_suffix": {
         "default": "",
@@ -42,18 +47,22 @@ inferable_args = {
     },
     "run_duration_hours": {
         "default": "04:00",
-        "meta-llama/Llama-2-7b-chat-hf": "02:00",
-        "meta-llama/Llama-2-13b-chat-hf": "02:00",
-        "meta-llama/Llama-2-70b-chat-hf": "04:00",
-        "bigscience/bloomz-7b1-mt": "04:00",
-        "tiiuae/falcon-7b-instruct": "04:00",
-        "tiiuae/falcon-40b-instruct": "08:00",
+        "meta-llama/Llama-2-7b-chat-hf": "12:00",
+        "meta-llama/Llama-2-13b-chat-hf": "18:00",
+        "meta-llama/Llama-2-70b-chat-hf": "18:00",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "18:00",
+        "garage-bAInd/Platypus2-70B-instruct": "18:00",
+        "bigscience/bloomz-7b1-mt": "08:00",
+        "tiiuae/falcon-7b-instruct": "08:00",
+        "tiiuae/falcon-40b-instruct": "18:00",
     },
     "gpu": {
         "default": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
+        "meta-llama/Llama-2-13b-chat-hf": "a100-pcie-40gb",
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
+        "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
         "tiiuae/falcon-40b-instruct": "a100_80gb",
@@ -63,9 +72,15 @@ inferable_args = {
         "meta-llama/Llama-2-7b-chat-hf": 1,
         "meta-llama/Llama-2-13b-chat-hf": 1,
         "meta-llama/Llama-2-70b-chat-hf": 1,
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 1,
+        "garage-bAInd/Platypus2-70B-instruct": 1,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 2,
+    },
+    "precision": {
+        "default": "",
+        "8b": ",load_in_8bit=True",
     }
 }
 BASE_PROMPT_TEMPLATE = "configs/prompt_templates/summarization_base.json"
@@ -75,8 +90,8 @@ NEW_CONFIG_PATTERN = "configs/eval_config_{random_string}.yaml"
 BASE_EULER_CONFIG = "lm_eval_euler_config.json"
 TMP_EULER_CONFIG = "tmp_euler_config.json"
 
-task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}"
-model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}"
+task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
+model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 
 """
     Build the configurations
@@ -95,11 +110,12 @@ for combination in combinations:
         temp_suffix_model_args = ""
     else:
         temp_suffix_model_args = f",do_sample=True,temperature={tempVal}"
+    precision_suffix = inferable_args["precision"][precision] if precision in inferable_args["precision"] else inferable_args["precision"]["default"]
 
     # Build the arguments (eval_config)
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
-    model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args)
-    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}")
+    model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
+    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}", precision=f"{precision}")
     # Build the arguments (euler_config)
     run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
     gpu = inferable_args["gpu"][model] if model in inferable_args["gpu"] else inferable_args["gpu"]["default"]

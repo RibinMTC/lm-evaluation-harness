@@ -19,3 +19,4 @@ lm_cache
 report/.DS_Store
 .DS_Store
 euler_scripts/tmp_euler_config.json
+/report/resources/lid.176.bin
