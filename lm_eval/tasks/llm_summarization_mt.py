@@ -42,6 +42,11 @@ def _bertscore_metric(predictions, references, key=None):
         return result
     return result[key]
 
+# TODO: Include BartScore???
+# from transformers import MBartForConditionalGeneration, MBart50Tokenizer
+# self.tokenizer = MBart50Tokenizer.from_pretrained("facebook/mbart-large-50", src_lang=YOUR_SRC_LANG, tgt_lang=YOUR_TGT_LANG)
+# self.model = MBartForConditionalGeneration.from_pretrained("facebook/mbart-large-50")
+
 
 class SummarizationTaskBase(Task):
     VERSION = 0

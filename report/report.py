@@ -2,6 +2,8 @@ import re
 from tqdm import tqdm
 import json
 import os
+import math
+from scipy.stats import bootstrap
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +30,20 @@ def extract_dataset_and_task_name(filename):
     # Extract the prompt version and the task name
     prompt_version = split_filename[2]
     dataset_name = split_filename[1]
-    return dataset_name, prompt_version
+
+    # find an element of the form 'T[0-9]*' in the split_filename
+    # if there is no such element, the temperature is 0.0
+    temperature = 0.0
+    foundTmp = False
+    for element in split_filename:
+        if element.startswith("T") and len(element) >= 3:
+            temperature = float(element[1:]) / 10
+            foundTmp = True
+    # if found temperature -> prompt-version is the element after the temperature
+    if foundTmp:
+        prompt_version = split_filename[3]
+
+    return dataset_name, prompt_version, temperature
 
 
 # Function to load results from JSON files to a dataframe
@@ -43,11 +58,12 @@ def load_results(model_name):
         with open(os.path.join(results_path, file), "r") as f:
             result = json.load(f)
 
-            dataset, promptVersion = extract_dataset_and_task_name(file)
+            dataset, promptVersion, temperature = extract_dataset_and_task_name(file)
             for entry in result:
                 entry["dataset"] = dataset
                 entry["promptVersion"] = promptVersion
                 entry["model"] = model_name
+                entry['temperature'] = temperature
 
             all_results.extend(result)
 
@@ -77,8 +93,9 @@ def save_dataframe(df, experiment_name):
 
 
 # Function to make plots and create an overview report
-def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
+def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_lang=True):
     sns.set_theme(style="darkgrid")
+    # groupByList = ["model", "promptVersion"]
 
     experiment_path = os.path.join("reports", experiment_name)
 
@@ -96,7 +113,7 @@ def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
     # create the statistics for the empty predictions
     # ... calculate the success rate per prompt
     # ... calculate the top 5 documents with the worst success rate
-    df_empty_stat, df_num_empty_docs, df_num_empty_prompts, worst_empty_docs, worst_empty_promptVersions = empty_statistics(df, groupbyList=["model", "promptVersion"])
+    df_empty_stat, df_num_empty_docs, df_num_empty_prompts, worst_empty_docs, worst_empty_promptVersions = empty_statistics(df, groupbyList=groupByList)
     # Filter out the empty predictions
     df = df[df["logit_0"] != ""]
 
@@ -105,28 +122,9 @@ def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
     # ... make a plot showing the distribution of the predicted languages per model and prompt
     if not skip_lang:
         df = lang_detect(df, "logit_0")
-        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, experiment_path, prompts, groupbyList=["model", "promptVersion"])
+        df_lang_stat, df_prompt_lang_effect, df_non_german = language_statistics(df, experiment_path, prompts, groupbyList=groupByList)
         # Filter out the non-german predictions
         df = df[df["lang"] == "de"]
-
-    # create the statistics for the token lengths and number of sentences
-    df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=["model", "promptVersion"], approximation=True)
-
-    # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
-    # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
-    # ... showing 1 table for (model, prompt)
-    # ... showing 1 table for (model) -> comparing prompts
-    # ... showing 1 table for (prompt) -> comparing models
-    tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"])
-
-    # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
-    # ... and 2 documents with the median performance
-    inspect_examples = find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion"])
-
-    # make violin (distribution) plot showing distribution of metric values per model and prompt
-    # ... group by model (comparing prompts)
-    # ... group by prompt (comparing models)
-    violin_figure_paths = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
 
     # Save all stuff
     print("Saving results...")
@@ -142,17 +140,6 @@ def create_report(df, experiment_name, metric_names, prompts, skip_lang=True):
         df_lang_stat.to_csv(os.path.join(experiment_path, "df_lang_stat.csv"), index=False)
         df_prompt_lang_effect.to_csv(os.path.join(experiment_path, "df_prompt_lang_effect.csv"), index=False)
         df_non_german.to_csv(os.path.join(experiment_path, "df_non_german.csv"), index=False)
-
-    df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
-
-    for table in tables_overview:
-        table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
-    for table in tables_detail:
-        table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
-
-    # save inspect examples in JSON
-    with open(os.path.join(experiment_path, "inspect_examples.json"), "w") as f:
-        json.dump(inspect_examples, f)
 
 
 def empty_statistics(df, groupbyList=["model", "promptVersion"], text_col="logit_0", topN=5, docCol="doc_id", promptCol="promptVersion") -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -215,8 +202,10 @@ def lang_detect(df, col_name):
     threshold = 0.5
     empty_val = "other"
 
+    tqdm.pandas()
+
     # generate dataframe column by df.apply
-    df["lang"] = df[col_name].apply(lambda x: get_lang_from_detector(lang_detector, x, threshold, empty_val))
+    df["lang"] = df[col_name].progress_apply(lambda x: get_lang_from_detector(lang_detector, x, threshold, empty_val))
     return df
 
 
@@ -237,7 +226,7 @@ def language_statistics(df, experiment_path, prompts, groupbyList=["model", "pro
     # calculate the effect of the prompt being in the target language (german) on the target language being the same (german)
     df_prompt_langs = df.copy()
     df_prompt_langs['prompt_lang'] = df_prompt_langs.apply(lambda row: prompt_langs[f"{row[promptVersionCol]}"], axis=1)
-    groupbyListLangEffect = [col for col in groupbyList if col != promptVersionCol]  # exclude promptVersion from groupbyList
+    groupbyListLangEffect = list(set([col for col in groupbyList if col != promptVersionCol] + [modelCol]))  # exclude promptVersion from groupbyList
     df_prompt_lang_effect = df_prompt_langs.groupby(groupbyListLangEffect + ["prompt_lang", "lang"]).agg({"logit_0": "count"}).reset_index()
 
     # Make a language effect plot, showing the effect of the prompt language on the predicted language (for each model)
@@ -404,7 +393,6 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     plt.savefig(token_distr_plot_path)
     plt.close()
 
-
     # make a subplot grid with one plot for each dimension in the group-by list
     sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     # plot the distribution of the number of sentences in each group
@@ -428,11 +416,24 @@ def percentile_agg(percentile):
     return lambda x: np.percentile(x, percentile)
 
 
+def bootstrap_CI(statistic, confidence_level=0.95, num_samples=10000):
+    def CI(x):
+        if len(x) <= 2:
+            return math.nan, math.nan
+        data = (np.array(x),)  # convert to sequence
+        confidence_interval = bootstrap(data, statistic, n_resamples=num_samples, confidence_level=confidence_level, method='basic', vectorized=True).confidence_interval
+        return confidence_interval.low, confidence_interval.high
+
+    return CI
+
+
 def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]):
+    confidence_level = 0.95
+
     print("Calculating statistics overview tables...")
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
-    agg_funcs = ["median", "std", "min", "max", percentile_agg(5), percentile_agg(95)]
-    agg_names = ["median", "std", "min", "max", "5th percentile", "95th percentile"]
+    agg_funcs = ["median", "std", "min", "max", percentile_agg(5), percentile_agg(95), bootstrap_CI(np.median, confidence_level=confidence_level)]
+    agg_names = ["median", "std", "min", "max", "5th percentile", "95th percentile", f"Median {int(confidence_level * 100)}% CI"]
     agg_dict = {agg_name: agg_func for agg_name, agg_func in zip(agg_names, agg_funcs)}
 
     out_overview = []
@@ -534,7 +535,7 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
             if df_prompt.shape[0] == 0:
                 continue
             for metric_name in metric_names:
-                for cat in out[model][promptVersion][metric_name]:
+                for cat in out[model][f"{promptVersion}"][metric_name]:
                     # calculate the percentiles
                     percentile_range = sample_ranges[cat]
                     percentile_values = np.percentile(df_prompt[metric_name], percentile_range)
@@ -542,7 +543,7 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
                     sample_population = df_prompt[(df_prompt[metric_name] >= percentile_values[0]) & (df_prompt[metric_name] <= percentile_values[1])]
                     df_sample = sample_population.sample(min(sample_population.shape[0], numExamples))
                     # add the examples to the dict
-                    out[model][promptVersion][metric_name][cat] = df_sample.to_dict(orient="records")
+                    out[model][f"{promptVersion}"][metric_name][cat] = df_sample.to_dict(orient="records")
 
     return out
 
@@ -557,14 +558,20 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     # sorted prompt versions (ordered as numbers, not strings)
     promptVersions = df["promptVersion"].unique().tolist()
     promptVersions.sort(key=lambda x: int(x))
+    # ...
+    residualGroupBy = [col for col in groupbyList if col not in ["promptVersion", "model"]]
 
     # Loop over the models -> making 1 figure per metric, comparing the prompts (on the same model)
     for model_name in df["model"].unique():
         out_paths = []
         df_model = df[df["model"] == model_name]
+
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each prompt
-            violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=promptVersions)
+            if len(residualGroupBy) > 0:
+                violin_plot = sns.violinplot(data=df_model, x="promptVersion", hue=residualGroupBy[0], y=metric_name, order=promptVersions)
+            else:
+                violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=promptVersions)
             # save
             violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
             plt.savefig(violin_plot_path)
@@ -578,7 +585,10 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         df_prompt = df[df["promptVersion"] == promptVersion]
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each model
-            violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
+            if len(residualGroupBy) > 0:
+                violin_plot = sns.violinplot(data=df_prompt, x="model", hue=residualGroupBy[0], y=metric_name)
+            else:
+                violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
             # save
             violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
             plt.savefig(violin_plot_path)
@@ -597,7 +607,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         metric_names: List of metric names
         metric_ordering: Dictionary mapping each metric name a boolean indicating whether a larger metric value is better or not
     """
-    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang']
+    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'temperature']
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
         "rouge1": True,
@@ -614,22 +624,30 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     return metric_names, {metric_name: metric_ordering_all[metric_name] for metric_name in metric_names}
 
 
-experiment_name = "base-experiment"
-models = ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"]  # List of LLM models
+experiment_name = "base-experiment-temperature"
+groupByList = ["promptVersion", "temperature"]
+models = ["meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf"]  # , "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"]  # List of LLM models
 # "bigscience/bloomz-7b1-mt", "tiiuae/falcon-7b-instruct", "google/flan-t5-xl" "meta-llama/Llama-2-7b-chat-hf"
+datasets = ["20Minuten"]
 
 # NOTE: left-hand-name must replace '/' with '-' to be a valid filename
 shortNames = {
     "meta-llama-Llama-2-7b-chat-hf": "Llama-2 7b",
+    "meta-llama/Llama-2-13b-chat-hf": "Llama-2 13b",
+    "meta-llama/Llama-2-70b-chat-hf": "Llama-2 70b",
     "tiiuae-falcon-7b-instruct": "Falcon 7b",
     "bigscience-bloomz-7b1-mt": "BloomZ 7b",
 }
 
+
 # Main function
 def main():
-
     # Aggregate results and create DataFrame
     df = load_all_results(models, shortNames)
+
+    # TODO: Adapt here
+    # Filter to only consider prompts 1,2,3
+    df = df[df["promptVersion"].isin(["1", "2", "3", "5", "20"])]
 
     # Save DataFrame as CSV
     save_dataframe(df, experiment_name)
@@ -646,12 +664,15 @@ def main():
     datasets = df["dataset"].unique()
     for dataset in datasets:
         df_dataset = df[df["dataset"] == dataset]
-        create_report(df_dataset, f"{experiment_name}-{dataset}", metric_names, prompts, skip_lang=False)
 
-    # create_report(df, experiment_name, metric_names)
+        report_name = f"{experiment_name}-{dataset}"
+        report_path = os.path.join("reports", report_name)
+        pathlib.Path(report_path).mkdir(parents=True, exist_ok=True)
+
+        create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
+
 
 def make_report_plots():
-    datasets = ["20Minuten"]
 
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
@@ -670,10 +691,40 @@ def make_report_plots():
 
         metric_names, _ = get_metrics_info(df)
 
-        # Make Language Effect plot
-        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
+        # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
+        # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
+        # ... showing 1 table for (model, prompt)
+        # ... showing 1 table for (model) -> comparing prompts
+        # ... showing 1 table for (prompt) -> comparing models
+        tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
+
+        # re-do language statistics plots
         _ = language_statistics(df_all, experiment_path, prompts)
 
+        # create the statistics for the token lengths and number of sentences
+        df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=groupByList, approximation=True)
+
+        # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
+        # ... and 2 documents with the median performance
+        inspect_examples = find_inspect_examples(df, metric_names, groupbyList=groupByList)
+
+        # make violin (distribution) plot showing distribution of metric values per model and prompt
+        # ... group by model (comparing prompts)
+        # ... group by prompt (comparing models)
+        violin_figure_paths = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList)
+
+        df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
+
+        for table in tables_overview:
+            table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
+        for table in tables_detail:
+            table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
+
+        # save inspect examples in JSON
+        with open(os.path.join(experiment_path, "inspect_examples.json"), "w") as f:
+            json.dump(inspect_examples, f)
+
+
 if __name__ == "__main__":
-    # main()
+    main()
     make_report_plots()

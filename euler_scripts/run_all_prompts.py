@@ -1,6 +1,6 @@
 import os
 import shutil
-import yaml
+from ruamel import yaml
 import json
 import subprocess
 import pprint
@@ -11,13 +11,14 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
+    # garage-bAInd/Platypus2-70B-instruct
     "meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf", "meta-llama/Llama-2-70b-chat-hf",
 ]
-temperature_values = [0, 0.1, 0.5, 1.0]
-precision_values = ["", ",load_in_8bit=True"]
+temperature_values = [0] # [0, 0.1, 0.5, 1.0]
+precision_values = [""]  # ["", ",load_in_8bit=True"]
 dataset_names = ["20Minuten"]
-prompt_versions = [1, 2, 3]
-task_base_names = ["SummLtM_", "SummLtMDe_"]
+prompt_versions = [1, 2, 3, 5, 20]
+task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_"]
 
 """
     Definitions
@@ -30,6 +31,7 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "hf-causal-experimental",
         "bigscience/bloomz-7b1-mt": "hf-causal-experimental",
         "tiiuae/falcon-7b-instruct": "hf-causal-experimental",
+        "tiiuae/falcon-40b-instruct": "hf-causal-experimental",
     },
     "task_temp_suffix": {
         "default": "",
@@ -45,6 +47,7 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "04:00",
         "bigscience/bloomz-7b1-mt": "04:00",
         "tiiuae/falcon-7b-instruct": "04:00",
+        "tiiuae/falcon-40b-instruct": "08:00",
     },
     "gpu": {
         "default": "rtx_3090",
@@ -53,7 +56,7 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
-        "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
+        "tiiuae/falcon-40b-instruct": "a100_80gb",
     },
     "num_gpus": {
         "default": 1,
@@ -95,7 +98,7 @@ for combination in combinations:
 
     # Build the arguments (eval_config)
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
-    model_args = model_args_schema.format(model=model_config, temperature_suffix=temp_suffix_model_args)
+    model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args)
     task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}")
     # Build the arguments (euler_config)
     run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
@@ -149,15 +152,19 @@ for config in config_list:
     random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
     new_config = NEW_CONFIG_PATTERN.format(random_string=random_string)
 
+    # configurate the yaml library
+    yamlPrinter = yaml.YAML()
+    yamlPrinter.preserve_quotes = True
+    yamlPrinter.default_flow_style = False
     with open(f"../{BASE_CONFIG}") as f:
-        y = yaml.safe_load(f)
-    y["model"] = config["model"]
-    y["model_args"] = config["model_args"]
-    y["tasks"] = config["tasks"]
+        y = yamlPrinter.load(f)
+    y["model"] = config['model']
+    y["model_args"] = config['model_args']
+    y["tasks"] = config['tasks']
     y["prompt_version_per_task"] = config["prompt_version_per_task"]
 
     with open(f"../{new_config}", "w") as new_f:
-        yaml.dump(y, new_f, default_flow_style=False, sort_keys=False)
+        yamlPrinter.dump(y, new_f)
 
     """
     Generate the temporary euler-config-file
@@ -176,7 +183,7 @@ for config in config_list:
     Schedule the experiment
     """
     # Run the command with the updated config
-    os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
+    # os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
 
     # Remove the temporary config files
     os.remove(f"tmp_euler_config.json")
