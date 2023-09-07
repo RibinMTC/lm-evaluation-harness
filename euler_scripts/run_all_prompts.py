@@ -18,14 +18,27 @@ models = [
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
+
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "mds-simple" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]
-dataset_names = ["Wikinews"] # ["20Minuten", "Wikinews"]
-prompt_versions = [50, 51] # [1, 2, 3, 4, 5]
-task_base_names = ["MDSSumm_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_"]
-num_fewshot_list = [""] # [0, 1, 2, 4, 8] # [0] #
+dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
+prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+num_fewshot_list = [""]  # [0, 1, 2, 4, 8] # [0] #
+
+# CUSTOM LtM Prompting
+# SummLtM1_20Minuten_21
+# SummLtM1_20Minuten_22
+# SummLtM2_20Minuten_23
+# SummLtM2_20Minuten_24
+
+# Element-aware summarization with LLMs -> CoT Summarization paper using LtM
+# SummLtM1_20Minuten_30
+# SummLtM1_20Minuten_31
+# SummLtM2_20Minuten_32
+# SummLtM2_20Minuten_33
 
 # SummFewshot1_20Minuten_1
 # SummFewshot1_20Minuten_2
@@ -59,7 +72,7 @@ inferable_args = {
         "default": "24:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "18:00",
+        "meta-llama/Llama-2-70b-chat-hf": "16:00",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "18:00",
         "garage-bAInd/Platypus2-70B-instruct": "18:00",
         "bigscience/bloomz-7b1-mt": "08:00",
