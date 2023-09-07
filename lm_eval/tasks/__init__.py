@@ -334,6 +334,8 @@ TASK_REGISTRY = {
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
     "SummSampleSmol_20Minuten_1": llm_summarization_mt.SummSampleSmol_20Minuten,
     "SummSampleSmol_20Minuten_2": llm_summarization_mt.SummSampleSmol_20Minuten,
+    "MDSSumm_Wikinews_50": llm_summarization_mt.SummarizationTask_Wikinewssum,
+    "MDSSumm_Wikinews_51": llm_summarization_mt.SummarizationTask_Wikinewssum,
     "SummFewshot0_20Minuten_1": llm_summarization_mt.SummarizationTask_20Minuten,
     "SummFewshot0_20Minuten_2": llm_summarization_mt.SummarizationTask_20Minuten,
     "SummFewshot0_20Minuten_3": llm_summarization_mt.SummarizationTask_20Minuten,

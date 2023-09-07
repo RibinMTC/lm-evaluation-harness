@@ -19,13 +19,13 @@ models = [
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "fewshot-experiment" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "mds-simple" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]
-dataset_names = ["20Minuten"]
-prompt_versions = [1, 2, 3, 4, 5]
-task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_"]
-num_fewshot_list = [0, 1, 2, 4, 8]
+dataset_names = ["Wikinews"] # ["20Minuten", "Wikinews"]
+prompt_versions = [50, 51] # [1, 2, 3, 4, 5]
+task_base_names = ["MDSSumm_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_"]
+num_fewshot_list = [""] # [0, 1, 2, 4, 8] # [0] #
 
 # SummFewshot1_20Minuten_1
 # SummFewshot1_20Minuten_2
@@ -123,7 +123,8 @@ for combination in combinations:
     precision_suffix = inferable_args["precision"][precision] if precision in inferable_args["precision"] else inferable_args["precision"]["default"]
     precision_task_suffix = "" if precision == "" else f"_{precision}"
 
-    if num_fewshot != 0:
+    # insert num_fewshot into task string if necessary
+    if "num_fewshot" in taskBaseName:
         taskBaseName = taskBaseName.format(num_fewshot=num_fewshot)
 
     # Build the arguments (eval_config)

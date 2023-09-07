@@ -21,7 +21,9 @@
     "19": "Fassen Sie die wichtigsten Punkte des folgenden Textes zusammen und behalten Sie dabei den Originalton bei.\n\n{article}",
     "20": "Summarize this in German like I’m a 5 years old, in a few sentences.\n\n{article}",
     "21": "Extract the main points of the following article. Then generate a summary in German using the main points. The summary should be around 2 to 3 sentences. Indicate the start of the summary using [SUMMARY]\nArticle: {article}\n",
-    "22": "Extrahiere die wichtigsten Punkte des folgenden Artikels und erstelle danach eine Zusammenfassung vom Artikel mit den wichtigsten Punkten. Die Zusammenfassung sollte aus 3 oder weniger Sätzen bestehen. Schreibe [ZUSAMMENFASSUNG] um den Beginn der Zusammenfassung zu zeigen.\nArtikel: {article}\n"
+    "22": "Extrahiere die wichtigsten Punkte des folgenden Artikels und erstelle danach eine Zusammenfassung vom Artikel mit den wichtigsten Punkten. Die Zusammenfassung sollte aus 3 oder weniger Sätzen bestehen. Schreibe [ZUSAMMENFASSUNG] um den Beginn der Zusammenfassung zu zeigen.\nArtikel: {article}\n",
+    "50": "Summarize the following set of articles in German. \nArticles: {article}\nSummary:\n",
+    "51": "Fasse die folgenden Artikel auf Deutsch zusammen. \nArtikel: {article}\nZusammenfassung:\n"
   },
   "fangloveskari/ORCA_LLaMA_70B_QLoRA": {
     "1": "Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\nSummary:\n",
