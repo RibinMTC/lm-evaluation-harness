@@ -223,9 +223,9 @@ with open(f"./logs/{experiment_name}.json", "a") as jsonl_file, open(f"./logs/{e
         sbatch_line_split = None
         submission_success = False
         for line in printable_out.split("\n"):
-            if "sbatch" in line:
+            if "sbatch" in line and sbatch_line is None:
                 sbatch_line = line
-            if "Submitted batch job" in line:
+            if "Submitted batch job" in line and job_id_line is None:
                 job_id_line = line
                 submission_success = True
         if sbatch_line is not None:
