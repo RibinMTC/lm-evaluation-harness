@@ -15,6 +15,7 @@ lm_cache
 /configs/prompt_templates/SummarizationTask_*.json
 /configs/prompt_templates/SummLtM_*.json
 /configs/prompt_templates/SummLtMDe_*.json
+/configs/prompt_templates/SummFewshot_*.json
 /configs/eval_config_*.yaml
 report/.DS_Store
 .DS_Store

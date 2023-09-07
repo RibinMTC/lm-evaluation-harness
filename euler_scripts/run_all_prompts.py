@@ -17,13 +17,14 @@ models = [
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
-experiment_name = "summarization_" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+# TODO: CHANGE PARAMETERS + NAME
+experiment_name = "summarization_fewshot_" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["", "8b"]  # ["", "8b"]
 dataset_names = ["20Minuten"]
 prompt_versions = [1, 2]
 task_base_names = ["SummFewshot_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_"]
-num_fewshot_list = [4]
+num_fewshot_list = [2]
 
 """
     Definitions
@@ -49,7 +50,7 @@ inferable_args = {
     },
     "run_duration_hours": {
         "default": "24:00",
-        "meta-llama/Llama-2-7b-chat-hf": "12:00",
+        "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
         "meta-llama/Llama-2-70b-chat-hf": "18:00",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "18:00",

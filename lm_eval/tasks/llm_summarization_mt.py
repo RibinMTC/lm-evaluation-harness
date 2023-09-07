@@ -256,8 +256,8 @@ class SummarizationTaskBase(Task):
             labeled_examples = (
                     "\n\n".join(
                         [
-                            # self.doc_to_text(doc) + self.doc_to_target(doc)
-                            self.doc_to_fewshot_prompt(doc)
+                            self.doc_to_text(doc) + self.doc_to_target(doc)
+                            # self.doc_to_fewshot_prompt(doc)
                             for doc in fewshotex
                         ]
                     )
