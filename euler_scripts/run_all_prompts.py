@@ -11,9 +11,9 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    # "meta-llama/Llama-2-7b-chat-hf",
+    "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
@@ -21,8 +21,9 @@ experiment_name = "summarization_" + ''.join(random.choice(string.ascii_lowercas
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["", "8b"]  # ["", "8b"]
 dataset_names = ["20Minuten"]
-prompt_versions = [1, 2, 3, 5, 20]
-task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_"]
+prompt_versions = [1, 2]
+task_base_names = ["SummFewshot_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_"]
+num_fewshot_list = [4]
 
 """
     Definitions
@@ -98,12 +99,12 @@ model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=Tr
     Build the configurations
 """
 # Create a list of all possible combinations of the parameters
-combinations = list(itertools.product(models, temperature_values, precision_values, dataset_names, prompt_versions, task_base_names))
+combinations = list(itertools.product(models, temperature_values, precision_values, dataset_names, prompt_versions, task_base_names, num_fewshot_list))
 config_list = []
 
 # Iterate over each combination and create a config dictionary
 for combination in combinations:
-    model, tempVal, precision, dataset, promptVersion, taskBaseName = combination
+    model, tempVal, precision, dataset, promptVersion, taskBaseName, num_fewshot = combination
 
     # prepare the values
     task_temp_suffix = inferable_args["task_temp_suffix"][tempVal] if tempVal in inferable_args["task_temp_suffix"] else inferable_args["task_temp_suffix"]["default"]
@@ -132,6 +133,7 @@ for combination in combinations:
         "run_duration_hours": run_duration_hours,
         "gpu": gpu,
         "num_gpus": num_gpus,
+        "num_fewshot": num_fewshot,
     }
 
     # Append the config dictionary to the list
@@ -157,7 +159,7 @@ else:
 if not os.path.exists("./logs"):
     os.makedirs("./logs")
 # open a jsonl file and a log file to append the outputs to
-with open(f"./logs/{experiment_name}.json", "a") as jsonl_file, open(f"./logs/{experiment_name}.log", "a") as log_file:
+with open(f"./logs/{experiment_name}.jsonl", "a") as jsonl_file, open(f"./logs/{experiment_name}.log", "a") as log_file:
 
     """
         Schedule the tasks
@@ -190,6 +192,7 @@ with open(f"./logs/{experiment_name}.json", "a") as jsonl_file, open(f"./logs/{e
         y["model_args"] = config['model_args']
         y["tasks"] = config['tasks']
         y["prompt_version_per_task"] = config["prompt_version_per_task"]
+        y["num_fewshot"] = config["num_fewshot"]
 
         with open(f"../{new_config}", "w") as new_f:
             yamlPrinter.dump(y, new_f)

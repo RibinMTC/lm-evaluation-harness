@@ -16,6 +16,8 @@ import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
+pd.set_option("display.precision", 4)
+sns.set_theme(style="darkgrid")
 
 def rename_hf_model(model_name):
     # replace / with -
@@ -98,7 +100,6 @@ def save_dataframe(df, experiment_name):
 
 # Function to make plots and create an overview report
 def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_lang=True):
-    sns.set_theme(style="darkgrid")
     # groupByList = ["model", "promptVersion"]
 
     experiment_path = os.path.join("reports", experiment_name)
@@ -206,18 +207,17 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "prom
     df_failure_stat = df_failure_stat.rename(columns={"logit_0": "count"})
     df_failure_stat = df_failure_stat.reset_index(drop=True)
 
-    # Make a facet-grid plot
-    # make 1 plot per x_group value
-    for x_group_val in df_failure_stat[x_group].unique():
-        df_failure_stat_x_group = df_failure_stat[df_failure_stat[x_group] == x_group_val]
+    # Make a facet-grid plot, make 1 plot per x_group value
+    for x_group_val in df_failures[x_group].unique():
+        df_failure_stat_x_group = df_failures[df_failures[x_group] == x_group_val]
         failure_plot = sns.FacetGrid(df_failure_stat_x_group, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-        failure_plot.map(sns.barplot, 'failure', 'count')
+        failure_plot.map(sns.countplot, 'failure')
         failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.png")
         plt.savefig(failure_plot_path)
         plt.close()
 
-    failure_plot = sns.FacetGrid(df_failure_stat, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-    failure_plot.map(sns.barplot, 'failure', 'count')
+    failure_plot = sns.FacetGrid(df_failures, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+    failure_plot.map(sns.countplot, 'failure')
     failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.png")
     plt.savefig(failure_plot_path)
     plt.close()
@@ -647,13 +647,31 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             # make a violin plot showing the distribution of the metric values for each prompt
             if len(residualGroupBy) > 0:
                 violin_plot = sns.violinplot(data=df_model, x="promptVersion", hue=residualGroupBy[0], y=metric_name, order=promptVersions)
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
+
+                violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='promptVersion', y=metric_name)
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
             else:
                 violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=promptVersions)
-            # save
-            violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
-            plt.savefig(violin_plot_path)
-            out_paths.append(violin_plot_path)
-            plt.close()
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
         model_plot_paths.append(out_paths)
 
     # Loop over the prompts -> making 1 figure per metric, comparing the models (on the same prompt)
@@ -664,14 +682,45 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             # make a violin plot showing the distribution of the metric values for each model
             if len(residualGroupBy) > 0:
                 violin_plot = sns.violinplot(data=df_prompt, x="model", hue=residualGroupBy[0], y=metric_name)
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
+
+                violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="model", y=metric_name)
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
             else:
                 violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
+                if metric_name in metric_0_1_range:
+                    violin_plot.set_ylim(0, 1)
+                # save
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
+                plt.savefig(violin_plot_path)
+                out_paths.append(violin_plot_path)
+                plt.close()
+        prompt_plot_paths.append(out_paths)
+
+    # Loop over the metrics -> make 1 figure per metric, comparing groupByList[0] with groupByList[1] (with hue) -> make plot in both directions
+    for metric_name in metric_names:
+        # 0-1 and 1-0 plot
+        for a,b in [(0,1), (1,0)]:
+            violin_plot = sns.violinplot(data=df_prompt, x=groupbyList[a], hue=groupbyList[b], y=metric_name)
+            if metric_name in metric_0_1_range:
+                violin_plot.set_ylim(0, 1)
             # save
-            violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
+            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot.png")
             plt.savefig(violin_plot_path)
             out_paths.append(violin_plot_path)
             plt.close()
-        prompt_plot_paths.append(out_paths)
 
     return prompt_plot_paths, model_plot_paths
 
@@ -722,9 +771,9 @@ experiment_config = {
             "meta-llama/Llama-2-7b-chat-hf",
             "meta-llama/Llama-2-13b-chat-hf",
             # "meta-llama/Llama-2-70b-chat-hf",
-            # "tiiuae/falcon-7b-instruct",
+            "tiiuae/falcon-7b-instruct",
             # "tiiuae/falcon-40b-instruct",
-            # "bigscience/bloomz-7b1-mt"
+            "bigscience/bloomz-7b1-mt"
         ],
         "datasets": ["20Minuten"]
     },
@@ -758,6 +807,7 @@ shortNames = {
     "fangloveskari/ORCA_LLaMA_70B_QLoRA": "OrcaLlama2 70B",
     "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
 }
+metric_0_1_range = ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1", "coverage"]
 
 
 # Main function
@@ -807,7 +857,6 @@ def make_report_plots():
         df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
         df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
 
-
         """
             EXPERIMENT COST ESTIMATE (IN TOKENS)
         """
@@ -832,7 +881,6 @@ def make_report_plots():
         numPrompts = len(df['promptVersion'].unique().tolist())
         print(f"Cost for {dataset} ({numPrompts} prompts): input {numTokens}, output {(numRows * avgSummarySize)}\n\tTokens: {numTokens}\n\tAvg. Summary Size: {avgSummarySize}\n\tNum. Rows: {numRows}\n\n")
 
-
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
@@ -841,13 +889,6 @@ def make_report_plots():
         failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'model'], x_group="temperature")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'temperature'], x_group="model")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['temperature', 'model'], x_group="promptVersion")
-
-        # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
-        # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
-        # ... showing 1 table for (model, prompt)
-        # ... showing 1 table for (model) -> comparing prompts
-        # ... showing 1 table for (prompt) -> comparing models
-        tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
 
         # re-do language statistics plots
         _ = language_statistics(df_all_langs, experiment_path, prompts)
@@ -865,6 +906,13 @@ def make_report_plots():
         violin_figure_paths = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList)
 
         df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
+
+        # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
+        # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
+        # ... showing 1 table for (model, prompt)
+        # ... showing 1 table for (model) -> comparing prompts
+        # ... showing 1 table for (prompt) -> comparing models
+        tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
 
         for table in tables_overview:
             table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
