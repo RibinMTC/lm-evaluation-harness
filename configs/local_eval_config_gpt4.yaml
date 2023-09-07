@@ -1,0 +1,17 @@
+model: gpt4
+model_args: "engine=gpt-4"
+tasks: "SummSample_20Minuten_1" #"germanquad_open_qa,x_stance_de,pawsx_de"
+prompt_version_per_task: "1"
+num_fewshot: 0
+batch_size: "1"
+device: null
+output_path: null
+limit: 1
+data_sampling: null
+no_cache: true
+decontamination_ngrams_path: null
+description_dict_path: null
+check_integrity: false
+write_out: true
+output_base_path: "results"
+wandb_on: false

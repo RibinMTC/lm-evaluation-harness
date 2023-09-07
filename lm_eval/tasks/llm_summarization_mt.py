@@ -198,6 +198,11 @@ class SummarizationTaskBase(Task):
         }
 
 
+class SummarizationTask_20Minuten_SAMPLE(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20minuten_sample_250"
+
 class SummarizationTask_20Minuten(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/20minuten"

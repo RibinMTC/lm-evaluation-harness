@@ -705,7 +705,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment"
+experiment_name = "base-experiment-temperature"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -721,10 +721,10 @@ experiment_config = {
         "models": [
             "meta-llama/Llama-2-7b-chat-hf",
             "meta-llama/Llama-2-13b-chat-hf",
-            "meta-llama/Llama-2-70b-chat-hf",
-            "tiiuae/falcon-7b-instruct",
-            "tiiuae/falcon-40b-instruct",
-            "bigscience/bloomz-7b1-mt"
+            # "meta-llama/Llama-2-70b-chat-hf",
+            # "tiiuae/falcon-7b-instruct",
+            # "tiiuae/falcon-40b-instruct",
+            # "bigscience/bloomz-7b1-mt"
         ],
         "datasets": ["20Minuten"]
     },
@@ -807,6 +807,32 @@ def make_report_plots():
         df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
         df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
 
+
+        """
+            EXPERIMENT COST ESTIMATE (IN TOKENS)
+        """
+        # Calculate the number of tokens per experiment
+        df_dataset = df_all[df_all["dataset"] == dataset]
+        df_dataset_model = df_dataset[df_dataset["model"] == shortNames[models[0]]]
+        # concatenate the 'prompt_0' columns to 1 string
+        prompt_list = df_dataset_model["prompt_0"].tolist()
+        total_prompt = " ".join(prompt_list)
+        # split into tokens (using approximation)
+        tokens = approxTokenize(total_prompt)
+        numTokens = len(tokens)
+        # calculate the average summary size (for all entries that did work out)
+        df_dataset = df[df["dataset"] == dataset]
+        df_dataset_model = df_dataset[df_dataset["model"] == shortNames[models[0]]]
+        summary_list = df_dataset_model["truth"].tolist()
+        summary_tokens = [approxTokenize(summary) for summary in summary_list]
+        summary_tokens = [len(tokens) for tokens in summary_tokens if tokens]
+        avgSummarySize = sum(summary_tokens) / len(summary_tokens)
+        # Print out the cost
+        numRows = df_dataset_model.shape[0]
+        numPrompts = len(df['promptVersion'].unique().tolist())
+        print(f"Cost for {dataset} ({numPrompts} prompts): input {numTokens}, output {(numRows * avgSummarySize)}\n\tTokens: {numTokens}\n\tAvg. Summary Size: {avgSummarySize}\n\tNum. Rows: {numRows}\n\n")
+
+
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
@@ -851,5 +877,5 @@ def make_report_plots():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     make_report_plots()

@@ -11,14 +11,15 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    "meta-llama/Llama-2-7b-chat-hf",
-    "meta-llama/Llama-2-13b-chat-hf",
+    # "meta-llama/Llama-2-7b-chat-hf",
+    # "meta-llama/Llama-2-13b-chat-hf",
     "meta-llama/Llama-2-70b-chat-hf",
-    "fangloveskari/ORCA_LLaMA_70B_QLoRA",
-    "garage-bAInd/Platypus2-70B-instruct",
+    # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+    # "garage-bAInd/Platypus2-70B-instruct",
 ]
+experiment_name = "summarization_" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = ["", "8b"]  # ["", "8b"]
 dataset_names = ["20Minuten"]
 prompt_versions = [1, 2, 3, 5, 20]
 task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_"]
@@ -46,7 +47,7 @@ inferable_args = {
         1.0: "_T10",
     },
     "run_duration_hours": {
-        "default": "04:00",
+        "default": "24:00",
         "meta-llama/Llama-2-7b-chat-hf": "12:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
         "meta-llama/Llama-2-70b-chat-hf": "18:00",
@@ -60,9 +61,9 @@ inferable_args = {
         "default": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "a100-pcie-40gb",
-        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
-        "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
+        "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100_80gb",
+        "garage-bAInd/Platypus2-70B-instruct": "a100_80gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
         "tiiuae/falcon-40b-instruct": "a100_80gb",
@@ -70,10 +71,10 @@ inferable_args = {
     "num_gpus": {
         "default": 1,
         "meta-llama/Llama-2-7b-chat-hf": 1,
-        "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 1,
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 1,
-        "garage-bAInd/Platypus2-70B-instruct": 1,
+        "meta-llama/Llama-2-13b-chat-hf": 2,
+        "meta-llama/Llama-2-70b-chat-hf": 2,
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
+        "garage-bAInd/Platypus2-70B-instruct": 2,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 2,
@@ -152,56 +153,110 @@ else:
     print("Execution stopped.")
     exit(0)
 
-"""
-    Schedule the tasks
-"""
-for config in config_list:
-    print(f"Scheduling\n")
-    pprint.pprint(config)
-
-    new_prompt_template = TMP_PROMPT_TEMPLATE.format(name=f"{config['tasks']}.json")
-    shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", f"../{new_prompt_template}")
+# make a logs dir if it doesn't exist
+if not os.path.exists("./logs"):
+    os.makedirs("./logs")
+# open a jsonl file and a log file to append the outputs to
+with open(f"./logs/{experiment_name}.json", "a") as jsonl_file, open(f"./logs/{experiment_name}.log", "a") as log_file:
 
     """
-    Load the old eval_config and update the values, and write it to the new temporary file
+        Schedule the tasks
     """
-    # generate a random 10 character long string for the config file name
-    random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
-    new_config = NEW_CONFIG_PATTERN.format(random_string=random_string)
+    for config in config_list:
+        print(f"Scheduling\n")
+        pprint.pprint(config)
 
-    # configurate the yaml library
-    yamlPrinter = yaml.YAML()
-    yamlPrinter.preserve_quotes = True
-    yamlPrinter.default_flow_style = False
-    with open(f"../{BASE_CONFIG}") as f:
-        y = yamlPrinter.load(f)
-    y["model"] = config['model']
-    y["model_args"] = config['model_args']
-    y["tasks"] = config['tasks']
-    y["prompt_version_per_task"] = config["prompt_version_per_task"]
+        # make a copy for the output file and print the config also to the log file
+        config_out = config.copy()
+        pprint.pprint(config_out, log_file)
 
-    with open(f"../{new_config}", "w") as new_f:
-        yamlPrinter.dump(y, new_f)
+        new_prompt_template = TMP_PROMPT_TEMPLATE.format(name=f"{config['tasks']}.json")
+        shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", f"../{new_prompt_template}")
 
-    """
-    Generate the temporary euler-config-file
-    """
-    with open(BASE_EULER_CONFIG) as f:
-        old_config_data = json.load(f)
-    old_config_data["run_duration_hours"] = config["run_duration_hours"]
-    old_config_data["gpu"] = config["gpu"]
-    old_config_data["num_gpus"] = config["num_gpus"]
-    old_config_data["config_file"] = new_config
+        """
+        Load the old eval_config and update the values, and write it to the new temporary file
+        """
+        # generate a random 10 character long string for the config file name
+        random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+        new_config = NEW_CONFIG_PATTERN.format(random_string=random_string)
 
-    with open(TMP_EULER_CONFIG, "w") as new_f:
-        json.dump(old_config_data, new_f, indent=4)
+        # configurate the yaml library
+        yamlPrinter = yaml.YAML()
+        yamlPrinter.preserve_quotes = True
+        yamlPrinter.default_flow_style = False
+        with open(f"../{BASE_CONFIG}") as f:
+            y = yamlPrinter.load(f)
+        y["model"] = config['model']
+        y["model_args"] = config['model_args']
+        y["tasks"] = config['tasks']
+        y["prompt_version_per_task"] = config["prompt_version_per_task"]
 
-    """
-    Schedule the experiment
-    """
-    # Run the command with the updated config
-    os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
+        with open(f"../{new_config}", "w") as new_f:
+            yamlPrinter.dump(y, new_f)
 
-    # Remove the temporary config files
-    os.remove(f"tmp_euler_config.json")
-    # os.remove(f"../{new_config}")
+        """
+        Generate the temporary euler-config-file
+        """
+        with open(BASE_EULER_CONFIG) as f:
+            old_config_data = json.load(f)
+        old_config_data["run_duration_hours"] = config["run_duration_hours"]
+        old_config_data["gpu"] = config["gpu"]
+        old_config_data["num_gpus"] = config["num_gpus"]
+        old_config_data["config_file"] = new_config
+
+        with open(TMP_EULER_CONFIG, "w") as new_f:
+            json.dump(old_config_data, new_f, indent=4)
+
+        """
+        Schedule the experiment
+        """
+        # Run the command with the updated config
+        # os.system(f"bash run_euler.sh {TMP_EULER_CONFIG}")
+        # cmd = ['bash', 'run_dummy.sh', f"{TMP_EULER_CONFIG}"]
+        cmd = ['bash', 'run_euler.sh', f"{TMP_EULER_CONFIG}"]
+        output = subprocess.run(cmd, stdout=subprocess.PIPE)
+        printable_out = output.stdout.decode('utf-8')
+
+        # Find the line with the sbatch command and the consecutive line with the job id
+        sbatch_line = None
+        job_id_line = None
+        sbatch_line_split = None
+        submission_success = False
+        for line in printable_out.split("\n"):
+            if "sbatch" in line:
+                sbatch_line = line
+            if "Submitted batch job" in line:
+                job_id_line = line
+                submission_success = True
+        if sbatch_line is not None:
+            # find the output file path (using -o flag)
+            sbatch_line_split = sbatch_line.split(" ")
+            out_idx = sbatch_line_split.index("-o")
+            output_file_path = sbatch_line_split[out_idx + 1] if out_idx + 1 < len(sbatch_line_split) else None
+        else:
+            sbatch_line = ""
+        if job_id_line is not None:
+            # find the job id
+            job_id = job_id_line.split(" ")[-1]
+        else:
+            job_id = ""
+            job_id_line = ""
+
+        # print the status to the log file
+        log_file.write(f"\n\n{printable_out}")
+        # print the status to the jsonl file
+        config_out["sbatch_line"] = sbatch_line
+        config_out["job_id_line"] = job_id_line
+        config_out["job_id"] = job_id
+        config_out["submission_success"] = submission_success
+        config_out["output_file_path"] = output_file_path
+        jsonl_file.write(json.dumps(config_out) + "\n")
+
+        # print the status to the console
+        print(f"\n{printable_out}")
+        print(f"JOB ID: {job_id}")
+        print(f"SUBMISSION: {'SUCCESS' if submission_success else 'FAILED'}")
+
+        # Remove the temporary config files
+        os.remove(f"tmp_euler_config.json")
+        # os.remove(f"../{new_config}")
