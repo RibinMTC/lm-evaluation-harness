@@ -19,6 +19,7 @@ from spacy_langdetect import LanguageDetector
 pd.set_option("display.precision", 4)
 sns.set_theme(style="darkgrid")
 
+
 def rename_hf_model(model_name):
     # replace / with -
     model_name = model_name.replace("/", "-")
@@ -31,22 +32,26 @@ def extract_dataset_and_task_name(filename):
     # Split the filename by underscores
     split_filename = filename.split("_")
     # Extract the prompt version and the task name
-    prompt_version = split_filename[2]
+    task_name = split_filename[0]
+    prompt_version_idx = 2
     dataset_name = split_filename[1]
 
     # find an element of the form 'T[0-9]*' in the split_filename
     # if there is no such element, the temperature is 0.0
     temperature = 0.0
-    foundTmp = False
     for element in split_filename:
         if element.startswith("T") and len(element) >= 3:
             temperature = float(element[1:]) / 10
-            foundTmp = True
+            prompt_version_idx = 3
     # if found temperature -> prompt-version is the element after the temperature
-    if foundTmp:
-        prompt_version = split_filename[3]
+    prompt_version = split_filename[prompt_version_idx]
 
-    return dataset_name, prompt_version, temperature
+    # Check if there is a precision flag after the prompt version
+    precision = "full"
+    if split_filename[prompt_version_idx + 1].endswith("b"):
+        precision = "8bit"
+
+    return task_name, dataset_name, prompt_version, temperature, precision
 
 
 # Function to load results from JSON files to a dataframe
@@ -61,12 +66,14 @@ def load_results(model_name):
         with open(os.path.join(results_path, file), "r") as f:
             result = json.load(f)
 
-            dataset, promptVersion, temperature = extract_dataset_and_task_name(file)
+            task_name, dataset, promptVersion, temperature, precision = extract_dataset_and_task_name(file)
             for entry in result:
+                entry["task_name"] = task_name
                 entry["dataset"] = dataset
                 entry["promptVersion"] = promptVersion
                 entry["model"] = model_name
                 entry['temperature'] = temperature
+                entry['precision'] = precision
 
             all_results.extend(result)
 
@@ -712,7 +719,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     # Loop over the metrics -> make 1 figure per metric, comparing groupByList[0] with groupByList[1] (with hue) -> make plot in both directions
     for metric_name in metric_names:
         # 0-1 and 1-0 plot
-        for a,b in [(0,1), (1,0)]:
+        for a, b in [(0, 1), (1, 0)]:
             violin_plot = sns.violinplot(data=df_prompt, x=groupbyList[a], hue=groupbyList[b], y=metric_name)
             if metric_name in metric_0_1_range:
                 violin_plot.set_ylim(0, 1)
@@ -733,7 +740,10 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         metric_names: List of metric names
         metric_ordering: Dictionary mapping each metric name a boolean indicating whether a larger metric value is better or not
     """
-    exclude = ['doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score', 'temperature']
+    exclude = [
+        'doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score',
+        'temperature', 'precision', 'task_name',
+    ]
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
         "rouge1": True,
@@ -754,7 +764,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment-temperature"
+experiment_name = "few-shot-initial"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -785,6 +795,13 @@ experiment_config = {
             "meta-llama/Llama-2-70b-chat-hf",
             "fangloveskari/ORCA_LLaMA_70B_QLoRA",
             "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "datasets": ["20Minuten"]
+    },
+    "few-shot-initial": {
+        "groupByList": ["task_name", "precision"],
+        "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
         ],
         "datasets": ["20Minuten"]
     },
@@ -925,5 +942,5 @@ def make_report_plots():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     make_report_plots()

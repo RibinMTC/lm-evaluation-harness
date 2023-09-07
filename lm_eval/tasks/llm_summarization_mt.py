@@ -279,6 +279,10 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
     DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
 
+class SummarizationTask_Wikinewssum(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum"
+
 
 class SummLtM_20Minuten(SummarizationTaskBase):
     VERSION = 0
