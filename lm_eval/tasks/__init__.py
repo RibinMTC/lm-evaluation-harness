@@ -332,6 +332,8 @@ TASK_REGISTRY = {
     "frank_hallucination_classification": frank_hallucination_classification.FrankHallucinationClassificationTask,
     "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
+    "SummSampleSmol_20Minuten_1": llm_summarization_mt.SummSampleSmol_20Minuten,
+    "SummSampleSmol_20Minuten_2": llm_summarization_mt.SummSampleSmol_20Minuten,
     "SummFewshot_20Minuten_1": llm_summarization_mt.SummarizationTask_20Minuten_SAMPLE,
     "SummFewshot_20Minuten_2": llm_summarization_mt.SummarizationTask_20Minuten_SAMPLE,
     "SummFewshot_20Minuten_1_8b": llm_summarization_mt.SummarizationTask_20Minuten_SAMPLE,

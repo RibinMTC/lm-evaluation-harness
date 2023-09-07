@@ -11,19 +11,20 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    "meta-llama/Llama-2-7b-chat-hf",
+    # "gpt4",
+    # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
-    # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
-    # "garage-bAInd/Platypus2-70B-instruct",
+    "meta-llama/Llama-2-70b-chat-hf",
+    "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+    "garage-bAInd/Platypus2-70B-instruct",
 ]
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "summarization_fewshot_" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "summarization_gpt4" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["", "8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 dataset_names = ["20Minuten"]
 prompt_versions = [1, 2]
-task_base_names = ["SummFewshot_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_"]
+task_base_names = ["SummSampleSmol_20Minuten_1"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", SummFewshot_]
 num_fewshot_list = [2]
 
 """
@@ -173,7 +174,7 @@ with open(f"./logs/{experiment_name}.jsonl", "a") as jsonl_file, open(f"./logs/{
         config_out = config.copy()
         pprint.pprint(config_out, log_file)
 
-        new_prompt_template = TMP_PROMPT_TEMPLATE.format(name=f"{config['tasks']}.json")
+        new_prompt_template = TMP_PROMPT_TEMPLATE.format(name=f"{config['tasks']}")
         shutil.copy(f"../{BASE_PROMPT_TEMPLATE}", f"../{new_prompt_template}")
 
         """

@@ -268,10 +268,11 @@ class SummarizationTaskBase(Task):
         return description + labeled_examples + example
 
 
-class SummarizationTask_20Minuten_SAMPLE(SummarizationTaskBase):
+class SummSampleSmol_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"
-    DATASET_PATH = "roysc/20minuten_sample_250"
+    # DATASET_PATH = "roysc/20minuten_sample_250"
+    DATASET_PATH = "roysc/20minuten_sample_10"
 
 class SummarizationTask_20Minuten(SummarizationTaskBase):
     VERSION = 0

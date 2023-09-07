@@ -31,6 +31,14 @@ CONFIG_FILE=$(python3 utils/euler_config_parser.py \
                 --euler_config_path "$1" \
                 --retreive_key config_file)
 
+# Load OPENAI API Key from OPENAI_API_KEY file if it exists
+if [ -f "OPENAI_API_KEY" ]; then
+    OPENAI_API_KEY=$(cat OPENAI_API_KEY)
+    echo "OPENAI_API_KEY found in OPENAI_API_KEY file"
+else
+    echo "OPENAI_API_KEY not found in OPENAI_API_KEY file"
+fi
+
 scp "$1" euler:$CODE_PATH/euler_scripts
 #scp utils/bash_euler_commands_helper.py euler:$CODE_PATH/euler_scripts/utils/bash_euler_commands_helper.py
 #scp ../lm_eval/tasks/xsum_faith_hallucination_classification.py euler:$CODE_PATH/lm_eval/tasks/xsum_faith_hallucination_classification.py
@@ -54,6 +62,7 @@ ssh euler ARG1=\"$1\" \
           ARG6=\"$CURR_BRANCH\" \
           ARG7=\"$PROJECT_PATH\" \
           ARG8=\"$CONFIG_FILE\" \
+          ARG9=\"$OPENAI_API_KEY\" \
           'bash -s' <<'ENDSSH'
 
     # Change to work dir
@@ -63,6 +72,10 @@ ssh euler ARG1=\"$1\" \
     # Export to avoid relativ folder import errors in python
     echo "### Add to python path: $ARG7/"
     export PYTHONPATH="${PYTHONPATH}:$ARG7/"
+
+    # Export OPENAI API Key
+    echo "### Adding OpenAI API Key to Environment Variables: $ARG9"
+    export OPENAI_API_SECRET_KEY="$ARG9"
 
     # Load all updates
     echo "### Pulling commits..."
