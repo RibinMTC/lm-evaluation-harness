@@ -26,7 +26,7 @@ precision_values = [""]  # ["", "8b"]
 dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
 prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
 task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-num_fewshot_list = [""]  # [0, 1, 2, 4, 8] # [0] #
+num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # CUSTOM LtM Prompting
 # SummLtM1_20Minuten_21

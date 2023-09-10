@@ -14,6 +14,8 @@ lm_cache
 /report/reports/
 /configs/prompt_templates/SummarizationTask_*.json
 /configs/prompt_templates/SummLtM_*.json
+/configs/prompt_templates/SummLtM1_*.json
+/configs/prompt_templates/SummLtM2_*.json
 /configs/prompt_templates/SummLtMDe_*.json
 /configs/prompt_templates/SummFewshot*.json
 /configs/prompt_templates/MDSSumm_*.json
