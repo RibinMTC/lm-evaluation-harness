@@ -20,13 +20,35 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "mds-simple-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", "8b"]
-dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
-prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+precision_values = ["8b"]  # ["", "8b"]
+dataset_names = ["Wikinews"]  # ["20Minuten", "Wikinews"]
+prompt_versions = [50, 51]  # [1, 2, 3, 4, 5]
+task_base_names = ["MDSSumm_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
+
+"""
+ltm-experiment-stage-1-
+prompt_versions = [21, 22, 30, 31]
+task_base_names = ["SummLtM1_"]
+
+ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM STAGE 1
+-> TODO: dataset_names (for pre-processed dataset)
+prompt_versions = [23, 24, 32, 33]
+task_base_names = ["SummLtM2_"]
+
+mds-simple-
+prompt_versions = [50,51]
+task_base_names = ["MDSSumm_"]
+dataset_names = ["Wikinews"]
+
+fewshot-experiment-
+prompt_versions = [1,2,3,4,5]
+task_base_names = ["SummFewshot{num_fewshot}_"]
+num_fewshot_list = [0,1,2,4]
+
+"""
 
 # CUSTOM LtM Prompting
 # SummLtM1_20Minuten_21
@@ -82,7 +104,7 @@ inferable_args = {
     "gpu": {
         "default": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-13b-chat-hf": "a100-pcie-40gb",
+        "meta-llama/Llama-2-13b-chat-hf": "a100_80gb",
         "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100_80gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100_80gb",
@@ -93,8 +115,8 @@ inferable_args = {
     "num_gpus": {
         "default": 1,
         "meta-llama/Llama-2-7b-chat-hf": 1,
-        "meta-llama/Llama-2-13b-chat-hf": 2,
-        "meta-llama/Llama-2-70b-chat-hf": 2,
+        "meta-llama/Llama-2-13b-chat-hf": 1,
+        "meta-llama/Llama-2-70b-chat-hf": 1,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
         "garage-bAInd/Platypus2-70B-instruct": 2,
         "bigscience/bloomz-7b1-mt": 1,
@@ -180,6 +202,16 @@ else:
     print("Execution stopped.")
     exit(0)
 
+
+# Adding null representation to avoid problems with generated yaml config files
+class NullRepresenter:
+    def __call__(self, repr, data):
+        ret_val = repr.represent_scalar(u'tag:yaml.org,2002:null', u'null')
+        return ret_val
+
+
+my_represent_none = NullRepresenter()
+
 # make a logs dir if it doesn't exist
 if not os.path.exists("./logs"):
     os.makedirs("./logs")
@@ -210,6 +242,7 @@ with open(f"./logs/{experiment_name}.jsonl", "a") as jsonl_file, open(f"./logs/{
         yamlPrinter = yaml.YAML()
         yamlPrinter.preserve_quotes = True
         yamlPrinter.default_flow_style = False
+        yamlPrinter.representer.add_representer(type(None), my_represent_none)
         with open(f"../{BASE_CONFIG}") as f:
             y = yamlPrinter.load(f)
         y["model"] = config['model']
