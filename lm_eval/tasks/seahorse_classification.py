@@ -24,6 +24,9 @@ class SeahorseClassificationTask(Task):
     # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
 
+    positive_label = "True"  # True Yes
+    negative_label = "False"  # False No
+
     worker_lang_to_language_dict = {
         "en-US": "English",
         "es-ES": "Spanish",
@@ -86,8 +89,8 @@ Summary: {summary}
         return " " + label
 
     def construct_requests(self, doc, ctx):
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        ll_true, _ = rf.loglikelihood(ctx, " True")
+        ll_false, _ = rf.loglikelihood(ctx, f" {self.negative_label}")
+        ll_true, _ = rf.loglikelihood(ctx, f" {self.positive_label}")
         return ll_false, ll_true
 
     @staticmethod
@@ -105,7 +108,7 @@ Summary: {summary}
         # sklearn documentation: roc prediction probability corresponds to the probability of the class with the
         # greater label(=1)
         results_probabilities = np.exp(results)
-        true_prediction_probability = results_probabilities[1]/np.sum(results_probabilities)
+        true_prediction_probability = results_probabilities[1] / np.sum(results_probabilities)
         truth = self.convert_label(self.doc_to_target(doc))
         print(f"Results: {results}, Prediction {prediction}, Truth: {truth}")
         return {"bacc": (prediction, truth),
