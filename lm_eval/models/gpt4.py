@@ -128,64 +128,26 @@ class OpenaiCompletionsLM(LM):
     def greedy_until(self, requests) -> List[str]:
         if not requests:
             return []
-        res = []
-        requests = [req.args for req in requests]
 
-        def _collate(x):
-            toks = self.tok_encode(x[0])
-            return len(toks), x[0]
-
-        re_ord = utils.Reorderer(requests, _collate)
-
-        def sameuntil_chunks(xs, size):
-            ret = []
-            lastuntil = xs[0][1]
-            for x in xs:
-                if len(ret) >= size or x[1] != lastuntil:
-                    yield ret, lastuntil
-                    ret = []
-                    lastuntil = x[1]
-                ret.append(x)
-
-            if ret:
-                yield ret, lastuntil
-
-        # todo: more intelligent batching for heterogeneous `until`
-        for chunk, request_args in tqdm(
-                list(sameuntil_chunks(re_ord.get_reordered(), self.REQ_CHUNK_SIZE))
-        ):
-            inps = []
-            for context, _ in chunk:
-                context_enc = self.tok_encode(context)
-                inp = context_enc[-(self.max_length - self.max_gen_toks):]
-                inps.append(inp)
-
-            until = request_args.get("until", ["<|endoftext|>"])
+        results = []
+        for request in tqdm(requests):
+            messages = [{"role": "user", "content": request[0]}]
 
             # TODO: temperature parameter -> is it accessible here?
             response = oa_completion(
                 model=self.engine,
-                messages=inps,
+                messages=messages,
                 max_tokens=self.max_gen_toks,
                 temperature=0.0,
             )
 
-            for resp, (context, args_) in zip(response.choices, chunk):
-                s = resp["text"]
-
-                until_ = args_.get("until", ["<|endoftext|>"])
-
-                for term in until_:
-                    if len(term) > 0:
-                        s = s.split(term)[0]
-
-                # partial caching
-                self.cache_hook.add_partial(
-                    "greedy_until", (context, {"until": until_}), s
-                )
-
-                res.append(s)
-        return re_ord.get_original(res)
+            # prepare the response
+            if len(response.choices) == 0:
+                prediction = ""
+            else:
+                prediction = response.choices[0].message.content
+            results.append(prediction)
+        return results
 
     def _encode_pair(
             self, context: str, continuation: str

@@ -110,11 +110,18 @@ def main():
 
     tasks_string = "TASK_" + "-".join(task_names)
     model_args_dict = utils.simple_parse_args_string(args.model_args)
-    model_id = model_args_dict["pretrained"].replace("/", "-")
-    model_string = f"MODEL_{model_id}"
+    if "pretrained" in model_args_dict:
+        model_id = model_args_dict["pretrained"]
+        model_id_path = model_args_dict["pretrained"].replace("/", "-")
+    elif "engine" in model_args_dict:
+        model_id = model_args_dict["engine"]
+        model_id_path = model_args_dict["engine"]
+    else:
+        return NotImplementedError("No model id found in model args")
+    model_string = f"MODEL_{model_id_path}"
     few_shot_string = f"{args.num_fewshot}-SHOT"
 
-    args.output_base_path = os.path.join(args.output_base_path, model_id)
+    args.output_base_path = os.path.join(args.output_base_path, model_id_path)
 
     wandb_run_name = randomname.get_name() + '_' + '_'.join(
         [tasks_string, model_string, few_shot_string])
@@ -126,7 +133,7 @@ def main():
 
     results = evaluator.simple_evaluate(
         model=args.model,
-        model_id=model_args_dict["pretrained"],
+        model_id=model_id,
         model_args=args.model_args,
         tasks=task_names,
         prompt_version_per_task=args.prompt_version_per_task,
