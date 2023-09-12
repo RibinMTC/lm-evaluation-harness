@@ -11,25 +11,30 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    # "gpt4",
+    "gpt-4",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "gpt-4-20min-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
-prompt_versions = [50, 51]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [1, 2, 3, 4, 5]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 """
-ltm-experiment-stage-1-
+gpt-4-20min- (SCHEDULED)
+dataset_names = ["20Minuten"]
+prompt_versions = [1,2,3,4,5]
+task_base_names = ["SummSample_"]
+
+ltm-experiment-stage-1- (SCHEDULED)
 prompt_versions = [21, 22, 30, 31]
 task_base_names = ["SummLtM1_"]
 
@@ -43,15 +48,21 @@ prompt_versions = [50,51]
 task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
 
-fewshot-experiment-
+fewshot-experiment- (SCHEDULED)
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummFewshot{num_fewshot}_"]
 num_fewshot_list = [0,1,2,4]
 
-versions-experiment-
+versions-experiment- (SCHEDULED)
 => Different llama2 versions
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummarizationTask_"]
+NOTE:
+- SummarizationTask_20Minuten_1_8b_MODEL_fangloveskari-ORCA_LLaMA_70B_QLoRA_0-SHOT
+    - -> requires 54 hours???
+- SummarizationTask_20Minuten_2_8b_MODEL_fangloveskari-ORCA_LLaMA_70B_QLoRA_0-SHOT
+    - -> requires 54 hours as well???
+=> KILLED BOTH FOR NOW
 
 """
 
@@ -79,6 +90,7 @@ task_base_names = ["SummarizationTask_"]
 inferable_args = {
     "model": {
         "default": "hf-causal-experimental",
+        "gpt-4": "gpt4",
         "meta-llama/Llama-2-7b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-13b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-70b-chat-hf": "hf-causal-experimental",
@@ -97,17 +109,19 @@ inferable_args = {
     },
     "run_duration_hours": {
         "default": "24:00",
+        "gpt-4": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "16:00",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "18:00",
-        "garage-bAInd/Platypus2-70B-instruct": "18:00",
+        "meta-llama/Llama-2-70b-chat-hf": "22:00",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
+        "garage-bAInd/Platypus2-70B-instruct": "22:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "18:00",
     },
     "gpu": {
         "default": "rtx_3090",
+        "gpt-4": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "a100_80gb",
         "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
@@ -119,14 +133,15 @@ inferable_args = {
     },
     "num_gpus": {
         "default": 1,
+        "gpt-4": 1,
         "meta-llama/Llama-2-7b-chat-hf": 1,
         "meta-llama/Llama-2-13b-chat-hf": 1,
         "meta-llama/Llama-2-70b-chat-hf": 1,
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
-        "garage-bAInd/Platypus2-70B-instruct": 2,
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 1,
+        "garage-bAInd/Platypus2-70B-instruct": 1,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
-        "tiiuae/falcon-40b-instruct": 2,
+        "tiiuae/falcon-40b-instruct": 1,
     },
     "precision": {
         "default": "",
@@ -142,6 +157,7 @@ TMP_EULER_CONFIG = "tmp_euler_config.json"
 
 task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
 model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
+model_args_schema_gpt4 = "engine=gpt-4"
 
 """
     Build the configurations
@@ -169,7 +185,12 @@ for combination in combinations:
 
     # Build the arguments (eval_config)
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
-    model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
+    if inferable_args["model"] == "gpt4":
+        model_args = model_args_schema_gpt4
+    elif inferable_args["model"] == "hf-causal-experimental":
+        model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
+    else:
+        raise NotImplementedError(f"Model {model} not implemented yet.")
     task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}", precision=f"{precision_task_suffix}")
     # Build the arguments (euler_config)
     run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
