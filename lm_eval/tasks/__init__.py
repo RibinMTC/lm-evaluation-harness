@@ -71,6 +71,7 @@ from . import frank_hallucination_classification
 from . import xsum_faith_hallucination_classification
 from . import swisstext23_summarization
 from . import seahorse_classification
+from . import swisstext23_faithfulness_classification
 
 ########################################
 # Translation tasks
@@ -332,6 +333,7 @@ TASK_REGISTRY = {
     "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
+    "swisstext23_faithfulness_classification": swisstext23_faithfulness_classification.SwissText23FaithfulnessClassificationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
