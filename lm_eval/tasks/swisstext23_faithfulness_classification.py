@@ -1,10 +1,16 @@
 from functools import partial
+from typing import List, Optional, Dict
 
+import PIL
 import evaluate
 import numpy as np
+import wandb
 
 from lm_eval.base import Task, rf
 from lm_eval.metrics import complex_metric_agg
+from lm_eval.tasks.base_plotter import Plotter
+import pandas as pd
+import matplotlib.pyplot as plt
 
 roc_auc_metric = evaluate.load("roc_auc")
 
@@ -17,7 +23,7 @@ def _roc_auc_agg(items):
     return result
 
 
-class SwissText23FaithfulnessClassificationTask(Task):
+class SwissText23FaithfulnessClassificationTask(Task, Plotter):
     VERSION = 0
     # dataset as denoted in HuggingFace `datasets`.
     DATASET_PATH = "mtc/swisstext23-20min-gold_annotation_train_test_data"
@@ -37,6 +43,7 @@ class SwissText23FaithfulnessClassificationTask(Task):
                                "faithful, and 'unfaithful' if it's not.\nArticle: {article}\nSentence: {"
                                "sentence}\n\n### Assistant:\n")
 
+    task_results_info_dict = {}
 
     def has_training_docs(self):
         return False
@@ -78,7 +85,6 @@ class SwissText23FaithfulnessClassificationTask(Task):
         ll_true, _ = rf.loglikelihood(ctx, f" {self.positive_label}")
         return ll_false, ll_true
 
-
     def process_results(self, doc, results):
         prediction = np.argmax(results)
         # sklearn documentation: roc prediction probability corresponds to the probability of the class with the
@@ -86,12 +92,16 @@ class SwissText23FaithfulnessClassificationTask(Task):
         results_probabilities = np.exp(results)
         true_prediction_probability = results_probabilities[1] / np.sum(results_probabilities)
         truth = doc["label"]
+        system = doc["system"]
+        doc_id = doc["id"]
+        self.task_results_info_dict[doc_id] = {"prediction": prediction, "reference": truth, "system": system}
         print(f"Results: {results}, Prediction {prediction}, Truth: {truth}")
         return {"bacc": (prediction, truth),
                 "f1": (prediction, truth),
                 "precision": (prediction, truth),
                 "recall": (prediction, truth),
-                "roc_auc": (true_prediction_probability, truth)}
+                "roc_auc": (true_prediction_probability, truth)
+                }
 
     def aggregation(self):
         return {
@@ -118,3 +128,33 @@ class SwissText23FaithfulnessClassificationTask(Task):
                 "precision": True,
                 "recall": True,
                 "roc_auc": True}
+
+    def get_plots(self):
+        task_results_info_df = pd.DataFrame.from_dict(self.task_results_info_dict).T
+        predictions = task_results_info_df["prediction"].tolist()
+        references = task_results_info_df["reference"].tolist()
+        class_names = ["Unfaithful", "Faithful"]
+        all_plots = {"confusion_matrix": wandb.plot.confusion_matrix(y_true=references, preds=predictions,
+                                                                     class_names=class_names)}
+        misclassifications_per_system = {}
+        for task_result_info in self.task_results_info_dict.values():
+            system = task_result_info["system"]
+            if system not in misclassifications_per_system:
+                misclassifications_per_system[system] = {
+                    "false_positives": 0,
+                    "false_negatives": 0
+                }
+            prediction = task_result_info["prediction"]
+            reference = task_result_info["reference"]
+            if prediction > reference:
+                misclassifications_per_system[system]["false_positives"] += 1
+            elif reference > prediction:
+                misclassifications_per_system[system]["false_negatives"] += 1
+        data = [[system, item["false_positives"], item["false_negatives"]] for system, item in
+                misclassifications_per_system.items()]
+        table = wandb.Table(data=data, columns=["system", "false_positives", "false_negatives"])
+        all_plots["false_positives_per_system"] = wandb.plot.bar(table=table, label="system", value="false_positives",
+                                                                 title="Per System False Positives")
+        all_plots["false_negatives_per_system"] = wandb.plot.bar(table=table, label="system", value="false_negatives",
+                                                                 title="Per System False Negatives")
+        return all_plots

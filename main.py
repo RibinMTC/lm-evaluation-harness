@@ -140,8 +140,8 @@ def main():
         write_out=args.write_out,
         output_base_path=args.output_base_path,
     )
-
-    dumped = json.dumps(results, indent=2)
+    results_dump = {"results ": results["results"], "write_out_info": results["write_out_info"]}
+    dumped = json.dumps(results_dump, indent=2)
 
     if args.output_path:
         os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
@@ -156,12 +156,15 @@ def main():
     if args.wandb_on:
         wandb.log(results["results"])
         write_out_info = results["write_out_info"]
+        plot_info = results["plot_info"]
         wandb.Table.MAX_ARTIFACTS_ROWS = 600000
         for task_name, task_output in write_out_info.items():
             df = pd.DataFrame.from_dict(task_output)
             task_table = wandb.Table(dataframe=df)
             table_name = task_name + "_output_table"
             wandb.log({table_name: task_table})
+        for task_name, plot_output in plot_info.items():
+            wandb.log(plot_output)
         print(evaluator.make_table(results))
 
 

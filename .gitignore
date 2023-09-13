@@ -7,3 +7,4 @@ lm_cache
 /wandb/
 /tests/testdata/
 /germanquad_results/
+/results/

@@ -6,6 +6,7 @@ import lm_eval.metrics
 import lm_eval.models
 import lm_eval.tasks
 import lm_eval.base
+from lm_eval.tasks.base_plotter import Plotter
 from lm_eval.utils import positional_deprecated, run_task_tests
 import json
 import pathlib
@@ -332,6 +333,7 @@ def evaluate(
                 if doc_id not in overlaps[task_name]:
                     vals[(task_name, metric + decontaminate_suffix)].append(value)
 
+    plot_info = {}
     # aggregate results
     for (task_name, metric), items in vals.items():
         task = task_dict[task_name]
@@ -344,7 +346,10 @@ def evaluate(
 
         # hotfix: bleu, chrf, ter seem to be really expensive to bootstrap
         # so we run them less iterations. still looking for a cleaner way to do this
-
+        if write_out:
+            if not isinstance(task, Plotter):
+                continue
+            plot_info[task_name] = task.get_plots()
         stderr = lm_eval.metrics.stderr_for_metric(
             metric=task.aggregation()[real_metric],
             bootstrap_iters=min(bootstrap_iters, 1000)
@@ -359,11 +364,11 @@ def evaluate(
         write_out_to_json(output_base_path, task_dict_items, write_out_info)
     else:
         write_out_info = None
-    return {"results": dict(results), "versions": dict(versions), "write_out_info": write_out_info}
+    return {"results": dict(results), "versions": dict(versions), "write_out_info": write_out_info,
+            'plot_info': plot_info}
 
 
 def write_out_to_json(output_base_path, task_dict_items, write_out_info):
-
     output_base_path = (
         pathlib.Path(output_base_path)
         if output_base_path is not None
