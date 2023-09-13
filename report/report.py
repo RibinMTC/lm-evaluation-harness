@@ -563,6 +563,109 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
     return out_overview, out_detail, agg_names
 
 
+def statistical_tests(df_all, df_non_empty, metric_names, comparison_columns=['model', 'promptVersion'], prompt_category_group="model", promptVersionCol="promptVersion"):
+    # Output a json file with all the statistical test outputs
+    # Loop over all comparison columns, for each column, compare the individual values of each metric
+    # additionally calculate columns based on the prompt version and use them as well
+
+    df_stat = df_all.copy()
+    df_stat_non_empty = df_non_empty.copy()
+
+    """
+    Prompt Categories:
+    - German/English (Language of the prompt)
+    - Short/Long (Length of the prompt)
+    - TargetLang (whether it is mentioned in the prompt)
+    - Length (Whether the length of the output is mentioned or not)
+    - Domain (Whether the domain is mentioned or not)
+    - Style (Whether the output style is mentioned or not)
+    - Personification
+    - Simplification
+    """
+    analyzeCategories = ["German", "English", "TargetLang", "Style", "Personification"]
+    promptCategories = {
+        "1": ["English", "Long", "TargetLang", "Length"],
+        "2": ["German", "Long", "TargetLang", "Length"],
+        "3": ["English", "Long", "TargetLang", "Length", "Domain", "Style"],
+        "4": ["German", "Long", "TargetLang", "Length", "Domain", "Style"],
+        "5": ["Short"],
+        "6": ["English", "Short"],
+        "7": ["German", "Short"],
+        "8": ["English", "Short", "Domain"],
+        "9": ["German", "Long", "Domain"],
+        "10": ["English", "Long", "Length", "Simplification"],
+        "11": ["German", "Long", "Length", "Simplification"],
+        "12": ["English", "Long", "Length", "Domain", "Style", "Personification"],
+        "13": ["German", "Long", "Length", "Domain", "Style", "Personification"],
+        "14": ["English", "Long", "Length", "Domain", "Personification"],
+        "15": ["German", "Long", "Length", "Domain", "Personification"],
+        "16": ["English", "Long", "Domain", "Simplification"],
+        "17": ["German", "Long", "Domain", "Simplification"],
+        "18": ["English", "Long"],
+        "19": ["German", "Long"],
+        "20": ["English", "Long", "TargetLang"],
+    }
+    # Build the inverted index mapping the categories to a list of promptVersions
+    promptCategoriesInv = {}
+    for promptVersion in promptCategories:
+        for category in promptCategories[promptVersion]:
+            if category not in promptCategoriesInv:
+                promptCategoriesInv[category] = []
+            promptCategoriesInv[category].append(promptVersion)
+    # Add the categories to the dataframe based on the promptVersion column
+    for promptCat in analyzeCategories:
+        if promptCat not in promptCategoriesInv:
+            raise ValueError(f"Prompt Category {promptCat} not found in promptCategoriesInv")
+        df_stat[promptCat] = df_stat["promptVersion"].apply(lambda x: 1 if x in promptCategoriesInv[promptCat] else 0)
+
+    results = {lbl: {} for lbl in comparison_columns + ['promptCategories']}
+
+    # Calculate the tests for the label categories
+    for group_label in df_stat[prompt_category_group].unique():
+        df_group = df_stat[df_stat[prompt_category_group] == group_label]
+        results['promptCategories'][group_label] = {}
+        for metric_name in metric_names:
+            results['promptCategories'][group_label][metric_name] = {}
+            pValues = {}
+            # make 1 vs all comparisons
+            for promptCat in analyzeCategories:
+                # get promptVersions for the current category (in-group), and the (out-group) promptVersions not in the current category
+                promptVersions_in = promptCategoriesInv[promptCat]
+                promptVersions_out = [promptVersion for promptVersion in df_group[promptVersionCol] if promptVersion not in promptVersions_in]
+
+                in_group = df_group[df_group[promptVersionCol].isin(promptVersions_in)]
+                out_group = df_group[df_group[promptVersionCol].isin(promptVersions_out)]
+
+                # make dependent t-test and Wilcoxon matched-pairs test for each metric
+
+
+
+
+
+            for comparison_label in df_stat[prompt_category_group].unique():
+                if group_label == comparison_label:
+                    continue
+                df_comparison = df_stat[df_stat[prompt_category_group] == comparison_label]
+                # calculate the test
+                test, pvalue = scipy.stats.ranksums(df_group[metric_name], df_comparison[metric_name])
+                results['promptCategories'][group_label][metric_name][comparison_label] = {
+                    "test": test,
+                    "pvalue": pvalue
+                }
+
+
+    # Kruskal Wallis Test -> test if the distributions of the metrics are the same across the groups
+    # scipy.stats.kruskal
+    # parametric -> one-way repeated measures ANOVA
+
+    # pair-wise Wilcoxon Rank Sum Test -> test if the distributions of the metrics are the same between each pair of groups
+    # pair-wise Wolcoxon matched-pairs test
+    # scipy.stats.wilcoxon
+    # parametric -> dependent t-test
+
+    pass
+
+
 def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion"], numExamples=2):
     print("Finding examples to inspect...")
     # percentile ranges to sample from

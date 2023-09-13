@@ -11,21 +11,21 @@ import random, string
     Experiment Combination Parameters
 """
 models = [
-    "gpt-4",
+    # "gpt-4",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "gpt-4-20min-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", "8b"]
+precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
-prompt_versions = [1, 2, 3, 4, 5]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 """
@@ -39,11 +39,13 @@ prompt_versions = [21, 22, 30, 31]
 task_base_names = ["SummLtM1_"]
 
 ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM STAGE 1
+=> Make sure to only include the main points and not the old prompt as well
+=> Make a second version leaving the old prompt in there as well??? (ASK SOMEONE)
 -> TODO: dataset_names (for pre-processed dataset)
 prompt_versions = [23, 24, 32, 33]
 task_base_names = ["SummLtM2_"]
 
-mds-simple-
+mds-simple- (SCHEDULED)
 prompt_versions = [50,51]
 task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
@@ -112,18 +114,18 @@ inferable_args = {
         "gpt-4": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "22:00",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
-        "garage-bAInd/Platypus2-70B-instruct": "22:00",
+        "meta-llama/Llama-2-70b-chat-hf": "24:00",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "24:00",
+        "garage-bAInd/Platypus2-70B-instruct": "24:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
-        "tiiuae/falcon-40b-instruct": "18:00",
+        "tiiuae/falcon-40b-instruct": "24:00",
     },
     "gpu": {
         "default": "rtx_3090",
         "gpt-4": "rtx_3090",
-        "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-13b-chat-hf": "a100_80gb",
+        "meta-llama/Llama-2-7b-chat-hf": "rtx_2080_ti",
+        "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100_80gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100_80gb",
@@ -136,9 +138,9 @@ inferable_args = {
         "gpt-4": 1,
         "meta-llama/Llama-2-7b-chat-hf": 1,
         "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 1,
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 1,
-        "garage-bAInd/Platypus2-70B-instruct": 1,
+        "meta-llama/Llama-2-70b-chat-hf": 2,
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
+        "garage-bAInd/Platypus2-70B-instruct": 2,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 1,
@@ -185,9 +187,9 @@ for combination in combinations:
 
     # Build the arguments (eval_config)
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
-    if inferable_args["model"] == "gpt4":
+    if inferable_args["model"][model] == "gpt4":
         model_args = model_args_schema_gpt4
-    elif inferable_args["model"] == "hf-causal-experimental":
+    elif inferable_args["model"][model] == "hf-causal-experimental":
         model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
     else:
         raise NotImplementedError(f"Model {model} not implemented yet.")
