@@ -30,19 +30,21 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
     article_key_name = None
     summary_key_name = None
+    language = ""
     label_key_name = "is_faithful"
 
     positive_label = "faithful"
     negative_label = "unfaithful"
 
-    default_prompt_template = ("You'll be given a German sentence and a German article. Your task is to determine if "
-                               "the sentence accurately reflects the content of the article without adding any "
-                               "unmentioned details or contradicting any information from the article. It's not "
-                               "necessary for the sentence to cover all the main ideas of the article, just that the "
-                               "details it does mention are correctly derived from the text. Provide your judgment by "
-                               "outputting only 'faithful' if the sentence is faithful, and 'unfaithful' if it's "
-                               "not.\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
-                               )
+    default_prompt_template = (
+        "You'll be given a {language} sentence and a {language} article. Your task is to determine if "
+        "the sentence accurately reflects the content of the article without adding any "
+        "unmentioned details or contradicting any information from the article. It's not "
+        "necessary for the sentence to cover all the main ideas of the article, just that the "
+        "details it does mention are correctly derived from the text. Provide your judgment by "
+        "outputting only 'faithful' if the sentence is faithful, and 'unfaithful' if it's "
+        "not.\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
+        )
 
     task_results_info_list = []
 
@@ -73,7 +75,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         if not self.prompt_template:
             self.prompt_template = self.default_prompt_template
         prompt = self.prompt_template.format(article=doc[self.article_key_name],
-                                             sentence=doc[self.summary_key_name], label="")
+                                             sentence=doc[self.summary_key_name], label="", language=self.language)
         return prompt
 
     def doc_to_target(self, doc):
@@ -143,26 +145,27 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
 class FaithfulnessClassificationTaskFactCC(FaithfulnessClassificationBaseTask):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_factcc"
-
+    language = "English"
     article_key_name = "text"
     summary_key_name = "claim"
 
 
 class FaithfulnessClassificationTaskFrank(FaithfulnessClassificationBaseTask):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_frank"
+    language = "English"
     article_key_name = "article"
     summary_key_name = "summary"
 
 
 class FaithfulnessClassificationTaskSwissText23GoldAnnotation(FaithfulnessClassificationBaseTask):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_gold_annotation"
-
+    language = "German"
     article_key_name = "article_with_lead"
     summary_key_name = "text"
 
 
 class FaithfulnessClassificationTaskXsumFaith(FaithfulnessClassificationBaseTask):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_xsum_faith"
-
+    language = "English"
     article_key_name = "text"
     summary_key_name = "summary"
