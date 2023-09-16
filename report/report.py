@@ -2,8 +2,10 @@ import re
 from tqdm import tqdm
 import json
 import os
+import sys
 import math
 from scipy.stats import bootstrap
+import scipy.stats as stats
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -272,7 +274,9 @@ def lang_detect(df, col_name, fast=True):
         fast_lang_detector = fasttext.load_model(pretrained_model_path)
 
         # Predict
-        predictions = fast_lang_detector.predict(df[col_name].tolist())
+        # remove any newline characters from the text
+        text_list = [text.replace("\n", " ") for text in df[col_name].tolist()]
+        predictions = fast_lang_detector.predict(text_list)
         post_preds = [(t[0][0].replace('__label__', ''), t[1][0]) for t in zip(predictions[0], predictions[1])]
 
         # Postprocess
@@ -563,13 +567,12 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
     return out_overview, out_detail, agg_names
 
 
-def statistical_tests(df_all, df_non_empty, metric_names, comparison_columns=['model', 'promptVersion'], prompt_category_group="model", promptVersionCol="promptVersion"):
+def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVersion'], prompt_category_group="model", promptVersionCol="promptVersion"):
     # Output a json file with all the statistical test outputs
     # Loop over all comparison columns, for each column, compare the individual values of each metric
     # additionally calculate columns based on the prompt version and use them as well
 
-    df_stat = df_all.copy()
-    df_stat_non_empty = df_non_empty.copy()
+    df_stat = df.copy()
 
     """
     Prompt Categories:
@@ -637,22 +640,28 @@ def statistical_tests(df_all, df_non_empty, metric_names, comparison_columns=['m
                 out_group = df_group[df_group[promptVersionCol].isin(promptVersions_out)]
 
                 # make dependent t-test and Wilcoxon matched-pairs test for each metric
+                ttest_res = stats.ttest_rel(in_group[metric_name], out_group[metric_name])
 
+                # TODO: Wilcoxon -> compare one-vs-all and take the mean of all paired samples?
+                # TODO: Wilcoxon -> compare all pairs (1vs1)?
+                # wilcoxon_res = stats.wilcoxon(in_group[metric_name], out_group[metric_name])
 
-
-
-
-            for comparison_label in df_stat[prompt_category_group].unique():
-                if group_label == comparison_label:
-                    continue
-                df_comparison = df_stat[df_stat[prompt_category_group] == comparison_label]
-                # calculate the test
-                test, pvalue = scipy.stats.ranksums(df_group[metric_name], df_comparison[metric_name])
-                results['promptCategories'][group_label][metric_name][comparison_label] = {
-                    "test": test,
-                    "pvalue": pvalue
+                # save the p-values
+                pValues[promptCat] = {
+                    "ttest": ttest_res.pvalue,
+                    # "wilcoxon": wilcoxon_res.pvalue
                 }
+            # save the p-values (for each metric), both raw and adjusted (with bonferroni correction)
+            results['promptCategories'][group_label][metric_name]["pValues"] = pValues
+            pValuesList = [pValues[promptCat]["ttest"] for promptCat in pValues]
+            pValuesAdj = stats.false_discovery_control(pValuesList)
+            results['promptCategories'][group_label][metric_name]["pValuesAdjusted"] = {}
+            for i, promptCat in enumerate(pValues):
+                results['promptCategories'][group_label][metric_name]["pValuesAdjusted"][promptCat] = pValuesAdj[i]
 
+    # loop over the comparison_columns
+
+    # TODO: CONTINUE HERE
 
     # Kruskal Wallis Test -> test if the distributions of the metrics are the same across the groups
     # scipy.stats.kruskal
@@ -735,7 +744,7 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
     return out
 
 
-def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["model", "promptVersion"]) -> Tuple[List[List[str]], List[List[str]]]:
+def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["model", "promptVersion"], file_suffix="") -> Tuple[List[List[str]], List[List[str]]]:
     print("Making metric distribution figures...")
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
 
@@ -760,7 +769,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -769,7 +778,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -778,7 +787,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -795,7 +804,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -804,7 +813,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -813,7 +822,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.png")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -823,11 +832,11 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     for metric_name in metric_names:
         # 0-1 and 1-0 plot
         for a, b in [(0, 1), (1, 0)]:
-            violin_plot = sns.violinplot(data=df_prompt, x=groupbyList[a], hue=groupbyList[b], y=metric_name)
+            violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name)
             if metric_name in metric_0_1_range:
                 violin_plot.set_ylim(0, 1)
             # save
-            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot.png")
+            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot{file_suffix}.png")
             plt.savefig(violin_plot_path)
             out_paths.append(violin_plot_path)
             plt.close()
@@ -867,7 +876,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "few-shot-initial"
+experiment_name = "versions-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -901,6 +910,17 @@ experiment_config = {
         ],
         "datasets": ["20Minuten"]
     },
+    "versions-experiment": {
+        "groupByList": ["promptVersion", "model"],
+        "models": [
+            "gpt-4",
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            # "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "datasets": ["20Minuten"]
+    },
     "few-shot-initial": {
         "groupByList": ["task_name", "precision"],
         "models": [
@@ -918,6 +938,7 @@ models = experiment_config[experiment_name]["models"]
 datasets = experiment_config[experiment_name]["datasets"]
 RESULTS_PATH = os.path.join(RESULTS_BASE_PATH, experiment_name)
 shortNames = {
+    "gpt-4": "GPT 4",
     "meta-llama/Llama-2-7b-chat-hf": "Llama-2  7b",
     "meta-llama/Llama-2-13b-chat-hf": "Llama-2 13b",
     "meta-llama/Llama-2-70b-chat-hf": "Llama-2 70b",
@@ -1023,7 +1044,9 @@ def make_report_plots():
         # make violin (distribution) plot showing distribution of metric values per model and prompt
         # ... group by model (comparing prompts)
         # ... group by prompt (comparing models)
-        violin_figure_paths = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList)
+        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList, file_suffix="")
+        _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
+        _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
 
         df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
 
@@ -1045,5 +1068,7 @@ def make_report_plots():
 
 
 if __name__ == "__main__":
-    main()
+    # if passing argument --full, run the main function
+    if "--full" in sys.argv:
+        main()
     make_report_plots()

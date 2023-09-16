@@ -42,6 +42,7 @@ def _bertscore_metric(predictions, references, key=None):
         return result
     return result[key]
 
+
 # TODO: Include BartScore???
 # from transformers import MBartForConditionalGeneration, MBart50Tokenizer
 # self.tokenizer = MBart50Tokenizer.from_pretrained("facebook/mbart-large-50", src_lang=YOUR_SRC_LANG, tgt_lang=YOUR_TGT_LANG)
@@ -268,16 +269,42 @@ class SummarizationTaskBase(Task):
         return description + labeled_examples + example
 
 
+class SummShard0_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20min0"
+
+
+class SummShard1_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20min1"
+
+
+class SummShard2_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20min2"
+
+
+class SummShard3_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20min3"
+
+
 class SummSampleSmol_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"
     DATASET_PATH = "roysc/20minuten_sample_250"
     # DATASET_PATH = "roysc/20minuten_sample_10"
 
+
 class SummarizationTask_20Minuten(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
+
 
 class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     VERSION = 0

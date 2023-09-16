@@ -20,16 +20,16 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"]
-prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-num_fewshot_list = [0]  # [0, 1, 2] # [0] #
+dataset_names = ["20min0", "20min1", "20min2", "20min3"]  # ["20Minuten", "Wikinews"]
+prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
 
 """
-gpt-4-20min- (SCHEDULED)
+gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummSample_"]
@@ -45,7 +45,7 @@ ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM ST
 prompt_versions = [23, 24, 32, 33]
 task_base_names = ["SummLtM2_"]
 
-mds-simple- (SCHEDULED)
+mds-simple- (FINISHED)
 prompt_versions = [50,51]
 task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
@@ -53,7 +53,7 @@ dataset_names = ["Wikinews"]
 fewshot-experiment- (SCHEDULED)
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummFewshot{num_fewshot}_"]
-num_fewshot_list = [0,1,2,4]
+num_fewshot_list = [0,1,2]
 
 versions-experiment- (SCHEDULED)
 => Different llama2 versions
@@ -114,9 +114,9 @@ inferable_args = {
         "gpt-4": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "24:00",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "24:00",
-        "garage-bAInd/Platypus2-70B-instruct": "24:00",
+        "meta-llama/Llama-2-70b-chat-hf": "35:00",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "50:00",
+        "garage-bAInd/Platypus2-70B-instruct": "40:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
@@ -126,12 +126,12 @@ inferable_args = {
         "gpt-4": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_2080_ti",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100_80gb",
-        "garage-bAInd/Platypus2-70B-instruct": "a100_80gb",
+        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
+        "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
-        "tiiuae/falcon-40b-instruct": "a100_80gb",
+        "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
     },
     "num_gpus": {
         "default": 1,
@@ -143,7 +143,7 @@ inferable_args = {
         "garage-bAInd/Platypus2-70B-instruct": 2,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
-        "tiiuae/falcon-40b-instruct": 1,
+        "tiiuae/falcon-40b-instruct": 4,
     },
     "precision": {
         "default": "",
