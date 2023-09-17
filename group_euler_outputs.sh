@@ -24,6 +24,8 @@ done
 
 # Exclude any subfolders from folder
 files=$(find euler_outputs -maxdepth 1 -type f)
+# remove the folder from the path of each file in files
+files=$(echo "${files}" | sed "s/${folder}\///g")
 # exclude .DS_Store files
 files=$(echo "${files}" | grep -v ".DS_Store")
 # sort the files by time

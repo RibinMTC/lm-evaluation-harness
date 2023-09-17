@@ -23,7 +23,7 @@ models = [
 experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20min0", "20min1", "20min2", "20min3"]  # ["20Minuten", "Wikinews"]
+dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
 prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
 task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
@@ -51,7 +51,7 @@ task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
 
 fewshot-experiment- (SCHEDULED)
-prompt_versions = [1,2,3,4,5]
+prompt_versions = [5] # [1,2,3,4,5]
 task_base_names = ["SummFewshot{num_fewshot}_"]
 num_fewshot_list = [0,1,2]
 
