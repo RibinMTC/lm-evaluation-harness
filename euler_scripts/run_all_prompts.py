@@ -24,7 +24,7 @@ experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_low
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
+prompt_versions = [5]  # [1, 2, 3, 4, 5]
 task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
 
@@ -116,7 +116,7 @@ inferable_args = {
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
         "meta-llama/Llama-2-70b-chat-hf": "35:00",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "50:00",
-        "garage-bAInd/Platypus2-70B-instruct": "40:00",
+        "garage-bAInd/Platypus2-70B-instruct": "50:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
