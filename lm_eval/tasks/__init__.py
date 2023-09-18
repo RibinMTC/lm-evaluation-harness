@@ -479,6 +479,7 @@ TASK_REGISTRY = {
     "SummSample_20Minuten_3": llm_summarization_mt.SummSampleSmol_20Minuten,
     "SummSample_20Minuten_4": llm_summarization_mt.SummSampleSmol_20Minuten,
     "SummSample_20Minuten_5": llm_summarization_mt.SummSampleSmol_20Minuten,
+    "SummNonEmpty_20min0_1_8b": llm_summarization_mt.SummShard0_20Minuten_NonEmpty,
     "SummarizationTask_20min0_1_8b": llm_summarization_mt.SummShard0_20Minuten,
     "SummarizationTask_20min0_2_8b": llm_summarization_mt.SummShard0_20Minuten,
     "SummarizationTask_20min0_3_8b": llm_summarization_mt.SummShard0_20Minuten,

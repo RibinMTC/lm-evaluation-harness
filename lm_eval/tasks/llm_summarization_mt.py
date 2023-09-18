@@ -117,7 +117,7 @@ class SummarizationTaskBase(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
+        continuation = rf.greedy_until(ctx, {"until": ["\n"]})  # ["\n"]
         return continuation
 
     def postprocess_text(self, prediction, reference):
@@ -267,6 +267,16 @@ class SummarizationTaskBase(Task):
 
         example = self.doc_to_text(doc)
         return description + labeled_examples + example
+
+
+class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20min0"
+
+    def construct_requests(self, doc, ctx):
+        continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
+        return continuation
 
 
 class SummShard0_20Minuten(SummarizationTaskBase):
