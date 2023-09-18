@@ -21,6 +21,7 @@ lm_cache
 /configs/prompt_templates/SummSample_*.json
 /configs/prompt_templates/MDSSumm_*.json
 /configs/prompt_templates/MDS2S_*.json
+/configs/prompt_templates/MDS2S*.json
 /configs/eval_config_*.yaml
 report/.DS_Store
 .DS_Store
