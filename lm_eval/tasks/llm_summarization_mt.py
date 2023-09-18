@@ -272,7 +272,8 @@ class SummarizationTaskBase(Task):
 class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"
-    DATASET_PATH = "roysc/20min0"
+    # DATASET_PATH = "roysc/20min0"
+    DATASET_PATH = "roysc/20minuten_sample_250"
 
     def construct_requests(self, doc, ctx):
         continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
