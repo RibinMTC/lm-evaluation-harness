@@ -311,6 +311,11 @@ class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     DATASET_PATH = "roysc/wikinewssum"
 
 
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_input_doc_split"
+
+
 class SummLtM_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"

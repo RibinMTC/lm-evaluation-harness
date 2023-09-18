@@ -20,15 +20,21 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "versions-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [5]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
+prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 """
+MDS-split-input-documents- (SCHEDULED)
+dataset_names = ["WikinewsSplit"]
+prompt_versions = [2]
+task_base_names = ["MDS2S"]
+
+
 gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
 prompt_versions = [1,2,3,4,5]
@@ -126,7 +132,7 @@ inferable_args = {
         "gpt-4": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_2080_ti",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
+        "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
@@ -138,7 +144,7 @@ inferable_args = {
         "gpt-4": 1,
         "meta-llama/Llama-2-7b-chat-hf": 1,
         "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 2,
+        "meta-llama/Llama-2-70b-chat-hf": 1,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
         "garage-bAInd/Platypus2-70B-instruct": 2,
         "bigscience/bloomz-7b1-mt": 1,

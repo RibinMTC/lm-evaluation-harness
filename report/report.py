@@ -876,7 +876,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "versions-experiment"
+experiment_name = "mds-baseline"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -886,6 +886,11 @@ experiment_config = {
         "groupByList": ["promptVersion", "model"],
         "models": ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"],
         "datasets": ["20Minuten"]
+    },
+    "mds-baseline": {
+        "groupByList": ["promptVersion", "model"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
     },
     "base-experiment-temperature": {
         "groupByList": ["promptVersion", "temperature"],
