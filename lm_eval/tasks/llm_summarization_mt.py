@@ -278,6 +278,11 @@ class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
         continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
         return continuation
 
+class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    # DATASET_PATH = "roysc/20minuten_sample_250"
+    DATASET_PATH = "roysc/20minuten_sample_10"
 
 class SummShard0_20Minuten(SummarizationTaskBase):
     VERSION = 0

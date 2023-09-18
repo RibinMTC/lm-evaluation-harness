@@ -28,11 +28,13 @@ prompt_versions = [1]  # [1, 2, 3, 4, 5]
 task_base_names = ["SummNonEmpty_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
+
+# TODO: MDS-split-input-documents
 """
-MDS-split-input-documents- (SCHEDULED)
+MDS-split-input-documents- (SCHEDULED) # TODO
 dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
-task_base_names = ["MDS2S"]
+task_base_names = ["MDS2S_"]
 
 
 gpt-4-20min- (FINISHED)
@@ -130,7 +132,7 @@ inferable_args = {
     "gpu": {
         "default": "rtx_3090",
         "gpt-4": "rtx_3090",
-        "meta-llama/Llama-2-7b-chat-hf": "rtx_2080_ti",
+        "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100_80gb",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
