@@ -96,6 +96,7 @@ def load_all_results(model_names, shortNames):
     df = pd.concat(dfs)
     df.rename(columns={"model": "model-fullname"}, inplace=True)
     df["model"] = df["model-fullname"].map(shortNames)
+    df["dataset"] = df["dataset"].apply(lambda x: x if x not in datasetNameMap else datasetNameMap[x])
     return df
 
 
@@ -876,7 +877,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-baseline"
+experiment_name = "versions-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -952,6 +953,12 @@ shortNames = {
     "bigscience/bloomz-7b1-mt": "BloomZ  7b",
     "fangloveskari/ORCA_LLaMA_70B_QLoRA": "OrcaLlama2 70B",
     "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
+}
+datasetNameMap = {
+    "20min0": "20Minuten",
+    "20min1": "20Minuten",
+    "20min2": "20Minuten",
+    "20min3": "20Minuten",
 }
 metric_0_1_range = ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1", "coverage"]
 
