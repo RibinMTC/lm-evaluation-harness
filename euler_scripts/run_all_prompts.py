@@ -23,9 +23,9 @@ models = [
 experiment_name = "non-empty-experiments-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+dataset_names = ["20minSmol"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
 prompt_versions = [1]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummNonEmpty_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+task_base_names = ["SummNonEmpty_", "SummEmpty_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 
