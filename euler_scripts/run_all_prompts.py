@@ -36,20 +36,22 @@ dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
 task_base_names = ["MDS2S_"]
 
+TODO: MDS Experiment: make annotated version stating: "Article 1: ..., Article 2: ..., ..."
+
 gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummSample_"]
 
 ltm-experiment-stage-1- (SCHEDULED)
-prompt_versions = [21, 22, 30, 31]
+prompt_versions = [21, 22, 30, 31, 32, 33]
 task_base_names = ["SummLtM1_"]
 
 ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM STAGE 1
 => Make sure to only include the main points and not the old prompt as well
 => Make a second version leaving the old prompt in there as well??? (ASK SOMEONE)
 -> TODO: dataset_names (for pre-processed dataset)
-prompt_versions = [23, 24, 32, 33]
+prompt_versions = [23, 24, 34, 35, 36, 37]
 task_base_names = ["SummLtM2_"]
 
 mds-simple- (FINISHED)
@@ -58,7 +60,7 @@ task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
 
 fewshot-experiment- (SCHEDULED)
-prompt_versions = [5] # [1,2,3,4,5]
+prompt_versions = [2] # [1,2,3,4,5]
 task_base_names = ["SummFewshot{num_fewshot}_"]
 num_fewshot_list = [0,1,2]
 
