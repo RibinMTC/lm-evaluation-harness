@@ -24,8 +24,8 @@ experiment_name = "versions-experiment-" + ''.join(random.choice(string.ascii_lo
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [21, 22, 30, 31, 32, 33]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 
@@ -51,7 +51,7 @@ ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM ST
 => Make sure to only include the main points and not the old prompt as well
 => Make a second version leaving the old prompt in there as well??? (ASK SOMEONE)
 -> TODO: dataset_names (for pre-processed dataset)
-prompt_versions = [23, 24, 34, 35, 36, 37]
+prompt_versions = [23, 24, 34, 35] # 36?, 37?
 task_base_names = ["SummLtM2_"]
 
 mds-simple- (FINISHED)
