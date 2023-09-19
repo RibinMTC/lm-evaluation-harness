@@ -279,11 +279,13 @@ class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
         continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
         return continuation
 
+
 class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
     DATASET_PATH = "roysc/20minuten_sample_10"
+
 
 class SummShard0_20Minuten(SummarizationTaskBase):
     VERSION = 0
@@ -325,8 +327,8 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
 class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum"
-    
-    
+
+
 class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple"
@@ -336,6 +338,7 @@ class SummarizationTask_Wikinewssum_Simple_Shuffled(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple_shuffled"
 
+
 class SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple_article_idx_ann"
@@ -344,6 +347,31 @@ class SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn(SummarizationTaskBase):
 class SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn_Shuffled(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple_article_idx_ann_shuffled"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_32(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_32"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_64(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_64"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_128(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_128"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_256(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_256"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_512(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_512"
 
 
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBase):
