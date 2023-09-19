@@ -325,6 +325,25 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
 class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum"
+    
+    
+class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple"
+
+
+class SummarizationTask_Wikinewssum_Simple_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_shuffled"
+
+class SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_article_idx_ann"
+
+
+class SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_article_idx_ann_shuffled"
 
 
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBase):

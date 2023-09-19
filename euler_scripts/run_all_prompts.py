@@ -24,9 +24,9 @@ experiment_name = "versions-experiment-" + ''.join(random.choice(string.ascii_lo
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
 dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [21, 22, 30, 31, 32, 33]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-num_fewshot_list = [0]  # [0, 1, 2] # [0] #
+prompt_versions = [2]   # [1, 2, 3, 4, 5]
+task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
 
 
 # TODO: MDS-split-input-documents
@@ -35,8 +35,6 @@ MDS-split-input-documents- (SCHEDULED) # TODO
 dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
 task_base_names = ["MDS2S_"]
-
-TODO: MDS Experiment: make annotated version stating: "Article 1: ..., Article 2: ..., ..."
 
 gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
@@ -58,6 +56,14 @@ mds-simple- (FINISHED)
 prompt_versions = [50,51]
 task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
+
+mds-simple-shuffle-annotations- (SCHEDULED)
+... MDS Experiment: make annotated version stating: "Article 1: ..., Article 2: ..., ..."
+... A = article index annotation, S = shuffled
+prompt_versions = [52]
+task_base_names = ["MDSSumm_"]
+dataset_names = ["WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS"]
+
 
 fewshot-experiment- (SCHEDULED)
 prompt_versions = [2] # [1,2,3,4,5]

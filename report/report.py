@@ -166,6 +166,8 @@ def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_
 
 
 def empty_statistics(df, groupbyList=["model", "promptVersion"], text_col="logit_0", topN=5, docCol="doc_id", promptCol="promptVersion") -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    if df.shape[0] == 0:
+        return None, None, None, None, None
     print("Calculating empty-prediction statistics...")
     # Get the count of empty predictions
     df_empty_stat = df[df[text_col] == ""].groupby(groupbyList).agg(
@@ -193,6 +195,8 @@ def empty_statistics(df, groupbyList=["model", "promptVersion"], text_col="logit
 
 
 def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "promptVersion"], x_group="temperature", text_col="logit_0", langCol="lang", docCol="doc_id", promptCol="promptVersion"):
+    if df_all.shape[0] == 0:
+        return
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
     assert x_group not in groupbyList, "x_group must not be in groupbyList"
 
@@ -302,6 +306,8 @@ def lang_detect(df, col_name, fast=True):
 
 
 def language_statistics(df, experiment_path, prompts, groupbyList=["model", "promptVersion"], promptVersionCol="promptVersion", modelCol="model"):
+    if df.shape[0] == 0:
+        return None, None
     print("Calculating language statistics...")
 
     # get the languages of each prompt
@@ -454,6 +460,8 @@ def num_sent_and_tokens(text: str, approximation: bool = True) -> Tuple[int, int
 
 
 def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"], approximation=True):
+    if df.shape[0] == 0:
+        return None, None, None
     print("Calculating length statistics...")
 
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
@@ -517,6 +525,8 @@ def bootstrap_CI(statistic, confidence_level=0.95, num_samples=10000):
 
 
 def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]):
+    if df.shape[0] == 0:
+        return None, None, None
     confidence_level = 0.95
 
     print("Calculating statistics overview tables...")
@@ -569,6 +579,8 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
 
 
 def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVersion'], prompt_category_group="model", promptVersionCol="promptVersion"):
+    if df.shape[0] == 0:
+        return None, None
     # Output a json file with all the statistical test outputs
     # Loop over all comparison columns, for each column, compare the individual values of each metric
     # additionally calculate columns based on the prompt version and use them as well
@@ -677,6 +689,8 @@ def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVers
 
 
 def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion"], numExamples=2):
+    if df.shape[0] == 0:
+        return {}
     print("Finding examples to inspect...")
     # percentile ranges to sample from
     sample_ranges = {
@@ -746,6 +760,8 @@ def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion
 
 
 def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["model", "promptVersion"], file_suffix="") -> Tuple[List[List[str]], List[List[str]]]:
+    if df.shape[0] == 0:
+        return [], []
     print("Making metric distribution figures...")
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
 
@@ -877,7 +893,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "versions-experiment"
+experiment_name = "empty-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1035,7 +1051,10 @@ def make_report_plots():
         summary_list = df_dataset_model["truth"].tolist()
         summary_tokens = [approxTokenize(summary) for summary in summary_list]
         summary_tokens = [len(tokens) for tokens in summary_tokens if tokens]
-        avgSummarySize = sum(summary_tokens) / len(summary_tokens)
+        if len(summary_tokens) == 0:
+            avgSummarySize = 0
+        else:
+            avgSummarySize = sum(summary_tokens) / len(summary_tokens)
         # Print out the cost
         numRows = df_dataset_model.shape[0]
         numPrompts = len(df['promptVersion'].unique().tolist())
@@ -1067,7 +1086,8 @@ def make_report_plots():
         _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
         _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
 
-        df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
+        if df_prompt_length_impact is not None:
+            df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
 
         # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
         # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
@@ -1076,10 +1096,12 @@ def make_report_plots():
         # ... showing 1 table for (prompt) -> comparing models
         tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
 
-        for table in tables_overview:
-            table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
-        for table in tables_detail:
-            table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
+        if tables_overview is not None:
+            for table in tables_overview:
+                table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
+        if tables_detail is not None:
+            for table in tables_detail:
+                table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
 
         # save inspect examples in JSON
         with open(os.path.join(experiment_path, "inspect_examples.json"), "w") as f:

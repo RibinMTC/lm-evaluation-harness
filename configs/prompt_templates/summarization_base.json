@@ -33,7 +33,8 @@
     "36": "Generate a summary in German using all of the following information in 2 to 3 sentences. Article: {article}\nSummary:\n",
     "37": "Erstelle eine Zusammenfassung mit allen folgenden Informationen in 2 bis 3 Sätzen. Artikel: {article}\nZusammenfassung:\n",
     "50": "Summarize the following set of articles in German. \nArticles: {article}\nSummary:\n",
-    "51": "Fasse die folgenden Artikel auf Deutsch zusammen. \nArtikel: {article}\nZusammenfassung:\n"
+    "51": "Fasse die folgenden Artikel auf Deutsch zusammen. \nArtikel: {article}\nZusammenfassung:\n",
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
   },
   "fangloveskari/ORCA_LLaMA_70B_QLoRA": {
     "1": "Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\nSummary:\n",
