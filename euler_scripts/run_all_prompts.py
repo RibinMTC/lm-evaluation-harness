@@ -20,12 +20,12 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "multi-gpu-test-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "versions-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20minSmol"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [2]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummNonEmpty_", "SummEmpty_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+prompt_versions = [21, 22, 30, 31]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummarizationTask_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 
@@ -35,7 +35,6 @@ MDS-split-input-documents- (SCHEDULED) # TODO
 dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
 task_base_names = ["MDS2S_"]
-
 
 gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
@@ -122,9 +121,9 @@ inferable_args = {
         "gpt-4": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "4:00",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "50:00",
-        "garage-bAInd/Platypus2-70B-instruct": "50:00",
+        "meta-llama/Llama-2-70b-chat-hf": "30:00",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
+        "garage-bAInd/Platypus2-70B-instruct": "30:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
@@ -135,8 +134,8 @@ inferable_args = {
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100_80gb",
-        "garage-bAInd/Platypus2-70B-instruct": "a100_80gb",
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
+        "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
@@ -147,8 +146,8 @@ inferable_args = {
         "meta-llama/Llama-2-7b-chat-hf": 1,
         "meta-llama/Llama-2-13b-chat-hf": 1,
         "meta-llama/Llama-2-70b-chat-hf": 3,
-        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 2,
-        "garage-bAInd/Platypus2-70B-instruct": 2,
+        "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
+        "garage-bAInd/Platypus2-70B-instruct": 3,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 4,
