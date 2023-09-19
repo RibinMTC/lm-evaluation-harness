@@ -62,7 +62,7 @@ mds-simple-shuffle-annotations- (SCHEDULED)
 ... A = article index annotation, S = shuffled
 prompt_versions = [52]
 task_base_names = ["MDSSumm_"]
-dataset_names = ["WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS",
+dataset_names = ["Wikinews", "WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS",
 "WikinewsSC32", "WikinewsSC64", "WikinewsSC128", "WikinewsSC256", "WikinewsSC512"] 
 
 
