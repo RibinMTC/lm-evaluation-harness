@@ -374,6 +374,31 @@ class SummarizationTask_Wikinewssum_Simple_Chunked_512(SummarizationTaskBase):
     DATASET_PATH = "roysc/wikinewssum_prefix_chunked_512"
 
 
+class SummarizationTask_Wikinewssum_Simple_Chunked_Sentences_2(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_by_sentences_maxSize_2"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_Sentences_4(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_by_sentences_maxSize_4"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_Sentences_8(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_by_sentences_maxSize_8"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_Sentences_16(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_by_sentences_maxSize_16"
+
+
+class SummarizationTask_Wikinewssum_Simple_Chunked_Sentences_32(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_prefix_chunked_by_sentences_maxSize_32"
+
+
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_input_doc_split"

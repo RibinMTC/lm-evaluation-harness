@@ -20,12 +20,13 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "ltm-experiment-stage-1-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "MDS-split-input-documents-stage2-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+dataset_names = ["WikinewsSplitS2O", "WikinewsSplitS2S"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+prompt_versions = [52]   # [1, 2, 3, 4, 5]
+task_base_names = ["MDS2S_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [21, 22, 30, 31, 32, 33]   # [1, 2, 3, 4, 5]
-task_base_names = ["SummLtM1_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 
@@ -68,7 +69,8 @@ mds-simple-shuffle-annotations-and-variants- (SCHEDULED)
 ... A = article index annotation, S = shuffled
 prompt_versions = [52]
 task_base_names = ["MDSSumm_"]
-dataset_names = ["Wikinews", "WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS", "WikinewsSC32", "WikinewsSC64", "WikinewsSC128", "WikinewsSC256", "WikinewsSC512"] 
+dataset_names = ["Wikinews", "WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS", "WikinewsSC32", "WikinewsSC64", "WikinewsSC128", "WikinewsSC256", "WikinewsSC512"]
+dataset_names [ "WikinewsSCS2", "WikinewsSCS4", "WikinewsSCS8", "WikinewsSCS16", "WikinewsSCS32"] -> TODO
 
 
 fewshot-experiment- (SCHEDULED)
