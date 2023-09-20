@@ -22,6 +22,8 @@ pd.set_option("display.precision", 4)
 sns.set_theme(style="darkgrid", rc={'figure.figsize':(14,7)})
 # plt.tight_layout()
 
+ROUND_TO_DECIMALS = 4
+
 def rename_hf_model(model_name):
     # replace / with -
     model_name = model_name.replace("/", "-")
@@ -519,7 +521,9 @@ def bootstrap_CI(statistic, confidence_level=0.95, num_samples=10000):
             return math.nan, math.nan
         data = (np.array(x),)  # convert to sequence
         confidence_interval = bootstrap(data, statistic, n_resamples=num_samples, confidence_level=confidence_level, method='basic', vectorized=True).confidence_interval
-        return confidence_interval.low, confidence_interval.high
+        LOW_CI = round(confidence_interval.low, ROUND_TO_DECIMALS)
+        HIGH_CI = round(confidence_interval.high, ROUND_TO_DECIMALS)
+        return LOW_CI, HIGH_CI
 
     return CI
 
@@ -543,11 +547,16 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
         # set the type of the metric column to float
         df[metric_name] = df[metric_name].astype(float, copy=True)
         # calculate the table
-        df_metric = df.groupby(groupbyList).agg({metric_name: "median"}).reset_index()
+        df_metric = df.groupby(groupbyList).agg({metric_name: ["median", bootstrap_CI(np.median, confidence_level=confidence_level)]}).reset_index()
+        col_new = groupbyList + ['median', f"Median {int(confidence_level * 100)}% CI"]
+        df_metric.columns = col_new
+        df_metric = df_metric.round(ROUND_TO_DECIMALS)
         out_overview.append({
             "name": f"median {metric_name}",
             "df": df_metric
         })
+
+        # TODO: Make a plot showing this overview table -> showing median performance + confidence interval for each model and promptVersion
 
     # loop over models (looking at them separately), and over the metrics (looking at them separately)
     # each table showing the median, 10th percentile, 90th percentile, and the stderr for each metric
@@ -558,6 +567,7 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
 
             col_new = groupbyList + agg_names
             df_metric.columns = col_new
+            df_metric = df_metric.round(ROUND_TO_DECIMALS)
             out_detail.append({
                 "name": f"{model_name} {metric_name}",
                 "df": df_metric
@@ -570,6 +580,7 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
 
             col_new = groupbyList + agg_names
             df_metric.columns = col_new
+            df_metric = df_metric.round(ROUND_TO_DECIMALS)
             out_detail.append({
                 "name": f"{promptVersion} {metric_name}",
                 "df": df_metric
