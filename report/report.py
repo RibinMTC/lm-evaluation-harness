@@ -19,8 +19,8 @@ from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
 pd.set_option("display.precision", 4)
-sns.set_theme(style="darkgrid")
-
+sns.set_theme(style="darkgrid", rc={'figure.figsize':(14,7)})
+# plt.tight_layout()
 
 def rename_hf_model(model_name):
     # replace / with -
@@ -226,13 +226,13 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "prom
         df_failure_stat_x_group = df_failures[df_failures[x_group] == x_group_val]
         failure_plot = sns.FacetGrid(df_failure_stat_x_group, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
         failure_plot.map(sns.countplot, 'failure')
-        failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.png")
+        failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.pdf")
         plt.savefig(failure_plot_path)
         plt.close()
 
     failure_plot = sns.FacetGrid(df_failures, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     failure_plot.map(sns.countplot, 'failure')
-    failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.png")
+    failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.pdf")
     plt.savefig(failure_plot_path)
     plt.close()
 
@@ -337,7 +337,7 @@ def language_statistics(df, experiment_path, prompts, groupbyList=["model", "pro
     # Make the actual plot
     lang_effect_plot = sns.FacetGrid(df_prompt_lang_effect_plot, col="prompt_lang", row=modelCol, height=3, aspect=1.5)
     lang_effect_plot.map(sns.barplot, "lang", "count")
-    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_plot.png")
+    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_plot.pdf")
     plt.savefig(token_distr_plot_path)
     plt.close()
     #
@@ -350,7 +350,7 @@ def language_statistics(df, experiment_path, prompts, groupbyList=["model", "pro
     # g.despine(left=True)
     # g.set_axis_labels("", "Count")
     # g.legend.set_title("Predicted Language")
-    # g.savefig(os.path.join(experiment_path, "prompt_lang_effect_plot.png"))
+    # g.savefig(os.path.join(experiment_path, "prompt_lang_effect_plot.pdf"))
 
     # Language effect plot, showing the distribution of the predicted languages per model and prompt (with the prompt language as hue) ->
     df_prompt_lang_effect_plot = df_prompt_lang_effect.copy()
@@ -367,7 +367,7 @@ def language_statistics(df, experiment_path, prompts, groupbyList=["model", "pro
     # plot
     lang_effect_distr_plot = sns.FacetGrid(df_prompt_lang_effect_plot, col="prompt_lang", row=modelCol, height=3, aspect=1.5, sharex=True)
     lang_effect_distr_plot.map(sns.barplot, "lang", "logit_0")
-    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_lang_distr_plot.png")
+    token_distr_plot_path = os.path.join(experiment_path, "prompt_lang_effect_lang_distr_plot.pdf")
     plt.savefig(token_distr_plot_path)
     plt.close()
 
@@ -479,14 +479,14 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     # plot the distribution of the number of tokens in each group
     token_distr_plot.map(sns.histplot, "num_tokens", bins=20)
     # save
-    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot.png")
+    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot.pdf")
     plt.savefig(token_distr_plot_path)
     plt.close()
 
     # make the same plot as violin plot
     token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     token_distr_plot.map(sns.violinplot, "num_tokens", bins=20)
-    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot_violin.png")
+    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot_violin.pdf")
     plt.savefig(token_distr_plot_path)
     plt.close()
 
@@ -495,14 +495,14 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     # plot the distribution of the number of sentences in each group
     sent_distr_plot.map(sns.histplot, "num_sentences", bins=20)
     # save
-    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot.png")
+    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot.pdf")
     plt.savefig(sent_distr_plot_path)
     plt.close()
 
     # make the same plot as violin plot
     sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     sent_distr_plot.map(sns.violinplot, "num_sentences", bins=20)
-    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot_violin.png")
+    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot_violin.pdf")
     plt.savefig(sent_distr_plot_path)
     plt.close()
 
@@ -786,7 +786,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -795,7 +795,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -804,7 +804,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -821,7 +821,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -830,7 +830,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -839,7 +839,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.png")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -853,7 +853,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             if metric_name in metric_0_1_range:
                 violin_plot.set_ylim(0, 1)
             # save
-            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot{file_suffix}.png")
+            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot{file_suffix}.pdf")
             plt.savefig(violin_plot_path)
             out_paths.append(violin_plot_path)
             plt.close()
@@ -893,7 +893,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "empty-experiment"
+experiment_name = "versions-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -939,7 +939,7 @@ experiment_config = {
             "meta-llama/Llama-2-7b-chat-hf",
             "meta-llama/Llama-2-70b-chat-hf",
             "fangloveskari/ORCA_LLaMA_70B_QLoRA",
-            # "garage-bAInd/Platypus2-70B-instruct",
+            "garage-bAInd/Platypus2-70B-instruct",
         ],
         "datasets": ["20Minuten"]
     },
