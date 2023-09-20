@@ -378,6 +378,15 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBas
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_input_doc_split"
 
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_originalOrder"
+
+
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_shuffled"
+
 
 class SummLtM_20Minuten(SummarizationTaskBase):
     VERSION = 0

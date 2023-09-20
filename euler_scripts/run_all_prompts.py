@@ -12,9 +12,9 @@ import random, string
 """
 models = [
     # "gpt-4",
-    "meta-llama/Llama-2-7b-chat-hf",
+    # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
@@ -36,8 +36,8 @@ dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
 task_base_names = ["MDS2S_"]
 
-MDS-split-input-documents-stage2- (TODO)
-dataset_names = ["WikinewsSplit"] -> TODO
+MDS-split-input-documents-stage2- (SCHEDULED)
+dataset_names = ["WikinewsSplitS2O", "WikinewsSplitS2S"]
 prompt_versions = [52]
 task_base_names = ["MDS2S_"]
 
