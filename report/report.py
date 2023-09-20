@@ -938,7 +938,7 @@ experiment_config = {
             "gpt-4",
             "meta-llama/Llama-2-7b-chat-hf",
             "meta-llama/Llama-2-70b-chat-hf",
-            # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            "fangloveskari/ORCA_LLaMA_70B_QLoRA",
             # "garage-bAInd/Platypus2-70B-instruct",
         ],
         "datasets": ["20Minuten"]
@@ -1065,6 +1065,7 @@ def make_report_plots():
         metric_names, _ = get_metrics_info(df)
 
         # Make plots showing the failure rate
+        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'model'], x_group="temperature")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'temperature'], x_group="model")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['temperature', 'model'], x_group="promptVersion")

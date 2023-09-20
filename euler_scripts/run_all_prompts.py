@@ -12,21 +12,21 @@ import random, string
 """
 models = [
     # "gpt-4",
-    # "meta-llama/Llama-2-7b-chat-hf",
+    "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "versions-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "empty-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-dataset_names = ["20min0"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [2]   # [1, 2, 3, 4, 5]
-task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
+dataset_names = ["20minSmol"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+prompt_versions = [4]   # [1, 2, 3, 4, 5]
+task_base_names = ["SummEmpty_", "SummNonEmpty_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 
 # TODO: MDS-split-input-documents
@@ -35,6 +35,12 @@ MDS-split-input-documents- (SCHEDULED) # TODO
 dataset_names = ["WikinewsSplit"]
 prompt_versions = [2]
 task_base_names = ["MDS2S_"]
+
+MDS-split-input-documents-stage2- (TODO)
+dataset_names = ["WikinewsSplit"] -> TODO
+prompt_versions = [52]
+task_base_names = ["MDS2S_"]
+
 
 gpt-4-20min- (FINISHED)
 dataset_names = ["20Minuten"]
@@ -57,13 +63,12 @@ prompt_versions = [50,51]
 task_base_names = ["MDSSumm_"]
 dataset_names = ["Wikinews"]
 
-mds-simple-shuffle-annotations- (SCHEDULED)
+mds-simple-shuffle-annotations-and-variants- (SCHEDULED)
 ... MDS Experiment: make annotated version stating: "Article 1: ..., Article 2: ..., ..."
 ... A = article index annotation, S = shuffled
 prompt_versions = [52]
 task_base_names = ["MDSSumm_"]
-dataset_names = ["Wikinews", "WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS",
-"WikinewsSC32", "WikinewsSC64", "WikinewsSC128", "WikinewsSC256", "WikinewsSC512"] 
+dataset_names = ["Wikinews", "WikinewsSimple", "WikinewsSimpleS", "WikinewsSimpleA", "WikinewsSimpleAS", "WikinewsSC32", "WikinewsSC64", "WikinewsSC128", "WikinewsSC256", "WikinewsSC512"] 
 
 
 fewshot-experiment- (SCHEDULED)
