@@ -117,7 +117,7 @@ class SummarizationTaskBase(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, {"until": ["\n"]})  # ["\n"]
+        continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
         return continuation
 
     def postprocess_text(self, prediction, reference):
@@ -427,7 +427,7 @@ class SummLtMDe_20Minuten(SummLtM_20Minuten):
     VERSION = 0
 
     def construct_requests(self, doc, ctx):
-        cont_request = rf.greedy_until(ctx, {"until": ["\n"]})
+        cont_request = rf.greedy_until(ctx, {"until": []})
         return cont_request
 
 

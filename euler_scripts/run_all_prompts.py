@@ -157,7 +157,7 @@ inferable_args = {
     "num_gpus": {
         "default": 1,
         "gpt-4": 1,
-        "meta-llama/Llama-2-7b-chat-hf": 1,
+        "meta-llama/Llama-2-7b-chat-hf": 2,
         "meta-llama/Llama-2-13b-chat-hf": 1,
         "meta-llama/Llama-2-70b-chat-hf": 3,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,

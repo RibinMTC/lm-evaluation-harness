@@ -951,7 +951,7 @@ experiment_config = {
         "datasets": ["20Minuten"]
     },
     "empty-experiment": {
-        "groupByList": ["task_name", "precision"],
+        "groupByList": ["task_name", "promptVersion"],
         "models": [
             "meta-llama/Llama-2-7b-chat-hf",
         ],
