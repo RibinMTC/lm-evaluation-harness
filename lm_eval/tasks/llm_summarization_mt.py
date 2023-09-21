@@ -329,6 +329,11 @@ class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     DATASET_PATH = "roysc/wikinewssum"
 
 
+class SummarizationTask_Wikinewssum_Cleaned(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_cleaned"
+
+
 class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple"

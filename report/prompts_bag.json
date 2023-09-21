@@ -65,6 +65,10 @@
   },
   "mds-baseline": {
     "50": "Summarize the following set of articles in German. \nArticles: {article}\nSummary:\n",
-    "51": "Fasse die folgenden Artikel auf Deutsch zusammen. \nArtikel: {article}\nZusammenfassung:\n"
+    "51": "Fasse die folgenden Artikel auf Deutsch zusammen. \nArtikel: {article}\nZusammenfassung:\n",
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
+  },
+  "mds-shuffling-and-annotation-experiment": {
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
   }
 }

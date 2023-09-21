@@ -1,4 +1,6 @@
 import re
+import shutil
+
 from tqdm import tqdm
 import json
 import os
@@ -19,10 +21,12 @@ from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
 pd.set_option("display.precision", 4)
-sns.set_theme(style="darkgrid", rc={'figure.figsize':(14,7)})
+sns.set_theme(style="darkgrid", rc={'figure.figsize': (14, 7)})
+sns.despine(bottom=True, left=True, offset=5)
 # plt.tight_layout()
 
 ROUND_TO_DECIMALS = 4
+
 
 def rename_hf_model(model_name):
     # replace / with -
@@ -98,6 +102,7 @@ def load_all_results(model_names, shortNames):
     df = pd.concat(dfs)
     df.rename(columns={"model": "model-fullname"}, inplace=True)
     df["model"] = df["model-fullname"].map(shortNames)
+    df["dataset-annotation"] = df["dataset"].apply(lambda x: datasetAnnotationMap[x] if x in datasetAnnotationMap else "")
     df["dataset"] = df["dataset"].apply(lambda x: x if x not in datasetNameMap else datasetNameMap[x])
     return df
 
@@ -202,6 +207,9 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "prom
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
     assert x_group not in groupbyList, "x_group must not be in groupbyList"
 
+    subfolder_name = "failure_statistics"
+    pathlib.Path(os.path.join(experiment_path, subfolder_name)).mkdir(parents=True, exist_ok=True)
+
     # map all float nan values in logit_0 to empty strings
     df_all[text_col] = df_all[text_col].apply(lambda x: "" if isinstance(x, float) and math.isnan(x) else x)
 
@@ -228,15 +236,18 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["model", "prom
         df_failure_stat_x_group = df_failures[df_failures[x_group] == x_group_val]
         failure_plot = sns.FacetGrid(df_failure_stat_x_group, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
         failure_plot.map(sns.countplot, 'failure')
-        failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.pdf")
+        failure_plot_path = os.path.join(experiment_path, subfolder_name, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_{x_group_val}.pdf")
         plt.savefig(failure_plot_path)
         plt.close()
 
     failure_plot = sns.FacetGrid(df_failures, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
     failure_plot.map(sns.countplot, 'failure')
-    failure_plot_path = os.path.join(experiment_path, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.pdf")
+    failure_plot_path = os.path.join(experiment_path, subfolder_name, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}.pdf")
     plt.savefig(failure_plot_path)
     plt.close()
+
+    # also save the failure statistics as csv
+    df_failure_stat.to_csv(os.path.join(experiment_path, subfolder_name, f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}.csv"), index=False)
 
 
 def get_lang_detector(nlp, name):
@@ -461,10 +472,12 @@ def num_sent_and_tokens(text: str, approximation: bool = True) -> Tuple[int, int
     return len(sentences), len(tokens)
 
 
-def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"], approximation=True):
+def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"], approximation=True, file_suffix=""):
     if df.shape[0] == 0:
         return None, None, None
     print("Calculating length statistics...")
+
+    pathlib.Path(os.path.join(save_base_path, "length-statistics")).mkdir(parents=True, exist_ok=True)
 
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
 
@@ -475,38 +488,35 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     # calculate the impact of the prompt on the number of tokens and sentences
     df_prompt_length_impact = df_len.groupby(groupbyList).agg({"num_sentences": "mean", "num_tokens": "mean"}).reset_index()
 
-    # make plots showing the two distributions (with a subplot grid, one for each dimension in the group-by list) (just showing the number of tokens)
-    # make a subplot grid with one plot for each dimension in the group-by list
-    token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-    # plot the distribution of the number of tokens in each group
-    token_distr_plot.map(sns.histplot, "num_tokens", bins=20)
-    # save
-    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot.pdf")
-    plt.savefig(token_distr_plot_path)
-    plt.close()
+    for lbl, (a,b) in zip(["", "_flipped"], [(0,1), (1,0)]):
+        # make plots showing the two distributions (with a subplot grid, one for each dimension in the group-by list) (just showing the number of tokens)
+        # make a subplot grid with one plot for each dimension in the group-by list
+        token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[a], row=groupbyList[b], height=3, aspect=1.5)
+        token_distr_plot.map(sns.histplot, "num_tokens", bins=20)
+        token_distr_plot_path = os.path.join(save_base_path, "length-statistics", f"token_distr_plot_hist{lbl}{file_suffix}.pdf")
+        plt.savefig(token_distr_plot_path)
+        plt.close()
 
-    # make the same plot as violin plot
-    token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-    token_distr_plot.map(sns.violinplot, "num_tokens", bins=20)
-    token_distr_plot_path = os.path.join(save_base_path, "token_distr_plot_violin.pdf")
-    plt.savefig(token_distr_plot_path)
-    plt.close()
+        # make the same plot as violin plot
+        token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[a], row=groupbyList[b], height=3, aspect=1.5)
+        token_distr_plot.map(sns.violinplot, "num_tokens", bins=20)
+        token_distr_plot_path = os.path.join(save_base_path, "length-statistics", f"token_distr_plot_violin{lbl}{file_suffix}.pdf")
+        plt.savefig(token_distr_plot_path)
+        plt.close()
 
-    # make a subplot grid with one plot for each dimension in the group-by list
-    sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-    # plot the distribution of the number of sentences in each group
-    sent_distr_plot.map(sns.histplot, "num_sentences", bins=20)
-    # save
-    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot.pdf")
-    plt.savefig(sent_distr_plot_path)
-    plt.close()
+        # make a subplot grid with one plot for each dimension in the group-by list
+        sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[a], row=groupbyList[b], height=3, aspect=1.5)
+        sent_distr_plot.map(sns.histplot, "num_sentences", bins=20)
+        sent_distr_plot_path = os.path.join(save_base_path, "length-statistics", f"sent_distr_plot_hist{lbl}{file_suffix}.pdf")
+        plt.savefig(sent_distr_plot_path)
+        plt.close()
 
-    # make the same plot as violin plot
-    sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
-    sent_distr_plot.map(sns.violinplot, "num_sentences", bins=20)
-    sent_distr_plot_path = os.path.join(save_base_path, "sent_distr_plot_violin.pdf")
-    plt.savefig(sent_distr_plot_path)
-    plt.close()
+        # make the same plot as violin plot
+        sent_distr_plot = sns.FacetGrid(df_len, col=groupbyList[a], row=groupbyList[b], height=3, aspect=1.5)
+        sent_distr_plot.map(sns.violinplot, "num_sentences", bins=20)
+        sent_distr_plot_path = os.path.join(save_base_path, "length-statistics", f"sent_distr_plot_violin{lbl}{file_suffix}.pdf")
+        plt.savefig(sent_distr_plot_path)
+        plt.close()
 
     return df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path
 
@@ -699,73 +709,154 @@ def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVers
     pass
 
 
-def find_inspect_examples(df, metric_names, groupbyList=["model", "promptVersion"], numExamples=2):
+def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"], numExamples=2):
     if df.shape[0] == 0:
         return {}
     print("Finding examples to inspect...")
+    assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
     # percentile ranges to sample from
     sample_ranges = {
         "worst": [0, 5],
         "median": [47.5, 52.5],
-        "best": [95, 100]
+        "best": [95, 100],
+        "all": [0,100]
     }
 
+    # delete old folder if it exists
+    base_folder = f"inspect-examples_{groupbyList[0]}_{groupbyList[1]}"
+    if os.path.exists(os.path.join(experiment_path, base_folder)):
+        shutil.rmtree(os.path.join(experiment_path, base_folder))
+    # make subfolders to store specific examples
+    pathlib.Path(os.path.join(experiment_path, base_folder)).mkdir(parents=True, exist_ok=True)
+
     # Initialize
-    numExamples = 2
+    def numExamples(category):
+        if category == "all":
+            return 10
+        else:
+            return 3
     out = {}
-    for model in df["model"].unique():
-        out[f"{model}"] = {}
-        out[f"{model}"]["general"] = {
+    for groupA in df[groupbyList[0]].unique():
+        out[f"{groupA}"] = {}
+        out[f"{groupA}"]["general"] = {
             f"{metric_name}": {
                 "best": [],
                 "worst": [],
-                "median": []
+                "median": [],
+                "all": []
             } for metric_name in metric_names
         }
-        for promptVersion in df["promptVersion"].unique():
-            out[f"{model}"][f"{promptVersion}"] = {
+        for groupB in df[groupbyList[1]].unique():
+            out[f"{groupA}"][f"{groupB}"] = {
                 f"{metric_name}": {
                     "best": [],
                     "worst": [],
-                    "median": []
+                    "median": [],
+                    "all": []
                 } for metric_name in metric_names
             }
 
     # fill the dict with examples
-    for model in df["model"].unique():
+    for groupA in df[groupbyList[0]].unique():
         # get the df for the current model
-        df_model = df[df["model"] == model]
+        df_groupA = df[df[groupbyList[0]] == groupA]
         # if empty, skip
-        if df_model.shape[0] == 0:
+        if df_groupA.shape[0] == 0:
             continue
         # in general, compute the percentiles for each metric and sample the examples
         for metric_name in metric_names:
-            for cat in out[model]["general"][metric_name]:
+            for cat in out[f"{groupA}"]["general"][metric_name]:
                 # calculate the percentiles
                 percentile_range = sample_ranges[cat]
-                percentile_values = np.percentile(df_model[metric_name], percentile_range)
+                percentile_values = np.percentile(df_groupA[metric_name], percentile_range)
                 # sample the examples
-                sample_population = df_model[(df_model[metric_name] >= percentile_values[0]) & (df_model[metric_name] <= percentile_values[1])]
-                df_sample = sample_population.sample(min(sample_population.shape[0], numExamples))
+                sample_population = df_groupA[(df_groupA[metric_name] >= percentile_values[0]) & (df_groupA[metric_name] <= percentile_values[1])]
+                df_sample = sample_population.sample(min(sample_population.shape[0], numExamples(cat)))
                 # add the examples to the dict
-                out[model]["general"][metric_name][cat] = df_sample.to_dict(orient="records")
+                out[f"{groupA}"]["general"][metric_name][cat] = df_sample.to_dict(orient="records")
         # for each prompt, compute the percentiles for each metric and sample the examples
-        for promptVersion in df["promptVersion"].unique():
+        for groupB in df[groupbyList[1]].unique():
             # get the df for the current prompt
-            df_prompt = df_model[df_model["promptVersion"] == promptVersion]
+            df_groupB = df_groupA[df_groupA[groupbyList[1]] == groupB]
             # if empty, skip
-            if df_prompt.shape[0] == 0:
+            if df_groupB.shape[0] == 0:
                 continue
             for metric_name in metric_names:
-                for cat in out[model][f"{promptVersion}"][metric_name]:
+                for cat in out[f"{groupA}"][f"{groupB}"][metric_name]:
                     # calculate the percentiles
                     percentile_range = sample_ranges[cat]
-                    percentile_values = np.percentile(df_prompt[metric_name], percentile_range)
+                    percentile_values = np.percentile(df_groupB[metric_name], percentile_range)
                     # sample the examples
-                    sample_population = df_prompt[(df_prompt[metric_name] >= percentile_values[0]) & (df_prompt[metric_name] <= percentile_values[1])]
-                    df_sample = sample_population.sample(min(sample_population.shape[0], numExamples))
+                    sample_population = df_groupB[(df_groupB[metric_name] >= percentile_values[0]) & (df_groupB[metric_name] <= percentile_values[1])]
+                    df_sample = sample_population.sample(min(sample_population.shape[0], numExamples(cat)))
                     # add the examples to the dict
-                    out[model][f"{promptVersion}"][metric_name][cat] = df_sample.to_dict(orient="records")
+                    out[f"{groupA}"][f"{groupB}"][metric_name][cat] = df_sample.to_dict(orient="records")
+
+    # Gather the examples for the inspect metrics, and make side-by-side comparisons to the other combinations in the data
+    # ... also sample 10 random examples and make a side-by-side comparison to the other combinations in the data
+    inspect_metrics = ["bertscore_f1"]
+    num_all_inspect_examples = 20
+    inspect_exclude_columns = ['prompt_0', 'logit_0', "truth"]
+    all_other_cols = [col for col in df.columns if col not in inspect_exclude_columns]
+    html_base = """<!DOCTYPE html>
+<html>
+<body>
+
+{table}
+
+</body>
+</html>"""
+    for inspect_metric in inspect_metrics:
+        interesting_docIds = {cat: [] for cat in sample_ranges if cat != "all"}
+        for groupA in out:
+            for groupB in out[groupA]:
+                for cat in out[groupA][groupB][inspect_metric]:
+                    if cat not in interesting_docIds:
+                        continue
+                    interesting_docIds[cat].extend([el["doc_id"] for el in out[groupA][groupB][inspect_metric][cat]])
+        
+        # exclude duplicate docIDs
+        for cat in interesting_docIds:
+            interesting_docIds[cat] = list(set(interesting_docIds[cat]))
+
+        # make sure all the folders exist
+        pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric)).mkdir(parents=True, exist_ok=True)
+        for cat in interesting_docIds:
+            pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric, cat)).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric, "random")).mkdir(parents=True, exist_ok=True)
+
+        # for each document ID, get all the predictions for that document and save them in a html file
+        for cat in interesting_docIds:
+            for docID in interesting_docIds[cat]:
+                df_docID = df[df["doc_id"] == docID]
+                # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
+                df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
+                df_docID = df_docID.drop(columns=all_other_cols)
+                df_docID = df_docID.transpose()
+
+                # save to html
+                html_data = df_docID.to_html().replace("\\n","<br>").replace("\n","<br>")
+                html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}.html")
+                html_page = html_base.format(table=html_data)
+                with open(html_path, "w") as f:
+                    f.write(html_page)
+
+        # also sample random document IDs and save them in a html file
+        uniqueDocIDs = df["doc_id"].unique()
+        random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), num_all_inspect_examples), replace=False)) + [1, 85]
+        for docID in random_docIDs:
+            df_docID = df[df["doc_id"] == docID]
+            # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
+            df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
+            df_docID = df_docID.drop(columns=all_other_cols)
+            df_docID = df_docID.transpose()
+
+            # save to html
+            html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+            html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random", f"{docID}.html")
+            html_page = html_base.format(table=html_data)
+            with open(html_path, "w") as f:
+                f.write(html_page)
 
     return out
 
@@ -778,6 +869,14 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
 
     prompt_plot_paths = []
     model_plot_paths = []
+
+    # make all subfolders
+    for metric_name in metric_names:
+        pathlib.Path(os.path.join(save_base_path, f"metric-{metric_name}")).mkdir(parents=True, exist_ok=True)
+    for model_name in df["model"].unique():
+        pathlib.Path(os.path.join(save_base_path, model_name)).mkdir(parents=True, exist_ok=True)
+    for promptVersion in df["promptVersion"].unique():
+        pathlib.Path(os.path.join(save_base_path, f"Prompt-{promptVersion}")).mkdir(parents=True, exist_ok=True)
 
     # sorted prompt versions (ordered as numbers, not strings)
     promptVersions = df["promptVersion"].unique().tolist()
@@ -797,7 +896,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, model_name, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -806,7 +905,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, model_name, f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -815,7 +914,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, model_name, f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -832,7 +931,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}", f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -841,7 +940,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}", f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -850,7 +949,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
+                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}", f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
                 plt.close()
@@ -860,13 +959,31 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     for metric_name in metric_names:
         # 0-1 and 1-0 plot
         for a, b in [(0, 1), (1, 0)]:
-            violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name)
+            violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, points=500, cut=0)
             if metric_name in metric_0_1_range:
                 violin_plot.set_ylim(0, 1)
             # save
-            violin_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot{file_suffix}.pdf")
+            violin_plot_path = os.path.join(save_base_path, f"metric-{metric_name}", f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_violin_plot{file_suffix}.pdf")
             plt.savefig(violin_plot_path)
             out_paths.append(violin_plot_path)
+            plt.close()
+
+            # dist_plot = sns.displot(data=df.dropna(), x=groupbyList[a], hue=groupbyList[b], y=metric_name, kind="kde", fill=True)
+            # if metric_name in metric_0_1_range:
+            #     dist_plot.set_ylim(0, 1)
+            # # save
+            # dist_plot_path = os.path.join(save_base_path, f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_distribution_plot{file_suffix}.pdf")
+            # plt.savefig(dist_plot_path)
+            # out_paths.append(dist_plot_path)
+            # plt.close()
+
+            box_plot = sns.boxplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, flierprops={"marker": "x"}, notch=True, bootstrap=1000)
+            if metric_name in metric_0_1_range:
+                box_plot.set_ylim(0, 1)
+            # save
+            box_plot_path = os.path.join(save_base_path, f"metric-{metric_name}", f"{metric_name}_{groupbyList[a]}_{groupbyList[b]}_box_plot{file_suffix}.pdf")
+            plt.savefig(box_plot_path)
+            out_paths.append(box_plot_path)
             plt.close()
 
     return prompt_plot_paths, model_plot_paths
@@ -874,7 +991,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
 
 def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     """
-    Returns a list of metric names and a dictionary mapping each metric name to a list of percentiles to be calculated.
+    Returns a list of metric names and a dicti onary mapping each metric name to a list of percentiles to be calculated.
     :param df: DataFrame containing the results
     :return: metric_names, metric_ordering
         metric_names: List of metric names
@@ -882,7 +999,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     """
     exclude = [
         'doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score',
-        'temperature', 'precision', 'task_name',
+        'temperature', 'precision', 'task_name', 'dataset-annotation'
     ]
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -904,21 +1021,26 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-baseline"
+experiment_name = "mds-shuffling-and-annotation-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
 """
 experiment_config = {
-    "base-experiment": {
-        "groupByList": ["promptVersion", "model"],
-        "models": ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"],
-        "datasets": ["20Minuten"]
-    },
     "mds-baseline": {
         "groupByList": ["promptVersion", "model"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
+    },
+    "mds-shuffling-and-annotation-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "base-experiment": {
+        "groupByList": ["promptVersion", "model"],
+        "models": ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"],
+        "datasets": ["20Minuten"]
     },
     "base-experiment-temperature": {
         "groupByList": ["promptVersion", "temperature"],
@@ -993,6 +1115,42 @@ datasetNameMap = {
     "20min1": "20Minuten",
     "20min2": "20Minuten",
     "20min3": "20Minuten",
+    "WikinewsSimple": "Wikinews",
+    "WikinewsSimpleS": "Wikinews",
+    "WikinewsSimpleA": "Wikinews",
+    "WikinewsSimpleAS": "Wikinews",
+    "WikinewsSC32": "Wikinews",
+    "WikinewsSC64": "Wikinews",
+    "WikinewsSC128": "Wikinews",
+    "WikinewsSC256": "Wikinews",
+    "WikinewsSC512": "Wikinews",
+    "WikinewsSCS2": "Wikinews",
+    "WikinewsSCS4": "Wikinews",
+    "WikinewsSCS8": "Wikinews",
+    "WikinewsSCS16": "Wikinews",
+    "WikinewsSCS32": "Wikinews",
+    "WikinewsSplit": "Wikinews",
+    "WikinewsSplitS2O": "Wikinews",
+    "WikinewsSplitS2S": "Wikinews",
+}
+datasetAnnotationMap = {
+    "WikinewsSimple": "no annotation, original order",
+    "WikinewsSimpleS": "no annotation, random order",
+    "WikinewsSimpleA": "article idx ann., original order",
+    "WikinewsSimpleAS": "article ids ann., random order",
+    "WikinewsSC32": "prefix chunk, 32 tokens",
+    "WikinewsSC64": "prefix chunk, 64 tokens",
+    "WikinewsSC128": "prefix chunk, 128 tokens",
+    "WikinewsSC256": "prefix chunk, 256 tokens",
+    "WikinewsSC512": "prefix chunk, 512 tokens",
+    "WikinewsSCS2": "prefix chunk, 2 sentences",
+    "WikinewsSCS4": "prefix chunk, 4 sentences",
+    "WikinewsSCS8": "prefix chunk, 8 sentences",
+    "WikinewsSCS16": "prefix chunk, 16 sentences",
+    "WikinewsSCS32": "prefix chunk, 32 sentences",
+    "WikinewsSplit": "2-stage summary, stage 1",
+    "WikinewsSplitS2O": "2-stage summary, stage 2, original order",
+    "WikinewsSplitS2S": "2-stage summary, stage 2, random order",
 }
 metric_0_1_range = ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1", "coverage"]
 
@@ -1074,6 +1232,7 @@ def make_report_plots():
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
+        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList)
 
         # Make plots showing the failure rate
         failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
@@ -1081,22 +1240,23 @@ def make_report_plots():
         failure_statistics_plot(df_all, experiment_path, groupbyList=['promptVersion', 'temperature'], x_group="model")
         failure_statistics_plot(df_all, experiment_path, groupbyList=['temperature', 'model'], x_group="promptVersion")
 
-        # re-do language statistics plots
-        _ = language_statistics(df_all_langs, experiment_path, prompts)
-
-        # create the statistics for the token lengths and number of sentences
-        df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=groupByList, approximation=True)
-
-        # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
-        # ... and 2 documents with the median performance
-        inspect_examples = find_inspect_examples(df, metric_names, groupbyList=groupByList)
-
         # make violin (distribution) plot showing distribution of metric values per model and prompt
         # ... group by model (comparing prompts)
         # ... group by prompt (comparing models)
         _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList, file_suffix="")
         _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
         _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
+
+        # re-do language statistics plots
+        _ = language_statistics(df_all_langs, experiment_path, prompts)
+
+        # create the statistics for the token lengths and number of sentences
+        df_prompt_length_impact, token_distr_plot_path, sent_distr_plot_path = length_statistics(df, experiment_path, groupbyList=groupByList, approximation=True)
+        _ = length_statistics(df_all, experiment_path, groupbyList=groupByList, approximation=True, file_suffix="_all")
+
+        # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
+        # ... and 2 documents with the median performance
+        inspect_examples_mp = find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
 
         if df_prompt_length_impact is not None:
             df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
@@ -1108,16 +1268,20 @@ def make_report_plots():
         # ... showing 1 table for (prompt) -> comparing models
         tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
 
+        pathlib.Path(os.path.join(experiment_path, "overview_table")).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(os.path.join(experiment_path, "detail_table")).mkdir(parents=True, exist_ok=True)
         if tables_overview is not None:
             for table in tables_overview:
-                table["df"].to_csv(os.path.join(experiment_path, f"overview_table_{table['name']}.csv"), index=False)
+                table["df"].to_csv(os.path.join(experiment_path, "overview_table", f"overview_table_{table['name']}.csv"), index=False)
         if tables_detail is not None:
             for table in tables_detail:
-                table["df"].to_csv(os.path.join(experiment_path, f"detail_table_{table['name']}.csv"), index=False)
+                table["df"].to_csv(os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"), index=False)
 
         # save inspect examples in JSON
-        with open(os.path.join(experiment_path, "inspect_examples.json"), "w") as f:
-            json.dump(inspect_examples, f)
+        with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
+            json.dump(inspect_examples, f, indent=4)
+        with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
+            json.dump(inspect_examples_mp, f, indent=4)
 
 
 if __name__ == "__main__":
