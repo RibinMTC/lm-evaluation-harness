@@ -955,11 +955,27 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
         prompt_plot_paths.append(out_paths)
 
+    def label_sort_key_func(x):
+        # if there is a number in the label, sort by that number first, then the string order
+        if isinstance(x, int):
+            return (x, "")
+        match = re.search(r'\d+', x)
+        if match:
+            return (int(match.group()), x)
+        else:
+            return (0, x)
+
     # Loop over the metrics -> make 1 figure per metric, comparing groupByList[0] with groupByList[1] (with hue) -> make plot in both directions
     for metric_name in metric_names:
         # 0-1 and 1-0 plot
         for a, b in [(0, 1), (1, 0)]:
-            violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, points=500, cut=0)
+            sorted_x_axis_labels = df[groupbyList[a]].unique().tolist()
+            sorted_x_axis_labels.sort(key=lambda x: label_sort_key_func(x))
+
+            sorted_hue_labels = df[groupbyList[b]].unique().tolist()
+            sorted_hue_labels.sort(key=lambda x: label_sort_key_func(x))
+
+            violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, points=500, cut=0, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
             if metric_name in metric_0_1_range:
                 violin_plot.set_ylim(0, 1)
             # save
@@ -977,7 +993,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             # out_paths.append(dist_plot_path)
             # plt.close()
 
-            box_plot = sns.boxplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, flierprops={"marker": "x"}, notch=True, bootstrap=1000)
+            box_plot = sns.boxplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, flierprops={"marker": "x"}, notch=True, bootstrap=1000, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
             if metric_name in metric_0_1_range:
                 box_plot.set_ylim(0, 1)
             # save
@@ -1021,7 +1037,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-shuffling-and-annotation-experiment"
+experiment_name = "mds-2stage-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1033,6 +1049,16 @@ experiment_config = {
         "datasets": ["Wikinews"]
     },
     "mds-shuffling-and-annotation-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-chunking-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-2stage-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
@@ -1134,23 +1160,25 @@ datasetNameMap = {
     "WikinewsSplitS2S": "Wikinews",
 }
 datasetAnnotationMap = {
-    "WikinewsSimple": "no annotation, original order",
-    "WikinewsSimpleS": "no annotation, random order",
-    "WikinewsSimpleA": "article idx ann., original order",
-    "WikinewsSimpleAS": "article ids ann., random order",
-    "WikinewsSC32": "prefix chunk, 32 tokens",
-    "WikinewsSC64": "prefix chunk, 64 tokens",
-    "WikinewsSC128": "prefix chunk, 128 tokens",
-    "WikinewsSC256": "prefix chunk, 256 tokens",
-    "WikinewsSC512": "prefix chunk, 512 tokens",
-    "WikinewsSCS2": "prefix chunk, 2 sentences",
-    "WikinewsSCS4": "prefix chunk, 4 sentences",
-    "WikinewsSCS8": "prefix chunk, 8 sentences",
-    "WikinewsSCS16": "prefix chunk, 16 sentences",
-    "WikinewsSCS32": "prefix chunk, 32 sentences",
-    "WikinewsSplit": "2-stage summary, stage 1",
-    "WikinewsSplitS2O": "2-stage summary, stage 2, original order",
-    "WikinewsSplitS2S": "2-stage summary, stage 2, random order",
+    "Wikinews": "basic, concat. of full articles,\noriginal order",
+    "WikinewsClean": "basic cleaning,\noriginal order",
+    "WikinewsSimple": "no annotation,\noriginal order",
+    "WikinewsSimpleS": "no annotation,\nrandom order",
+    "WikinewsSimpleA": "article idx ann.,\noriginal order",
+    "WikinewsSimpleAS": "article ids ann.,\nrandom order",
+    "WikinewsSC32": "token prefix chunk,\n 32 tokens",
+    "WikinewsSC64": "token prefix chunk,\n 64 tokens",
+    "WikinewsSC128": "token prefix chunk,\n128 tokens",
+    "WikinewsSC256": "token prefix chunk,\n256 tokens",
+    "WikinewsSC512": "token prefix chunk,\n512 tokens",
+    "WikinewsSCS2": "sentence prefix chunk,\n 2 sentences",
+    "WikinewsSCS4": "sentence prefix chunk,\n 4 sentences",
+    "WikinewsSCS8": "sentence prefix chunk,\n 8 sentences",
+    "WikinewsSCS16": "sentence prefix chunk,\n16 sentences",
+    "WikinewsSCS32": "sentence prefix chunk,\n32 sentences",
+    "WikinewsSplit": "2-stage summary,\nstage 1",
+    "WikinewsSplitS2O": "2-stage summary,\noriginal order",
+    "WikinewsSplitS2S": "2-stage summary,\nrandom order",
 }
 metric_0_1_range = ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1", "coverage"]
 

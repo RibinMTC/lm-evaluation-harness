@@ -287,6 +287,12 @@ class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
     DATASET_PATH = "roysc/20minuten_sample_10"
 
 
+class SummFewshot_250TestSample_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20minuten_test_sample_250"
+
+
 class SummShard0_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"

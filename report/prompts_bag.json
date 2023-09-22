@@ -70,5 +70,11 @@
   },
   "mds-shuffling-and-annotation-experiment": {
     "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
+  },
+  "mds-chunking-experiment": {
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
+  },
+  "mds-2stage-experiment": {
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
   }
 }
