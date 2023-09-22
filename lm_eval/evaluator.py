@@ -78,6 +78,10 @@ def simple_evaluate(
         lm = lm_eval.models.get_model(model).create_from_arg_string(
             model_args, {"batch_size": batch_size, "device": device}
         )
+        #todo: remove this hack to solve multi gpu problem
+        if "pretraining_tp" in model_args:
+            print(f"Current pretraining_tp config: {lm.model.config.pretraining_tp}. Setting to 1")
+            lm.model.config.pretraining_tp = 1
     else:
         assert isinstance(model, lm_eval.base.LM)
         lm = model
