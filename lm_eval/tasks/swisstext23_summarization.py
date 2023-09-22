@@ -32,20 +32,20 @@ def _rouge_agg(key, items):
 class SwissText23SummarizationTask(Task):
     VERSION = 0
     # dataset as denoted in HuggingFace `datasets`.
-    DATASET_PATH = "mtc/swisstext23-20min-annotation-data"
+    DATASET_PATH = "mtc/swisstext23-20min-annotation-data-with-train-set"
     # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
     LANGUAGE = "german"
 
     default_prompt_template = (
-        f"Generate a summary in German for the following article. The summary should be around 2 to 3 "
-        f"sentences.\nArticle: {{article}}\nSummary:{{summary}}\n\nAssistant:\n")
+        "Erstelle eine Zusammenfassung vom folgenden Artikel in 3 oder weniger Sätzen:\nArtikel: {"
+        "article}\nZusammenfassung:\n")
 
     def has_training_docs(self):
         return True
 
     def has_validation_docs(self):
-        return True
+        return False
 
     def has_test_docs(self):
         return True
@@ -56,7 +56,7 @@ class SwissText23SummarizationTask(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-                self._training_docs = list(self.dataset["train"])
+                self._training_docs = list(self.dataset["train"])[:2]
             return self._training_docs
 
     def validation_docs(self):
@@ -80,7 +80,7 @@ class SwissText23SummarizationTask(Task):
 
     def doc_to_target(self, doc):
         summary = doc["summary"]
-        return " " + summary
+        return summary
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
