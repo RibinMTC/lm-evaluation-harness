@@ -324,6 +324,13 @@ class SummSampleSmol_20Minuten(SummarizationTaskBase):
     # DATASET_PATH = "roysc/20minuten_sample_10"
 
 
+class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
+    VERSION = 0
+    # DATASET_PATH = "roysc/20minuten"
+    # DATASET_PATH = "roysc/20minuten_sample_250"
+    DATASET_PATH = "roysc/20minuten_sample_10"
+
+
 class SummarizationTask_20Minuten(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/20minuten"

@@ -12,18 +12,19 @@ import random, string
 """
 models = [
     # "gpt-4",
+    "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
-dataset_names = ["20minTS250"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1,2]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+experiment_name = "palm2-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+prompt_versions = [1]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummSmolSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
@@ -42,7 +43,7 @@ prompt_versions = [52]
 task_base_names = ["MDS2S_"]
 
 
-gpt-4-20min- (FINISHED)
+gpt-4-20min- (FINISHED) / PALM2
 dataset_names = ["20Minuten"]
 prompt_versions = [1,2,3,4,5]
 task_base_names = ["SummSample_"]
@@ -116,6 +117,7 @@ inferable_args = {
     "model": {
         "default": "hf-causal-experimental",
         "gpt-4": "gpt4",
+        "palm2": "palm2",
         "meta-llama/Llama-2-7b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-13b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-70b-chat-hf": "hf-causal-experimental",
@@ -135,6 +137,7 @@ inferable_args = {
     "run_duration_hours": {
         "default": "24:00",
         "gpt-4": "08:00",
+        "palm2": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
         "meta-llama/Llama-2-70b-chat-hf": "30:00",
@@ -147,6 +150,7 @@ inferable_args = {
     "gpu": {
         "default": "rtx_3090",
         "gpt-4": "rtx_3090",
+        "palm2": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
@@ -159,6 +163,7 @@ inferable_args = {
     "num_gpus": {
         "default": 1,
         "gpt-4": 1,
+        "palm2": 1,
         "meta-llama/Llama-2-7b-chat-hf": 2,
         "meta-llama/Llama-2-13b-chat-hf": 1,
         "meta-llama/Llama-2-70b-chat-hf": 3,
@@ -183,6 +188,7 @@ TMP_EULER_CONFIG = "tmp_euler_config.json"
 task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
 model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 model_args_schema_gpt4 = "engine=gpt-4"
+model_args_schema_palm2 = "engine=text-bison@001"
 
 """
     Build the configurations
@@ -212,6 +218,8 @@ for combination in combinations:
     model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
     if inferable_args["model"][model] == "gpt4":
         model_args = model_args_schema_gpt4
+    elif inferable_args["model"][model] == "palm2":
+        model_args = model_args_schema_palm2
     elif inferable_args["model"][model] == "hf-causal-experimental":
         model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
     else:
