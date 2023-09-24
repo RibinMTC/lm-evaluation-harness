@@ -19,6 +19,7 @@ lm_cache
 /configs/prompt_templates/SummLtMDe_*.json
 /configs/prompt_templates/SummFewshot*.json
 /configs/prompt_templates/SummSample_*.json
+/configs/prompt_templates/SummSmolSample_*.json
 /configs/prompt_templates/MDSSumm_*.json
 /configs/prompt_templates/MDS2S_*.json
 /configs/prompt_templates/MDS2S*.json
@@ -32,3 +33,4 @@ euler_scripts/tmp_euler_config.json
 /euler_scripts/logs/
 euler_scripts/OPENAI_API_KEY
 /gcloud_service_account.json
+/euler_scripts/GCLOUD_PROJECT

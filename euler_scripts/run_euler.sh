@@ -39,6 +39,14 @@ else
     echo "OPENAI_API_KEY not found in OPENAI_API_KEY file"
 fi
 
+# Load GCLOUD Info
+if [ -f "GCLOUD_PROJECT" ]; then
+    GCLOUD_PROJECT=$(cat GCLOUD_PROJECT)
+    echo "GCLOUD_PROJECT found in GCLOUD_PROJECT file"
+else
+    echo "GCLOUD_PROJECT not found in GCLOUD_PROJECT file"
+fi
+
 scp "$1" euler:$CODE_PATH/euler_scripts
 #scp utils/bash_euler_commands_helper.py euler:$CODE_PATH/euler_scripts/utils/bash_euler_commands_helper.py
 #scp ../lm_eval/tasks/xsum_faith_hallucination_classification.py euler:$CODE_PATH/lm_eval/tasks/xsum_faith_hallucination_classification.py
@@ -63,6 +71,7 @@ ssh euler ARG1=\"$1\" \
           ARG7=\"$PROJECT_PATH\" \
           ARG8=\"$CONFIG_FILE\" \
           ARG9=\"$OPENAI_API_KEY\" \
+          ARG10=\"$GCLOUD_PROJECT\" \
           'bash -s' <<'ENDSSH'
 
     # Change to work dir
@@ -76,6 +85,7 @@ ssh euler ARG1=\"$1\" \
     # Export OPENAI API Key
     echo "### Adding OpenAI API Key to Environment Variables: $ARG9"
     export OPENAI_API_SECRET_KEY="$ARG9"
+    export GCLOUD_PROJECT="$ARG10"
 
     # Load all updates
     echo "### Pulling commits..."
