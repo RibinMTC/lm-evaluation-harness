@@ -21,7 +21,7 @@ from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
 pd.set_option("display.precision", 4)
-sns.set_theme(style="darkgrid", rc={'figure.figsize': (14, 7)})
+sns.set_theme(style="darkgrid", rc={'figure.figsize': (17, 7)})
 sns.despine(bottom=True, left=True, offset=5)
 # plt.tight_layout()
 
@@ -870,6 +870,21 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     prompt_plot_paths = []
     model_plot_paths = []
 
+    def label_sort_key_func(x):
+        # if there is a number in the label, sort by that number first, then the string order
+        if isinstance(x, int):
+            return (x, "")
+        match = re.search(r'\d+', x)
+        if match:
+            return (int(match.group()), x)
+        else:
+            return (0, x)
+
+    def get_sorted_labels(data_df, column):
+        sorted_axis_labels = df[column].unique().tolist()
+        sorted_axis_labels.sort(key=lambda x: label_sort_key_func(x))
+        return sorted_axis_labels
+
     # make all subfolders
     for metric_name in metric_names:
         pathlib.Path(os.path.join(save_base_path, f"metric-{metric_name}")).mkdir(parents=True, exist_ok=True)
@@ -879,8 +894,8 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         pathlib.Path(os.path.join(save_base_path, f"Prompt-{promptVersion}")).mkdir(parents=True, exist_ok=True)
 
     # sorted prompt versions (ordered as numbers, not strings)
-    promptVersions = df["promptVersion"].unique().tolist()
-    promptVersions.sort(key=lambda x: int(x))
+    # promptVersions = df["promptVersion"].unique().tolist()
+    # promptVersions.sort(key=lambda x: int(x))
     # ...
     residualGroupBy = [col for col in groupbyList if col not in ["promptVersion", "model"]]
 
@@ -892,7 +907,9 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each prompt
             if len(residualGroupBy) > 0:
-                violin_plot = sns.violinplot(data=df_model, x="promptVersion", hue=residualGroupBy[0], y=metric_name, order=promptVersions)
+                sorted_x_axis_labels = get_sorted_labels(df, "promptVersion")
+                sorted_hue_labels = get_sorted_labels(df, residualGroupBy[0])
+                violin_plot = sns.violinplot(data=df_model, x="promptVersion", hue=residualGroupBy[0], y=metric_name, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -901,7 +918,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
 
-                violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='promptVersion', y=metric_name)
+                violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='promptVersion', y=metric_name, order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -910,7 +927,8 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
             else:
-                violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=promptVersions)
+                sorted_x_axis_labels = get_sorted_labels(df, "promptVersion")
+                violin_plot = sns.violinplot(data=df_model, x="promptVersion", y=metric_name, order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -927,7 +945,9 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
         for metric_name in metric_names:
             # make a violin plot showing the distribution of the metric values for each model
             if len(residualGroupBy) > 0:
-                violin_plot = sns.violinplot(data=df_prompt, x="model", hue=residualGroupBy[0], y=metric_name)
+                sorted_x_axis_labels = get_sorted_labels(df, "model")
+                sorted_hue_labels = get_sorted_labels(df, residualGroupBy[0])
+                violin_plot = sns.violinplot(data=df_prompt, x="model", hue=residualGroupBy[0], y=metric_name, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -936,7 +956,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
 
-                violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="model", y=metric_name)
+                violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="model", y=metric_name, order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -945,7 +965,8 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
             else:
-                violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name)
+                sorted_x_axis_labels = get_sorted_labels(df, "model")
+                violin_plot = sns.violinplot(data=df_prompt, x="model", y=metric_name, order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     violin_plot.set_ylim(0, 1)
                 # save
@@ -955,25 +976,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
         prompt_plot_paths.append(out_paths)
 
-    def label_sort_key_func(x):
-        # if there is a number in the label, sort by that number first, then the string order
-        if isinstance(x, int):
-            return (x, "")
-        match = re.search(r'\d+', x)
-        if match:
-            return (int(match.group()), x)
-        else:
-            return (0, x)
-
     # Loop over the metrics -> make 1 figure per metric, comparing groupByList[0] with groupByList[1] (with hue) -> make plot in both directions
     for metric_name in metric_names:
         # 0-1 and 1-0 plot
         for a, b in [(0, 1), (1, 0)]:
-            sorted_x_axis_labels = df[groupbyList[a]].unique().tolist()
-            sorted_x_axis_labels.sort(key=lambda x: label_sort_key_func(x))
-
-            sorted_hue_labels = df[groupbyList[b]].unique().tolist()
-            sorted_hue_labels.sort(key=lambda x: label_sort_key_func(x))
+            sorted_x_axis_labels = get_sorted_labels(df, groupbyList[a])
+            sorted_hue_labels = get_sorted_labels(df, groupbyList[b])
 
             violin_plot = sns.violinplot(data=df, x=groupbyList[a], hue=groupbyList[b], y=metric_name, points=500, cut=0, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
             if metric_name in metric_0_1_range:
@@ -1037,7 +1045,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-2stage-experiment"
+experiment_name = "mds-chunking-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1160,22 +1168,22 @@ datasetNameMap = {
     "WikinewsSplitS2S": "Wikinews",
 }
 datasetAnnotationMap = {
-    "Wikinews": "basic, concat. of full articles,\noriginal order",
-    "WikinewsClean": "basic cleaning,\noriginal order",
+    "Wikinews": "basic,\nfull articles,\noriginal order",
+    "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
     "WikinewsSimpleS": "no annotation,\nrandom order",
     "WikinewsSimpleA": "article idx ann.,\noriginal order",
     "WikinewsSimpleAS": "article ids ann.,\nrandom order",
-    "WikinewsSC32": "token prefix chunk,\n 32 tokens",
-    "WikinewsSC64": "token prefix chunk,\n 64 tokens",
-    "WikinewsSC128": "token prefix chunk,\n128 tokens",
-    "WikinewsSC256": "token prefix chunk,\n256 tokens",
-    "WikinewsSC512": "token prefix chunk,\n512 tokens",
-    "WikinewsSCS2": "sentence prefix chunk,\n 2 sentences",
-    "WikinewsSCS4": "sentence prefix chunk,\n 4 sentences",
-    "WikinewsSCS8": "sentence prefix chunk,\n 8 sentences",
-    "WikinewsSCS16": "sentence prefix chunk,\n16 sentences",
-    "WikinewsSCS32": "sentence prefix chunk,\n32 sentences",
+    "WikinewsSC32": "token prefix,\n 32 tokens",
+    "WikinewsSC64": "token prefix,\n 64 tokens",
+    "WikinewsSC128": "token prefix,\n128 tokens",
+    "WikinewsSC256": "token prefix,\n256 tokens",
+    "WikinewsSC512": "token prefix,\n512 tokens",
+    "WikinewsSCS2": "sentence prefix,\n 2 sentences",
+    "WikinewsSCS4": "sentence prefix,\n 4 sentences",
+    "WikinewsSCS8": "sentence prefix,\n 8 sentences",
+    "WikinewsSCS16": "sentence prefix,\n16 sentences",
+    "WikinewsSCS32": "sentence prefix,\n32 sentences",
     "WikinewsSplit": "2-stage summary,\nstage 1",
     "WikinewsSplitS2O": "2-stage summary,\noriginal order",
     "WikinewsSplitS2S": "2-stage summary,\nrandom order",

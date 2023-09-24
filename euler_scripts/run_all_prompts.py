@@ -20,14 +20,14 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "mds-simple-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
-dataset_names = ["WikinewsClean"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [52]  # [1, 2, 3, 4, 5]
-task_base_names = ["MDSSumm_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+experiment_name = "fewshot-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+dataset_names = ["20minTS250"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
+prompt_versions = [1,2]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummFewshot{num_fewshot}_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
-num_fewshot_list = [0]  # [0, 1, 2] # [0] #
+num_fewshot_list = [0,1,2]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
 """
@@ -73,7 +73,8 @@ dataset_names [ "WikinewsSCS2", "WikinewsSCS4", "WikinewsSCS8", "WikinewsSCS16",
 
 
 fewshot-experiment- (SCHEDULED)
-prompt_versions = [2] # [1,2,3,4,5]
+dataset_names = ["20minTS250"]
+prompt_versions = [1,2] # [1,2,3,4,5]
 task_base_names = ["SummFewshot{num_fewshot}_"]
 num_fewshot_list = [0,1,2]
 

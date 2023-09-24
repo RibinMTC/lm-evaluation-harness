@@ -31,3 +31,4 @@ euler_scripts/tmp_euler_config.json
 /report/resources/lid.176.bin
 /euler_scripts/logs/
 euler_scripts/OPENAI_API_KEY
+/gcloud_service_account.json
