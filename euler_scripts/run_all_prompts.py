@@ -12,8 +12,8 @@ import random, string
 """
 models = [
     # "gpt-4",
-    "palm2",
-    # "meta-llama/Llama-2-7b-chat-hf",
+    # "palm2",
+    "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
     # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
@@ -23,7 +23,7 @@ models = [
 # TODO: CHANGE PARAMETERS + NAME
 experiment_name = "palm2-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [5]  # [1, 2, 3, 4, 5]
+prompt_versions = [2]  # [1, 2, 3, 4, 5]
 task_base_names = ["SummSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
@@ -194,7 +194,7 @@ BASE_EULER_CONFIG = "lm_eval_euler_config.json"
 TMP_EULER_CONFIG = "tmp_euler_config.json"
 
 task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
-model_args_schema = "pretrained={model},trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
+model_args_schema = "pretrained={model},max_gen_toks=512,trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 model_args_schema_gpt4 = "engine=gpt-4"
 model_args_schema_palm2 = "engine=text-bison@001"
 

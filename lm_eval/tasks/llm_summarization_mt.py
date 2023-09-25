@@ -117,7 +117,7 @@ class SummarizationTaskBase(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, {"until": []})  # ["\n"]
+        continuation = rf.greedy_until(ctx, {})  # ["\n"]
         return continuation
 
     def postprocess_text(self, prediction, reference):
