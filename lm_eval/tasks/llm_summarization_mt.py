@@ -336,6 +336,35 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
     DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
 
+class SummLtM2_20min_prompt22_start(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_22_processed_header_start_de"
+
+
+class SummLtM2_20min_prompt22_end(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_22_processed_header_end_de"
+
+
+class SummLtM2_20min_prompt31_start(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_31_processed_header_start_de"
+
+
+class SummLtM2_20min_prompt31_end(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_31_processed_header_end_de"
+
+
+class SummLtM2_20min_prompt33_start(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_33_processed_header_start_de"
+
+
+class SummLtM2_20min_prompt33_end(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_LtM1_33_processed_header_end_de"
+
 
 class SummarizationTask_Wikinewssum(SummarizationTaskBase):
     VERSION = 0

@@ -44,6 +44,18 @@ def extract_dataset_and_task_name(filename):
     prompt_version_idx = 2
     dataset_name = split_filename[1]
 
+    # extract number of shots
+    nshot = 0
+    if "Fewshot" in task_name:
+        nshotRegex = re.compile(r"Fewshot[0-9]+")
+        nshotMatch = nshotRegex.search(task_name)
+        if nshotMatch:
+            nshot = int(nshotMatch.group(0)[len("Fewshot"):])
+
+        # get location of Fewshot in the task name, and extract the number after the Fewshot string
+        # nshot = int(task_name[task_name.find("Fewshot") + len("Fewshot"):])
+    # TODO
+
     # find an element of the form 'T[0-9]*' in the split_filename
     # if there is no such element, the temperature is 0.0
     temperature = 0.0
@@ -59,7 +71,7 @@ def extract_dataset_and_task_name(filename):
     if split_filename[prompt_version_idx + 1].endswith("b"):
         precision = "8bit"
 
-    return task_name, dataset_name, prompt_version, temperature, precision
+    return task_name, nshot, dataset_name, prompt_version, temperature, precision
 
 
 # Function to load results from JSON files to a dataframe
@@ -74,9 +86,10 @@ def load_results(model_name):
         with open(os.path.join(results_path, file), "r") as f:
             result = json.load(f)
 
-            task_name, dataset, promptVersion, temperature, precision = extract_dataset_and_task_name(file)
+            task_name, nshot, dataset, promptVersion, temperature, precision = extract_dataset_and_task_name(file)
             for entry in result:
                 entry["task_name"] = task_name
+                entry["n-shot"] = nshot
                 entry["dataset"] = dataset
                 entry["promptVersion"] = promptVersion
                 entry["model"] = model_name
@@ -488,7 +501,7 @@ def length_statistics(df, save_base_path, groupbyList=["model", "promptVersion"]
     # calculate the impact of the prompt on the number of tokens and sentences
     df_prompt_length_impact = df_len.groupby(groupbyList).agg({"num_sentences": "mean", "num_tokens": "mean"}).reset_index()
 
-    for lbl, (a,b) in zip(["", "_flipped"], [(0,1), (1,0)]):
+    for lbl, (a, b) in zip(["", "_flipped"], [(0, 1), (1, 0)]):
         # make plots showing the two distributions (with a subplot grid, one for each dimension in the group-by list) (just showing the number of tokens)
         # make a subplot grid with one plot for each dimension in the group-by list
         token_distr_plot = sns.FacetGrid(df_len, col=groupbyList[a], row=groupbyList[b], height=3, aspect=1.5)
@@ -709,7 +722,7 @@ def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVers
     pass
 
 
-def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"], numExamples=2):
+def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"], numExamples=2, suffix=""):
     if df.shape[0] == 0:
         return {}
     print("Finding examples to inspect...")
@@ -719,11 +732,11 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
         "worst": [0, 5],
         "median": [47.5, 52.5],
         "best": [95, 100],
-        "all": [0,100]
+        "all": [0, 100]
     }
 
     # delete old folder if it exists
-    base_folder = f"inspect-examples_{groupbyList[0]}_{groupbyList[1]}"
+    base_folder = f"inspect-examples_{groupbyList[0]}_{groupbyList[1]}{suffix}"
     if os.path.exists(os.path.join(experiment_path, base_folder)):
         shutil.rmtree(os.path.join(experiment_path, base_folder))
     # make subfolders to store specific examples
@@ -735,6 +748,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
             return 10
         else:
             return 3
+
     out = {}
     for groupA in df[groupbyList[0]].unique():
         out[f"{groupA}"] = {}
@@ -814,7 +828,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
                     if cat not in interesting_docIds:
                         continue
                     interesting_docIds[cat].extend([el["doc_id"] for el in out[groupA][groupB][inspect_metric][cat]])
-        
+
         # exclude duplicate docIDs
         for cat in interesting_docIds:
             interesting_docIds[cat] = list(set(interesting_docIds[cat]))
@@ -835,7 +849,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
                 df_docID = df_docID.transpose()
 
                 # save to html
-                html_data = df_docID.to_html().replace("\\n","<br>").replace("\n","<br>")
+                html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
                 html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}.html")
                 html_page = html_base.format(table=html_data)
                 with open(html_path, "w") as f:
@@ -1023,7 +1037,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     """
     exclude = [
         'doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score',
-        'temperature', 'precision', 'task_name', 'dataset-annotation'
+        'temperature', 'precision', 'task_name', 'dataset-annotation', 'n-shot'
     ]
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -1045,14 +1059,25 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-chunking-experiment"
+experiment_name = "versions-experiment-gpt4-only"
 
 """
     ADD NEW EXPERIMENTS HERE
 """
+# read the json file into a dictionary
 experiment_config = {
-    "mds-baseline": {
+    "few-shot-initial": {
+        "groupByList": ["n-shot", "promptVersion"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"]
+    },
+    "least-to-most-prompting-stage1": {
         "groupByList": ["promptVersion", "model"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"]
+    },
+    "mds-baseline": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
     },
@@ -1110,11 +1135,9 @@ experiment_config = {
         ],
         "datasets": ["20Minuten"]
     },
-    "few-shot-initial": {
-        "groupByList": ["task_name", "precision"],
-        "models": [
-            "meta-llama/Llama-2-7b-chat-hf",
-        ],
+    "versions-experiment-gpt4-only": {
+        "groupByList": ["promptVersion", "model"],
+        "models": ["gpt-4"],
         "datasets": ["20Minuten"]
     },
     "empty-experiment": {
@@ -1145,6 +1168,7 @@ shortNames = {
     "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
 }
 datasetNameMap = {
+    "20minTS250": "20Minuten",
     "20min0": "20Minuten",
     "20min1": "20Minuten",
     "20min2": "20Minuten",
@@ -1168,6 +1192,11 @@ datasetNameMap = {
     "WikinewsSplitS2S": "Wikinews",
 }
 datasetAnnotationMap = {
+    "20minTS250": "20Minuten, 250 samples",
+    "20min0": "20Minuten, shard 1",
+    "20min1": "20Minuten, shard 2",
+    "20min2": "20Minuten, shard 3",
+    "20min3": "20Minuten, shard 4",
     "Wikinews": "basic,\nfull articles,\noriginal order",
     "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
@@ -1268,7 +1297,8 @@ def make_report_plots():
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
-        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList)
+        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
+        inspect_examples_all = find_inspect_examples(df_all, experiment_path, metric_names, groupbyList=groupByList, suffix="_all")
 
         # Make plots showing the failure rate
         failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
@@ -1316,6 +1346,8 @@ def make_report_plots():
         # save inspect examples in JSON
         with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
             json.dump(inspect_examples, f, indent=4)
+        with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:
+            json.dump(inspect_examples_all, f, indent=4)
         with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
             json.dump(inspect_examples_mp, f, indent=4)
 

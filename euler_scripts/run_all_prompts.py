@@ -23,8 +23,8 @@ models = [
 # TODO: CHANGE PARAMETERS + NAME
 experiment_name = "palm2-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = ["20Minuten"]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummSmolSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]
@@ -56,8 +56,16 @@ ltm-experiment-stage-2- => UPLOAD NEW PRE-PROCESSED DATASET FROM OUTPUTS FROM ST
 => Make sure to only include the main points and not the old prompt as well
 => Make a second version leaving the old prompt in there as well??? (ASK SOMEONE)
 -> TODO: dataset_names (for pre-processed dataset)
-prompt_versions = [23, 24, 34, 35] # 36?, 37?
+PromptVersions LtM1: 22, 31, 33 -> because others predicted too much non-german text
+All LtM2 Prompt Versions: 34, 35, 36, 37 -> but only use 35 (suffix), 37 (prefix) (because german prompts)
+prompt_versions = [35, 37] # 35: summary instruction at end, 37: summary instruction at beginning
 task_base_names = ["SummLtM2_"]
+dataset_names = [
+    '20minLtm2p22S', '20minLtm2p22E'
+    '20minLtm2p31S', '20minLtm2p31E'
+    '20minLtm2p33S', '20minLtm2p33E'
+]
+
 
 mds-simple- (FINISHED)
 prompt_versions = [50,51]
@@ -150,7 +158,7 @@ inferable_args = {
     "gpu": {
         "default": "rtx_3090",
         "gpt-4": "rtx_3090",
-        "palm2": "rtx_2080_ti",
+        "palm2": "rtx_3090",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
