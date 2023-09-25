@@ -74,7 +74,32 @@ class Palm2CompletionsLM(LM):
             'temperature': 0.0,
             'top_p': 1.0,
             'top_k': 40,
+            'safetySettings': [
+                {
+                    "category": "HARM_CATEGORY_UNSPECIFIED",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_DEROGATORY",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_TOXICITY",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_VIOLENCE",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_SEXUAL",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_MEDICAL",
+                    "threshold": "BLOCK_NONE"
+                }, {
+                    "category": "HARM_CATEGORY_DANGEROUS",
+                    "threshold": "BLOCK_NONE"
+                }
+            ]
         }
+        
         model = TextGenerationModel.from_pretrained(self.engine)
 
         results = []
