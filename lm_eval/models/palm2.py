@@ -99,7 +99,7 @@ class Palm2CompletionsLM(LM):
                 }
             ]
         }
-        
+
         model = TextGenerationModel.from_pretrained(self.engine)
 
         results = []
