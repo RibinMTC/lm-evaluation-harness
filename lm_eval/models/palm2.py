@@ -74,7 +74,9 @@ class Palm2CompletionsLM(LM):
             'temperature': 0.0,
             'top_p': 1.0,
             'top_k': 40,
-            'safety_settings': [
+        }
+        """
+        'safety_settings': [
                 {
                     "category": "HARM_CATEGORY_UNSPECIFIED",
                     "threshold": "BLOCK_NONE"
@@ -98,7 +100,7 @@ class Palm2CompletionsLM(LM):
                     "threshold": "BLOCK_NONE"
                 }
             ]
-        }
+        """
 
         model = TextGenerationModel.from_pretrained(self.engine)
 
@@ -111,6 +113,8 @@ class Palm2CompletionsLM(LM):
                 request[0],
                 **parameters,
             )
+
+            # Prediction(predictions=[{'content': '', 'citationMetadata': None, 'safetyAttributes': {'blocked': True, 'errors': [253.0]}}], deployed_model_id='', model_version_id='', model_resource_name='', explanations=None)
 
             prediction = response.text
             results.append(prediction)
