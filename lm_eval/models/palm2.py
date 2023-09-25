@@ -74,7 +74,7 @@ class Palm2CompletionsLM(LM):
             'temperature': 0.0,
             'top_p': 1.0,
             'top_k': 40,
-            'safetySettings': [
+            'safety_settings': [
                 {
                     "category": "HARM_CATEGORY_UNSPECIFIED",
                     "threshold": "BLOCK_NONE"
