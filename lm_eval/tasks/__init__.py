@@ -383,6 +383,8 @@ TASK_REGISTRY = {
     "MDSSumm_Wikinews_51_8b": llm_summarization_mt.SummarizationTask_Wikinewssum,
     "MDSSumm_Wikinews_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum,
     "MDSSumm_WikinewsClean_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_Cleaned,
+    "MDSSumm_WikinewsSL_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_SingleLine,
+    "MDSSumm_WikinewsSLR_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_SingleLine_Shuffled,
     "MDSSumm_WikinewsSimple_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_Simple,
     "MDSSumm_WikinewsSimpleS_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_Simple_Shuffled,
     "MDSSumm_WikinewsSimpleA_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_Simple_ArticleIdxAnn,

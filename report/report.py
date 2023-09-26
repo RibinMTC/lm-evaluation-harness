@@ -842,35 +842,42 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
         # for each document ID, get all the predictions for that document and save them in a html file
         for cat in interesting_docIds:
             for docID in interesting_docIds[cat]:
-                df_docID = df[df["doc_id"] == docID]
-                # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
-                df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
-                df_docID = df_docID.drop(columns=all_other_cols)
-                df_docID = df_docID.transpose()
+                doc_id_gt_summaries = df[df["doc_id"] == docID]["truth"].unique().tolist()
+                # loop over all the gt-summaries, make 1 html file per gt-summary
+                for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
+                    df_docID = df[df['truth'].apply(lambda x: x.strip()) == gt_summary.strip()]
 
-                # save to html
-                html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
-                html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}.html")
-                html_page = html_base.format(table=html_data)
-                with open(html_path, "w") as f:
-                    f.write(html_page)
+                    # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
+                    # df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
+                    # df_docID = df_docID.drop(columns=all_other_cols)
+                    df_docID = df_docID.transpose()
+
+                    # save to html
+                    html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+                    html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}__{summ_idx}.html")
+                    html_page = html_base.format(table=html_data)
+                    with open(html_path, "w") as f:
+                        f.write(html_page)
 
         # also sample random document IDs and save them in a html file
         uniqueDocIDs = df["doc_id"].unique()
         random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), num_all_inspect_examples), replace=False)) + [1, 85]
         for docID in random_docIDs:
-            df_docID = df[df["doc_id"] == docID]
-            # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
-            df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
-            df_docID = df_docID.drop(columns=all_other_cols)
-            df_docID = df_docID.transpose()
+            doc_id_gt_summaries = df[df["doc_id"] == docID]["truth"].unique().tolist()
+            # loop over all the gt-summaries, make 1 html file per gt-summary
+            for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
+                df_docID = df[df['truth'].apply(lambda x: x.strip()) == gt_summary.strip()]
+                # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
+                # df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
+                # df_docID = df_docID.drop(columns=all_other_cols)
+                df_docID = df_docID.transpose()
 
-            # save to html
-            html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
-            html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random", f"{docID}.html")
-            html_page = html_base.format(table=html_data)
-            with open(html_path, "w") as f:
-                f.write(html_page)
+                # save to html
+                html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+                html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random", f"{docID}__{summ_idx}.html")
+                html_page = html_base.format(table=html_data)
+                with open(html_path, "w") as f:
+                    f.write(html_page)
 
     return out
 
@@ -1059,7 +1066,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "versions-experiment-gpt4-only"
+experiment_name = "mds-2stage-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1073,6 +1080,11 @@ experiment_config = {
     },
     "least-to-most-prompting-stage1": {
         "groupByList": ["promptVersion", "model"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"]
+    },
+    "least-to-most-prompting-stage2": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["20Minuten"]
     },
@@ -1094,7 +1106,8 @@ experiment_config = {
     "mds-2stage-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["Wikinews"]
+        "datasets": ["Wikinews"],
+        "additional_prompts": ["21", "22", "30", "31", "32", "33"]
     },
     "base-experiment": {
         "groupByList": ["promptVersion", "model"],
@@ -1128,6 +1141,7 @@ experiment_config = {
         "groupByList": ["promptVersion", "model"],
         "models": [
             "gpt-4",
+            "palm2",
             "meta-llama/Llama-2-7b-chat-hf",
             "meta-llama/Llama-2-70b-chat-hf",
             "fangloveskari/ORCA_LLaMA_70B_QLoRA",
@@ -1155,9 +1169,11 @@ RESULTS_BASE_PATH = 'results_bag'
 groupByList = experiment_config[experiment_name]["groupByList"]
 models = experiment_config[experiment_name]["models"]
 datasets = experiment_config[experiment_name]["datasets"]
+additional_prompts = experiment_config[experiment_name].get("additional_prompts", [])
 RESULTS_PATH = os.path.join(RESULTS_BASE_PATH, experiment_name)
 shortNames = {
     "gpt-4": "GPT 4",
+    "palm2": "PaLM 2",
     "meta-llama/Llama-2-7b-chat-hf": "Llama-2  7b",
     "meta-llama/Llama-2-13b-chat-hf": "Llama-2 13b",
     "meta-llama/Llama-2-70b-chat-hf": "Llama-2 70b",
@@ -1173,6 +1189,13 @@ datasetNameMap = {
     "20min1": "20Minuten",
     "20min2": "20Minuten",
     "20min3": "20Minuten",
+    "20minLtm2p22S": "20Minuten",
+    "20minLtm2p22E": "20Minuten",
+    "20minLtm2p31S": "20Minuten",
+    "20minLtm2p31E": "20Minuten",
+    "20minLtm2p33S": "20Minuten",
+    "20minLtm2p33E": "20Minuten",
+    "WikinewsClean": "Wikinews",
     "WikinewsSimple": "Wikinews",
     "WikinewsSimpleS": "Wikinews",
     "WikinewsSimpleA": "Wikinews",
@@ -1197,6 +1220,12 @@ datasetAnnotationMap = {
     "20min1": "20Minuten, shard 2",
     "20min2": "20Minuten, shard 3",
     "20min3": "20Minuten, shard 4",
+    "20minLtm2p22S": "20Min, Prompt 22,\nPrompt at start",
+    "20minLtm2p22E": "20Min, Prompt 22,\nPrompt at end",
+    "20minLtm2p31S": "20Min, Prompt 31,\nPrompt at start",
+    "20minLtm2p31E": "20Min, Prompt 31,\nPrompt at end",
+    "20minLtm2p33S": "20Min, Prompt 33,\nPrompt at start",
+    "20minLtm2p33E": "20Min, Prompt 33,\nPrompt at end",
     "Wikinews": "basic,\nfull articles,\noriginal order",
     "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
@@ -1266,6 +1295,27 @@ def make_report_plots():
         df_all = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
         df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
         df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
+
+        # make a prompt-html-file showing all the used prompts
+        html_base = """<!DOCTYPE html>
+        <html>
+        <body>
+
+        {table}
+
+        </body>
+        </html>"""
+        df_prompts = pd.DataFrame(pd.DataFrame({"promptVersion": df_all['promptVersion'].unique().tolist() + additional_prompts}).drop_duplicates())
+        df_prompts = pd.DataFrame(df_all['promptVersion'].drop_duplicates())
+        df_prompts['prompt'] = df_prompts['promptVersion'].apply(lambda x: prompts[f"{x}"])
+        df_prompts.sort_values(by='promptVersion', inplace=True)
+        df_prompts.reset_index(inplace=True, drop=True)
+        # df_prompts = df_prompts.transpose()
+        html_data = df_prompts.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+        html_path = os.path.join(experiment_path, f"prompts_overview.html")
+        html_page = html_base.format(table=html_data)
+        with open(html_path, "w") as f:
+            f.write(html_page)
 
         """
             EXPERIMENT COST ESTIMATE (IN TOKENS)

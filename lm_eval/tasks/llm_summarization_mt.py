@@ -385,6 +385,14 @@ class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple"
 
+class SummarizationTask_Wikinewssum_SingleLine(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_single_line"
+
+class SummarizationTask_Wikinewssum_SingleLine_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_single_line_shuffled"
+
 
 class SummarizationTask_Wikinewssum_Simple_Shuffled(SummarizationTaskBase):
     VERSION = 0
