@@ -338,6 +338,8 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_factcc": faithfulness_classification_base_task.FaithfulnessClassificationTaskFactCC,
     "faithfulness_benchmark_frank": faithfulness_classification_base_task.FaithfulnessClassificationTaskFrank,
     "faithfulness_benchmark_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskSwissText23GoldAnnotation,
+    "faithfulness_benchmark_extrinsic_only_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation,
+    "faithfulness_benchmark_intrinsic_only_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskIntrinsicOnlySwissText23GoldAnnotation,
     "faithfulness_benchmark_xsum_faith": faithfulness_classification_base_task.FaithfulnessClassificationTaskXsumFaith,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,

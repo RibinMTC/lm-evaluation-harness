@@ -44,7 +44,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         "details it does mention are correctly derived from the text. Provide your judgment by "
         "outputting only 'faithful' if the sentence is faithful, and 'unfaithful' if it's "
         "not.\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
-        )
+    )
 
     task_results_info_list = []
 
@@ -162,6 +162,16 @@ class FaithfulnessClassificationTaskSwissText23GoldAnnotation(FaithfulnessClassi
     language = "German"
     article_key_name = "article_with_lead"
     summary_key_name = "text"
+
+
+class FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation(
+    FaithfulnessClassificationTaskSwissText23GoldAnnotation):
+    DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_extrinsic_only_gold_annotation"
+
+
+class FaithfulnessClassificationTaskIntrinsicOnlySwissText23GoldAnnotation(
+    FaithfulnessClassificationTaskSwissText23GoldAnnotation):
+    DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_intrinsic_only_gold_annotation"
 
 
 class FaithfulnessClassificationTaskXsumFaith(FaithfulnessClassificationBaseTask):
