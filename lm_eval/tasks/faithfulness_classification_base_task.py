@@ -167,6 +167,14 @@ class FaithfulnessClassificationTaskSwissText23GoldAnnotation(FaithfulnessClassi
 class FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation(
     FaithfulnessClassificationTaskSwissText23GoldAnnotation):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_extrinsic_only_gold_annotation"
+    default_prompt_template = (
+        "Your task is to carefully read an article and a given sentence. You should classify whether the sentence "
+        "contains any information, fact, or detail that is not mentioned in the article. If the sentence adds no new "
+        "information and only summarizes or rephrases the contents of the article, you should return 'faithful'. "
+        "However, if the sentence introduces any new information or details, even if they are factually correct but "
+        "are not found in the article, you should return 'unfaithful'.\nArticle: {article}\nSentence: {"
+        "sentence}\nLabel:\n"
+    )
 
 
 class FaithfulnessClassificationTaskIntrinsicOnlySwissText23GoldAnnotation(
