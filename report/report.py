@@ -32,6 +32,7 @@ sns.despine(bottom=True, left=True, offset=5)
 # plt.tight_layout()
 
 ROUND_TO_DECIMALS = 4
+pd.options.mode.chained_assignment = None  # default='warn'
 
 
 def rename_hf_model(model_name):
@@ -808,7 +809,7 @@ def save_inspect_examples_to_html(df, html_path, newline_columns=['prompt_0', 'l
                                   similarity_matcher=[{'ref': "prompt_0", 'tgt': "logit_0", 'col': "source-similarity"}, {'ref': "logit_0", 'tgt': "truth", 'col': "truth-similarity"}]):
     # add similarity matching columns
     for matcher in similarity_matcher:
-        df[matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
+        df.loc[:, matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
 
     # prepare the html output
     df = df.transpose()
@@ -1519,8 +1520,6 @@ def make_report_plots():
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
-        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
-        inspect_examples_all = find_inspect_examples(df_all, experiment_path, metric_names, groupbyList=groupByList, suffix="_all")
 
         # Make plots showing the failure rate
         failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
@@ -1544,7 +1543,9 @@ def make_report_plots():
 
         # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
         # ... and 2 documents with the median performance
-        inspect_examples_mp = find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
+        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
+        # inspect_examples_all = find_inspect_examples(df_all, experiment_path, metric_names, groupbyList=groupByList, suffix="_all")
+        # inspect_examples_mp = find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
 
         if df_prompt_length_impact is not None:
             df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
@@ -1568,10 +1569,10 @@ def make_report_plots():
         # save inspect examples in JSON
         with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
             json.dump(inspect_examples, f, indent=4)
-        with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:
-            json.dump(inspect_examples_all, f, indent=4)
-        with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
-            json.dump(inspect_examples_mp, f, indent=4)
+        # with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:
+        #     json.dump(inspect_examples_all, f, indent=4)
+        # with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
+        #     json.dump(inspect_examples_mp, f, indent=4)
 
 
 if __name__ == "__main__":

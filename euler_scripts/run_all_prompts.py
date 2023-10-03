@@ -160,7 +160,7 @@ inferable_args = {
     "gpu": {
         "default": "rtx_3090",
         "gpt-4": "rtx_3090",
-        "palm2": "rtx_3090",
+        "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
@@ -198,7 +198,7 @@ TMP_EULER_CONFIG = "tmp_euler_config.json"
 task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
 model_args_schema = "pretrained={model},max_gen_toks=512,trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 model_args_schema_gpt4 = "engine=gpt-4"
-model_args_schema_palm2 = "engine=text-bison-001"
+model_args_schema_palm2 = "engine=models/text-bison-001"
 
 """
     Build the configurations

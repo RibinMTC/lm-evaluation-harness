@@ -6,6 +6,7 @@ import time
 from google.oauth2 import service_account
 from google.cloud import aiplatform
 import google.generativeai as palm
+from google.generativeai.types import safety_types
 # from vertexai.language_models import TextGenerationModel
 from lm_eval.base import LM
 from typing import List, Tuple
@@ -129,26 +130,26 @@ class Palm2CompletionsLM(LM):
                 top_p=1.0,
                 safety_settings=[
                     {
-                        "category": "HARM_CATEGORY_UNSPECIFIED",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_DEROGATORY",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_DEROGATORY,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_TOXICITY",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_TOXICITY,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_VIOLENCE",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_VIOLENCE,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_SEXUAL",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_SEXUAL,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_MEDICAL",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_MEDICAL,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }, {
-                        "category": "HARM_CATEGORY_DANGEROUS",
-                        "threshold": "BLOCK_NONE"
+                        "category": safety_types.HarmCategory.HARM_CATEGORY_DANGEROUS,
+                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
                     }
                 ],
             )
