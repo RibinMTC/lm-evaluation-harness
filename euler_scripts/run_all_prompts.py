@@ -12,24 +12,24 @@ import random, string
 """
 models = [
     # "gpt-4",
-    # "palm2",
+    "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "mds-summ-single-line-experiment-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "palm2-initial-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
-    'WikinewsSL', 'WikinewsSLR',
+    '20Minuten',
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [52]  # [1, 2, 3, 4, 5]
-task_base_names = ["MDSSumm_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [2]  # [1, 2, 3, 4, 5]
+task_base_names = ["SummPalm2_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
@@ -198,7 +198,7 @@ TMP_EULER_CONFIG = "tmp_euler_config.json"
 task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt_suffix}{precision}"
 model_args_schema = "pretrained={model},max_gen_toks=512,trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 model_args_schema_gpt4 = "engine=gpt-4"
-model_args_schema_palm2 = "engine=text-bison@001"
+model_args_schema_palm2 = "engine=text-bison-001"
 
 """
     Build the configurations

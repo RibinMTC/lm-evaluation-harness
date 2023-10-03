@@ -20,6 +20,12 @@ import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
+import nltk
+from sentence_transformers import SentenceTransformer, util
+from flair.embeddings import TransformerDocumentEmbeddings
+from flair.data import Sentence
+from somajo import SoMaJo
+
 pd.set_option("display.precision", 4)
 sns.set_theme(style="darkgrid", rc={'figure.figsize': (17, 7)})
 sns.despine(bottom=True, left=True, offset=5)
@@ -721,6 +727,204 @@ def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVers
 
     pass
 
+sbert_model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
+somajo_tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=True)
+
+def sentence_similarity_matcher(reference, target, count=2, ref_name="Reference", tgt_name="Target") -> str:
+    """
+    Returns a html fragment (interactive)
+    """
+
+    embedding_model = lambda list: sbert_model.encode(list)
+
+
+    ref_sentences = list(somajo_tokenizer.tokenize_text([reference]))
+    ref_sentences_text = [" ".join([el.text for el in x]) for x in ref_sentences]
+    tgt_sentences = list(somajo_tokenizer.tokenize_text([target]))
+    tgt_sentences_text = [" ".join([el.text for el in x]) for x in tgt_sentences]
+
+    ref_sentence_embeddings = embedding_model(ref_sentences_text)
+    tgt_sentence_embeddings = embedding_model(tgt_sentences_text)
+
+    similarity_matrix = util.cos_sim(tgt_sentence_embeddings, ref_sentence_embeddings)
+    
+    # get the indices of the most similar sentences
+    indices = np.argsort(similarity_matrix, axis=1)
+    indices = indices[:, -count:]
+
+    # generate a list with the sentences and the indices in the other group (
+    reference_list = []
+    target_list = []
+    for i, index in enumerate(tgt_sentences):
+        target_list.append({
+            "sentence": tgt_sentences_text[i],
+            "similar": indices[i].tolist(),
+            "index": i}
+        )
+    for i, index in enumerate(ref_sentences):
+        similar_indices = []
+        for j, index in enumerate(indices):
+            if i in index:
+                similar_indices.append(j)
+        reference_list.append({
+            "sentence": ref_sentences_text[i],
+            "similar": similar_indices,
+            "index": i,
+        })
+
+    # generate the html fragment
+    ref_sentence_fragment = ""
+    for el in reference_list:
+        similar_classes = " ".join(["similar-" + str(x) for x in el["similar"]])
+        similar_classes += " " + "match" if len(el["similar"]) > 0 else ""
+        ref_sentence_fragment += f'<div class="sentence-similarity__reference__sentence {similar_classes}" data-index="{el["index"]}">{el["sentence"]}</div>\n'
+    tgt_sentence_fragment = ""
+    for el in target_list:
+        similar_classes = " ".join(["similar-" + str(x) for x in el["similar"]])
+        similar_classes += " " + "match" if len(el["similar"]) > 0 else ""
+        tgt_sentence_fragment += f'<div class="sentence-similarity__target__sentence {similar_classes}" data-index="{el["index"]}">{el["sentence"]}</div>\n'
+
+    similarity_fragment = f"""
+    <div class="sentence-similarity">
+        <div class="sentence-similarity__reference">
+            <h3>{ref_name}</h3>
+            <div class="sentence-similarity__reference__sentences">
+                {ref_sentence_fragment}
+            </div>
+        </div>
+        <div class="sentence-similarity__target">
+            <h3>{tgt_name}</h3>
+            <div class="sentence-similarity__target__sentences">
+                {tgt_sentence_fragment}
+            </div>
+        </div>
+    </div>
+    """
+
+    return similarity_fragment
+
+
+def save_inspect_examples_to_html(df, html_path, newline_columns=['prompt_0', 'logit_0', 'truth'], 
+                                  similarity_matcher=[{'ref': "prompt_0", 'tgt': "logit_0", 'col': "source-similarity"}, {'ref': "logit_0", 'tgt': "truth", 'col': "truth-similarity"}]):
+    # add similarity matching columns
+    for matcher in similarity_matcher:
+        df[matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
+
+    # prepare the html output
+    df = df.transpose()
+    df = df.apply(lambda row: df_row_replace(row, ['prompt_0', 'logit_0', 'truth'], '\n', '<br>'))
+
+    html_data = df.to_html(escape=False).replace("\\n", "").replace("\n", "")
+    html_page = html_base.format(table=html_data)
+    with open(html_path, "w") as f:
+        f.write(html_page)
+
+
+def df_row_replace(row, columns, replace, with_string):
+    # Note: assumes columns are strings (values)
+    for col in columns:
+        # if element is float.nan -> skip
+        if isinstance(row[col], float) and np.isnan(row[col]):
+            continue
+        row[col] = row[col].replace(replace, with_string)
+    return row
+
+
+html_base = """<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<html>
+<head>
+    <style>
+        td {{
+            text-align: left;
+            vertical-align: top;
+            min-width: 125rem;
+        }}
+        .sentence-similarity {{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }}
+        .sentence-similarity__reference,
+        .sentence-similarity__target {{
+            width: 50%;
+        }}
+        .sentence-similarity__reference__sentences,
+        .sentence-similarity__target__sentences {{
+            display: flex;
+            flex-direction: column;
+        }}
+        .sentence-similarity__reference__sentence,
+        .sentence-similarity__target__sentence {{
+            padding: 0.15rem;
+            margin: 0.2rem 0;
+        }}
+        .sentence-similarity__reference__sentence.highlight,
+        .sentence-similarity__target__sentence.highlight {{
+            background-color: #f7c6ff !important;
+            border: 0.25px solid red;
+        }}
+        .sentence-similarity__reference__sentence.match,
+        .sentence-similarity__target__sentence.match {{
+            background-color: #bdfff6;
+        }}
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {{
+            $('.sentence-similarity__target__sentence').hover(function () {{
+                // add highlight class to element hovering on and all elements with data-index equal to index in similar-{{idx}} classes of element hovering on
+                $(this).addClass('highlight');
+                var similarIndices = $(this).attr('class').match(/similar-\d+/g);
+                var referenceSentence = $(this).closest('.sentence-similarity').find('.sentence-similarity__reference__sentence');
+                referenceSentence = referenceSentence.filter(function () {{
+                    var idx = $(this).data('index');
+                    return similarIndices.includes('similar-' + idx);
+                }});
+                referenceSentence.addClass('highlight');
+            }}, function () {{
+                // remove highlight class from element hovering on and all elements with data-index equal to index in similar-{{idx}} classes of element hovering on
+                $(this).removeClass('highlight');
+                var similarIndices = $(this).attr('class').match(/similar-\d+/g);
+                var referenceSentence = $(this).closest('.sentence-similarity').find('.sentence-similarity__reference__sentence');
+                referenceSentence = referenceSentence.filter(function () {{
+                    var idx = $(this).data('index');
+                    return similarIndices.includes('similar-' + idx);
+                }});
+                referenceSentence.removeClass('highlight');
+            }});
+
+            $('.sentence-similarity__reference__sentence').hover(function () {{
+                // add highlight class to element hovering on and all elements with data-index equal to index in similar-{{idx}} classes of element hovering on
+                $(this).addClass('highlight');
+                var similarIndices = $(this).attr('class').match(/similar-\d+/g);
+                var targetSentence = $(this).closest('.sentence-similarity').find('.sentence-similarity__target__sentence');
+                targetSentence = targetSentence.filter(function () {{
+                    var idx = $(this).data('index');
+                    return similarIndices.includes('similar-' + idx);
+                }});
+                targetSentence.addClass('highlight');
+            }}, function () {{
+                // remove highlight class from element hovering on and all elements with data-index equal to index in similar-{{idx}} classes of element hovering on
+                $(this).removeClass('highlight');
+                var similarIndices = $(this).attr('class').match(/similar-\d+/g);
+                var targetSentence = $(this).closest('.sentence-similarity').find('.sentence-similarity__target__sentence');
+                targetSentence = targetSentence.filter(function () {{
+                    var idx = $(this).data('index');
+                    return similarIndices.includes('similar-' + idx);
+                }});
+                targetSentence.removeClass('highlight');
+            }});
+        }});
+    </script>
+</head>
+<body>
+
+{table}
+
+</body>
+</html>"""
+
 
 def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"], numExamples=2, suffix=""):
     if df.shape[0] == 0:
@@ -839,18 +1043,9 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
                 for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
                     df_docID = df[df['truth'].apply(lambda x: x.strip()) == gt_summary.strip()]
 
-                    # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
-                    # df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
-                    # df_docID = df_docID.drop(columns=all_other_cols)
-                    df_docID = df_docID.transpose()
-
                     # save to html
-                    df_docID = df_docID.apply(lambda row: df_row_replace(row, ['prompt_0', 'logit_0', 'truth'], '\n', '<br>'))
-                    html_data = df_docID.to_html(escape=False).replace("\\n", "").replace("\n", "")
                     html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}__{summ_idx}.html")
-                    html_page = html_base.format(table=html_data)
-                    with open(html_path, "w") as f:
-                        f.write(html_page)
+                    save_inspect_examples_to_html(df_docID, html_path, newline_columns=['prompt_0', 'logit_0', 'truth'])
 
         # also sample random document IDs and save them in a html file
         uniqueDocIDs = df["doc_id"].unique()
@@ -860,18 +1055,9 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
             # loop over all the gt-summaries, make 1 html file per gt-summary
             for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
                 df_docID = df[df['truth'].apply(lambda x: x.strip()) == gt_summary.strip()]
-                # make a new dataframe with the columns in inspect_exclude_columns, and the rest should be combined into a single column (JSON)
-                # df_docID["info"] = df_docID.apply(lambda row: json.dumps({col: row[col] for col in all_other_cols}), axis=1)
-                # df_docID = df_docID.drop(columns=all_other_cols)
-                df_docID = df_docID.transpose()
 
-                # save to html
-                df_docID = df_docID.apply(lambda row: df_row_replace(row, ['prompt_0', 'logit_0', 'truth'], '\n', '<br>'))
-                html_data = df_docID.to_html(escape=False).replace("\\n", "").replace("\n", "")
                 html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random", f"{docID}__{summ_idx}.html")
-                html_page = html_base.format(table=html_data)
-                with open(html_path, "w") as f:
-                    f.write(html_page)
+                save_inspect_examples_to_html(df_docID, html_path, newline_columns=['prompt_0', 'logit_0', 'truth'])
 
     return out
 
@@ -1272,35 +1458,6 @@ def main():
         pathlib.Path(report_path).mkdir(parents=True, exist_ok=True)
 
         create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
-
-
-def df_row_replace(row, columns, replace, with_string):
-    # Note: assumes columns are strings (values)
-    for col in columns:
-        # if element is float.nan -> skip
-        if isinstance(row[col], float) and np.isnan(row[col]):
-            continue
-        row[col] = row[col].replace(replace, with_string)
-    return row
-
-html_base = """<!DOCTYPE html>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<html>
-<head>
-    <style>
-        td {{
-            text-align: left;
-            vertical-align: top;
-            min-width: 50rem;
-        }}
-    </style>
-</head>
-<body>
-
-{table}
-
-</body>
-</html>"""
 
 def make_report_plots():
     # Get the prompts from the prompts_bag.json file for the given experiment
