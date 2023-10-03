@@ -812,14 +812,6 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
     num_all_inspect_examples = 20
     inspect_exclude_columns = ['prompt_0', 'logit_0', "truth"]
     all_other_cols = [col for col in df.columns if col not in inspect_exclude_columns]
-    html_base = """<!DOCTYPE html>
-<html>
-<body>
-
-{table}
-
-</body>
-</html>"""
     for inspect_metric in inspect_metrics:
         interesting_docIds = {cat: [] for cat in sample_ranges if cat != "all"}
         for groupA in out:
@@ -853,7 +845,8 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
                     df_docID = df_docID.transpose()
 
                     # save to html
-                    html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+                    df_docID = df_docID.apply(lambda row: df_row_replace(row, ['prompt_0', 'logit_0', 'truth'], '\n', '<br>'))
+                    html_data = df_docID.to_html(escape=False).replace("\\n", "").replace("\n", "")
                     html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat, f"{docID}__{summ_idx}.html")
                     html_page = html_base.format(table=html_data)
                     with open(html_path, "w") as f:
@@ -873,7 +866,8 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
                 df_docID = df_docID.transpose()
 
                 # save to html
-                html_data = df_docID.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+                df_docID = df_docID.apply(lambda row: df_row_replace(row, ['prompt_0', 'logit_0', 'truth'], '\n', '<br>'))
+                html_data = df_docID.to_html(escape=False).replace("\\n", "").replace("\n", "")
                 html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random", f"{docID}__{summ_idx}.html")
                 html_page = html_base.format(table=html_data)
                 with open(html_path, "w") as f:
@@ -1066,7 +1060,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-2stage-experiment"
+experiment_name = "least-to-most-prompting-stage2"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1280,6 +1274,34 @@ def main():
         create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
 
 
+def df_row_replace(row, columns, replace, with_string):
+    # Note: assumes columns are strings (values)
+    for col in columns:
+        # if element is float.nan -> skip
+        if isinstance(row[col], float) and np.isnan(row[col]):
+            continue
+        row[col] = row[col].replace(replace, with_string)
+    return row
+
+html_base = """<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<html>
+<head>
+    <style>
+        td {{
+            text-align: left;
+            vertical-align: top;
+            min-width: 50rem;
+        }}
+    </style>
+</head>
+<body>
+
+{table}
+
+</body>
+</html>"""
+
 def make_report_plots():
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
@@ -1297,21 +1319,14 @@ def make_report_plots():
         df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
 
         # make a prompt-html-file showing all the used prompts
-        html_base = """<!DOCTYPE html>
-        <html>
-        <body>
-
-        {table}
-
-        </body>
-        </html>"""
         df_prompts = pd.DataFrame(pd.DataFrame({"promptVersion": df_all['promptVersion'].unique().tolist() + additional_prompts}).drop_duplicates())
-        df_prompts = pd.DataFrame(df_all['promptVersion'].drop_duplicates())
-        df_prompts['prompt'] = df_prompts['promptVersion'].apply(lambda x: prompts[f"{x}"])
+        # df_prompts = pd.DataFrame(df_all['promptVersion'].drop_duplicates())
+        df_prompts['prompt'] = df_prompts.apply(lambda x: prompts[f"{x['promptVersion']}"], axis=1)
         df_prompts.sort_values(by='promptVersion', inplace=True)
         df_prompts.reset_index(inplace=True, drop=True)
         # df_prompts = df_prompts.transpose()
-        html_data = df_prompts.to_html().replace("\\n", "<br>").replace("\n", "<br>")
+        df_prompts = df_prompts.apply(lambda row: df_row_replace(row, ['prompt'], '\n', '<br>'), axis=1)
+        html_data = df_prompts.to_html(escape=False).replace("\\n", "").replace("\n", "")
         html_path = os.path.join(experiment_path, f"prompts_overview.html")
         html_page = html_base.format(table=html_data)
         with open(html_path, "w") as f:

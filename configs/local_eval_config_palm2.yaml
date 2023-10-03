@@ -1,5 +1,5 @@
 model: palm2
-model_args: "engine=text-bison@001"
+model_args: "engine=text-bison-001"
 tasks: "SummPalm2_20Minuten_2" #"germanquad_open_qa,x_stance_de,pawsx_de"
 prompt_version_per_task: "2"
 num_fewshot: 0

@@ -5,7 +5,8 @@ import os
 import time
 from google.oauth2 import service_account
 from google.cloud import aiplatform
-from vertexai.language_models import TextGenerationModel
+import google.generativeai as palm
+# from vertexai.language_models import TextGenerationModel
 from lm_eval.base import LM
 from typing import List, Tuple
 from tqdm import tqdm
@@ -32,6 +33,7 @@ class Palm2CompletionsLM(LM):
         credentials = service_account.Credentials.from_service_account_file('gcloud_service_account.json')
         # get environment variables
         project = os.environ.get('GCLOUD_PROJECT')
+        # palm.configure(credentials=credentials)
         aiplatform.init(project=project, location='us-central1', credentials=credentials, experiment='llm-master-thesis')
 
         self.engine = engine
@@ -101,23 +103,59 @@ class Palm2CompletionsLM(LM):
                 }
             ]
         """
-
-        model = TextGenerationModel.from_pretrained(self.engine)
+        # model = TextGenerationModel.from_pretrained(self.engine)
 
         results = []
         for request in tqdm(requests):
             # messages = [{"role": "user", "content": request[0]}]
 
             # TODO: temperature parameter -> is it accessible here?
-            response = model.predict(
-                request[0],
-                **parameters,
+            # response = model.predict(
+            #     request[0],
+            #     **parameters,
+            # )
+            #
+            # # Prediction(predictions=[{'content': '', 'citationMetadata': None, 'safetyAttributes': {'blocked': True, 'errors': [253.0]}}], deployed_model_id='', model_version_id='', model_resource_name='', explanations=None)
+            #
+            # prediction = response.text
+            # results.append(prediction)
+
+            result = palm.generate_text(
+                model=self.engine,
+                prompt=request[0],
+                temperature=0,
+                max_output_tokens=256,
+                top_k=40,
+                top_p=1.0,
+                safety_settings=[
+                    {
+                        "category": "HARM_CATEGORY_UNSPECIFIED",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_DEROGATORY",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_TOXICITY",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_VIOLENCE",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_SEXUAL",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_MEDICAL",
+                        "threshold": "BLOCK_NONE"
+                    }, {
+                        "category": "HARM_CATEGORY_DANGEROUS",
+                        "threshold": "BLOCK_NONE"
+                    }
+                ],
             )
 
-            # Prediction(predictions=[{'content': '', 'citationMetadata': None, 'safetyAttributes': {'blocked': True, 'errors': [253.0]}}], deployed_model_id='', model_version_id='', model_resource_name='', explanations=None)
-
-            prediction = response.text
+            prediction = result.result
             results.append(prediction)
+
         return results
 
     def _encode_pair(
