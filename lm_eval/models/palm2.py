@@ -34,8 +34,8 @@ class Palm2CompletionsLM(LM):
         credentials = service_account.Credentials.from_service_account_file('gcloud_service_account.json')
         # get environment variables
         project = os.environ.get('GCLOUD_PROJECT')
-        # palm.configure(credentials=credentials)
         aiplatform.init(project=project, location='us-central1', credentials=credentials, experiment='llm-master-thesis')
+        palm.configure(credentials=credentials)
 
         self.engine = engine
 
