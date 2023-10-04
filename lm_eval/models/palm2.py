@@ -35,7 +35,7 @@ class Palm2CompletionsLM(LM):
         # get environment variables
         project = os.environ.get('GCLOUD_PROJECT')
         aiplatform.init(project=project, location='us-central1', credentials=credentials, experiment='llm-master-thesis')
-        palm.configure(credentials=credentials)
+        palm.configure(credentials=credentials, location='us-central1')
 
         self.engine = engine
 

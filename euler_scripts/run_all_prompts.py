@@ -12,21 +12,21 @@ import random, string
 """
 models = [
     # "gpt-4",
-    "palm2",
+    # "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "palm2-initial-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "mds-2stage-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
-    '20Minuten',
+    'WikinewsSplit',
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [2]  # [1, 2, 3, 4, 5]
-task_base_names = ["SummPalm2_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
+prompt_versions = [41]  # [1, 2, 3, 4, 5]
+task_base_names = ["MDS2S_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]

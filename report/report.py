@@ -728,16 +728,36 @@ def statistical_tests(df, metric_names, comparison_columns=['model', 'promptVers
 
     pass
 
+
 sbert_model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 somajo_tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=True)
+
 
 def sentence_similarity_matcher(reference, target, count=2, ref_name="Reference", tgt_name="Target") -> str:
     """
     Returns a html fragment (interactive)
     """
 
-    embedding_model = lambda list: sbert_model.encode(list)
+    def _sub(match):
+        return '\n\n ' + match.group(0) + " "
 
+    # Help the tokenizer with some special patterns
+    patterns = [
+        (r"\*", "\n\n "),
+        (r"•", "\n\n "),
+        (r"•", "\n\n "),
+        (r"\d\.", _sub),
+        (r"\d\)", _sub),
+    ]
+    for pattern in patterns:
+        if re.search(pattern[0], reference):
+            reference = re.sub(pattern[0], pattern[1], reference)
+        if re.search(pattern[0], target):
+            target = re.sub(pattern[0], pattern[1], target)
+
+    # Tokenize, embed, group
+
+    embedding_model = lambda list: sbert_model.encode(list)
 
     ref_sentences = list(somajo_tokenizer.tokenize_text([reference]))
     ref_sentences_text = [" ".join([el.text for el in x]) for x in ref_sentences]
@@ -748,7 +768,7 @@ def sentence_similarity_matcher(reference, target, count=2, ref_name="Reference"
     tgt_sentence_embeddings = embedding_model(tgt_sentences_text)
 
     similarity_matrix = util.cos_sim(tgt_sentence_embeddings, ref_sentence_embeddings)
-    
+
     # get the indices of the most similar sentences
     indices = np.argsort(similarity_matrix, axis=1)
     indices = indices[:, -count:]
@@ -805,8 +825,9 @@ def sentence_similarity_matcher(reference, target, count=2, ref_name="Reference"
     return similarity_fragment
 
 
-def save_inspect_examples_to_html(df, html_path, newline_columns=['prompt_0', 'logit_0', 'truth'], 
-                                  similarity_matcher=[{'ref': "prompt_0", 'tgt': "logit_0", 'col': "source-similarity"}, {'ref': "logit_0", 'tgt': "truth", 'col': "truth-similarity"}]):
+def save_inspect_examples_to_html(df, html_path, newline_columns=['prompt_0', 'logit_0', 'truth'],
+                                  similarity_matcher=[{'ref': "prompt_0", 'tgt': "logit_0", 'col': "source-similarity"}, {'ref': "logit_0", 'tgt': "truth", 'col': "truth-similarity"},
+                                                      {'ref': "prompt_0", 'tgt': "truth", 'col': "ground-truth-similarity"}]):
     # add similarity matching columns
     for matcher in similarity_matcher:
         df.loc[:, matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
@@ -1267,7 +1288,8 @@ experiment_config = {
     "least-to-most-prompting-stage2": {
         "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["20Minuten"]
+        "datasets": ["20Minuten"],
+        "additional_prompts": [21, 22, 30, 31, 32, 33]
     },
     "mds-baseline": {
         "groupByList": ["promptVersion", "dataset-annotation"],
@@ -1287,8 +1309,7 @@ experiment_config = {
     "mds-2stage-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["Wikinews"],
-        "additional_prompts": ["21", "22", "30", "31", "32", "33"]
+        "datasets": ["Wikinews"]
     },
     "base-experiment": {
         "groupByList": ["promptVersion", "model"],
@@ -1460,6 +1481,7 @@ def main():
 
         create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
 
+
 def make_report_plots():
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
@@ -1520,6 +1542,7 @@ def make_report_plots():
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
+        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
 
         # Make plots showing the failure rate
         failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
@@ -1543,7 +1566,7 @@ def make_report_plots():
 
         # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
         # ... and 2 documents with the median performance
-        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
+        # inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
         # inspect_examples_all = find_inspect_examples(df_all, experiment_path, metric_names, groupbyList=groupByList, suffix="_all")
         # inspect_examples_mp = find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model", "promptVersion"])
 
