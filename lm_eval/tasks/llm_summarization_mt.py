@@ -341,6 +341,7 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
     DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
 
+
 class SummLtM2_20min_prompt22_start(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/20minuten_LtM1_22_processed_header_start_de"
@@ -385,9 +386,11 @@ class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple"
 
+
 class SummarizationTask_Wikinewssum_SingleLine(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple_single_line"
+
 
 class SummarizationTask_Wikinewssum_SingleLine_Shuffled(SummarizationTaskBase):
     VERSION = 0
@@ -463,6 +466,7 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBas
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_input_doc_split"
 
+
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_originalOrder"
@@ -471,6 +475,66 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_shuffled"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_cluster-size"
 
 
 class SummLtM_20Minuten(SummarizationTaskBase):

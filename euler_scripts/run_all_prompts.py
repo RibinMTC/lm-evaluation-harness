@@ -29,7 +29,7 @@ prompt_versions = [41]  # [1, 2, 3, 4, 5]
 task_base_names = ["MDS2S_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", "8b"]
+precision_values = ["8b"]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
