@@ -30,6 +30,8 @@ def simple_evaluate(
         decontamination_ngrams_path=None,
         write_out=False,
         output_base_path=None,
+        seed: int = 42,
+        fewshot_sampling: str = None
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -111,6 +113,8 @@ def simple_evaluate(
         decontamination_ngrams_path=decontamination_ngrams_path,
         write_out=write_out,
         output_base_path=output_base_path,
+        seed=seed,
+        fewshot_sampling=fewshot_sampling
     )
 
     # add info about the model and few shot config
@@ -144,6 +148,8 @@ def evaluate(
         decontamination_ngrams_path=None,
         write_out=False,
         output_base_path=None,
+        seed:int=42,
+        fewshot_sampling:str=None
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -222,7 +228,7 @@ def evaluate(
         # deterministically shuffle docs and chop off the first `limit` because sometimes docs are in some kind of order
         task_docs = list(task_doc_func())
         rnd = random.Random()
-        rnd.seed(42)
+        rnd.seed(seed)
         #rnd.shuffle(task_docs)
         print(f"Task: {task_name}; number of docs: {len(task_docs)}")
 
@@ -245,7 +251,7 @@ def evaluate(
 
             docs[(task_name, doc_id)] = doc
             ctx = task.fewshot_context(
-                doc=doc, num_fewshot=num_fewshot, rnd=rnd, description=description
+                doc=doc, num_fewshot=num_fewshot, rnd=rnd, description=description, fewshot_sampling=fewshot_sampling
             )
             reqs = task.construct_requests(doc, ctx)
 

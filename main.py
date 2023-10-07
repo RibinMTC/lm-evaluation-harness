@@ -45,6 +45,8 @@ def parse_args():
     parser.add_argument("--prompt_version_per_task", type=str, default=None)
     parser.add_argument("--provide_description", action="store_true")
     parser.add_argument("--num_fewshot", type=int, default=0)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--fewshot_sampling", type=str, default="")
     parser.add_argument("--batch_size", type=str, default=None)
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--output_path", default=None)
@@ -116,8 +118,13 @@ def main():
 
     args.output_base_path = os.path.join(args.output_base_path, model_id)
 
+    if args.num_fewshot > 0:
+        few_shot_string += f"-sampling-{args.fewshot_sampling}"
+
+    seed_string = f"seed-{args.seed}"
+
     wandb_run_name = randomname.get_name() + '_' + '_'.join(
-        [tasks_string, model_string, few_shot_string])
+        [model_string, few_shot_string, seed_string])
 
     wandb_run_group_name = f"llm_leaderboard_{tasks_string}_group"
     wandb.init(project="llm_leaderboard", entity="background-tool", config=vars(args), name=wandb_run_name,
@@ -139,6 +146,8 @@ def main():
         check_integrity=args.check_integrity,
         write_out=args.write_out,
         output_base_path=args.output_base_path,
+        seed=args.seed,
+        fewshot_sampling=args.fewshot_sampling
     )
     results_dump = {"results ": results["results"], "write_out_info": results["write_out_info"]}
     dumped = json.dumps(results_dump, indent=2)
