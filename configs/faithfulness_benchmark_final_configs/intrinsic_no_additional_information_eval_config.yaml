@@ -1,0 +1,17 @@
+model: hf-causal-experimental #hf-seq2seq #hf-causal-experimental
+model_args: "pretrained=NousResearch/Llama-2-7b-hf,trust_remote_code=True,use_accelerate=True" #,load_in_8bit=True"#,do_sample=True,temperature=0.2"
+tasks: "faithfulness_benchmark_final_swisstext23_benchmark_intrinsic"
+prompt_version_per_task: "intrinsic_template_no_additional_information"
+num_fewshot: 0
+batch_size: "1"
+device: null
+output_path: null
+limit: null
+data_sampling: null
+no_cache: true
+decontamination_ngrams_path: null
+description_dict_path: null
+check_integrity: false
+write_out: true
+output_base_path: "results"
+wandb_on: true
