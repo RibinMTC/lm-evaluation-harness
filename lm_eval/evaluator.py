@@ -223,7 +223,7 @@ def evaluate(
         task_docs = list(task_doc_func())
         rnd = random.Random()
         rnd.seed(42)
-        rnd.shuffle(task_docs)
+        #rnd.shuffle(task_docs)
         print(f"Task: {task_name}; number of docs: {len(task_docs)}")
 
         if write_out:
