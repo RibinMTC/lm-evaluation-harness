@@ -1,3 +1,4 @@
+import glob
 import os
 from pprint import pprint
 from typing import List, Union, Dict
@@ -415,9 +416,22 @@ def get_task_name_from_object(task_object):
     )
 
 
+def get_json_filenames(directory: str):
+    files = glob.glob(f"{directory}/*.json")
+    filenames = [os.path.splitext(os.path.basename(file))[0] for file in files]
+    return filenames
+
+
 def load_prompt(task_name, model_id, prompt_version):
     """Load the appropriate prompt based on task name, model prefix, and version."""
-    file_path = os.path.join("configs", "prompt_templates", f"{task_name}.json")
+    root_prompt_template_dir = os.path.join("configs", "prompt_templates")
+    prompt_templates_task_names = get_json_filenames(root_prompt_template_dir)
+    file_path = None
+
+    for filename in prompt_templates_task_names:
+        if task_name.startswith(filename):
+            file_path = os.path.join(root_prompt_template_dir, f"{filename}.json")
+            break
 
     if not os.path.exists(file_path):
         return None
