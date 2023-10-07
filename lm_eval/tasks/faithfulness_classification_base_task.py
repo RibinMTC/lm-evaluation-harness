@@ -32,6 +32,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
     summary_key_name = None
     language = ""
     label_key_name = "is_faithful"
+    true_label_name = None
 
     positive_label = "faithful"
     negative_label = "unfaithful"
@@ -80,16 +81,18 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
     def doc_to_target(self, doc):
         label = str(doc[self.label_key_name])
-        return " " + label
+        return label
 
     def construct_requests(self, doc, ctx):
         ll_false, _ = rf.loglikelihood(ctx, f" {self.negative_label}")
         ll_true, _ = rf.loglikelihood(ctx, f" {self.positive_label}")
         return ll_false, ll_true
 
-    @staticmethod
-    def convert_label(label: bool):
-        return int(label)
+    def convert_label(self, label) -> int:
+        if self.true_label_name:
+            return int(label == self.true_label_name)
+        else:
+            return int(label)
 
     def process_results(self, doc, results):
         prediction = np.argmax(results)
@@ -164,15 +167,42 @@ class FaithfulnessClassificationTaskSwissText23GoldAnnotation(FaithfulnessClassi
     summary_key_name = "text"
 
 
+class FaithfulnessClassificationTaskFinalSwissText23Benchmark(FaithfulnessClassificationBaseTask):
+    DATASET_PATH = "mtc/final_german_faithfulness_benchmark"
+    label_key_name = "label"
+    positive_label = "true"
+    negative_label = "false"
+    language = "German"
+    article_key_name = "lead_with_article"
+    summary_key_name = "text"
+
+
+class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
+    FaithfulnessClassificationTaskFinalSwissText23Benchmark):
+    true_label_name = "Faithful"
+
+
+class FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic(
+    FaithfulnessClassificationTaskFinalSwissText23Benchmark):
+    true_label_name = "Intrinsic Hallucination"
+
+
+class FaithfulnessClassificationTaskFinalSwissText23BenchmarkExtrinsic(
+    FaithfulnessClassificationTaskFinalSwissText23Benchmark):
+    true_label_name = "Extrinsic Hallucination"
+
+
 class FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation(
     FaithfulnessClassificationTaskSwissText23GoldAnnotation):
     DATASET_PATH = "mtc/faithfulness_benchmark_sanity_check_extrinsic_only_gold_annotation"
+    positive_label = "true"
+    negative_label = "false"
     default_prompt_template = (
         "Your task is to carefully read an article and a given sentence. You should classify whether the sentence "
         "contains any information, fact, or detail that is not mentioned in the article. If the sentence adds no new "
-        "information and only summarizes or rephrases the contents of the article, you should return 'faithful'. "
+        "information and only summarizes or rephrases the contents of the article, you should return 'true'. "
         "However, if the sentence introduces any new information or details, even if they are factually correct but "
-        "are not found in the article, you should return 'unfaithful'.\nArticle: {article}\nSentence: {"
+        "are not found in the article, you should return 'false'.\nArticle: {article}\nSentence: {"
         "sentence}\nLabel:\n"
     )
 

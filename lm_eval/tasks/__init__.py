@@ -341,6 +341,9 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_extrinsic_only_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation,
     "faithfulness_benchmark_intrinsic_only_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskIntrinsicOnlySwissText23GoldAnnotation,
     "faithfulness_benchmark_xsum_faith": faithfulness_classification_base_task.FaithfulnessClassificationTaskXsumFaith,
+    "faithfulness_benchmark_final_swisstext23_benchmark_faithful": faithfulness_classification_base_task.FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful,
+    "faithfulness_benchmark_final_swisstext23_benchmark_intrinsic": faithfulness_classification_base_task.FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic,
+    "faithfulness_benchmark_final_swisstext23_benchmark_extrinsic": faithfulness_classification_base_task.FaithfulnessClassificationTaskFinalSwissText23BenchmarkExtrinsic,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

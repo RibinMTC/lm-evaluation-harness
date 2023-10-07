@@ -1,0 +1,15 @@
+{
+  "stabilityai/StableBeluga": {
+    },
+  "google/flan-ul2": {
+   },
+  "tiiuae/falcon": {
+   },
+  "NousResearch/Llama-2": {
+    "faithfulness_template": "For a given article and sentence in German, determine if the sentence faithfully represents the article's information. If the sentence aligns with the article's content without introducing new details, respond with 'true'. If the sentence contradicts or adds any unmentioned details, respond with 'false'.\nArticle: {article}\nSentence: {sentence}\nLabel:\n",
+    "intrinsic_template_no_additional_information": "For a given article and sentence in German, determine whether the sentence is unfaithful by contradicting the article's content, such as swapped entities, dates, location or wrong dates. If the sentence is contradictory, answer 'true'. If the sentence is consistent, answer 'false'.\nArticle: {article}\nSentence: {sentence}\nLabel:\n",
+    "intrinsic_template_with_additional_information": "For a given article and sentence in German, determine whether the sentence is unfaithful by contradicting the article's content, such as swapped entities, dates, location or wrong dates. Additional information in the sentence, which cannot be confirmed nor denied based on the article, should not be considered as a contradiction. If the sentence is contradictory, answer 'true'. If the sentence is consistent, answer 'false'.\nArticle: {article}\nSentence: {sentence}\nLabel:\n",
+    "extrinsic_template_no_contradictions": "For a given article and sentence in German, analyze if the sentence introduces additional details not present in the article. If the sentence is unfaithful by adding new information, respond with 'true'. If the sentence is faithful without extra details, respond with 'false'.\nArticle: {article}\nSentence: {sentence}\nLabel:\n",
+    "extrinsic_template_with_contradictions": "For a given article and sentence in German, analyze if the sentence introduces additional details not present in the article. Contradictory information like swapped entities, incorrect dates, locations, times or negations don't count as unfaithful, only new, additional information does. If the sentence is unfaithful by adding new information, respond with 'true'. If the sentence is faithful without extra details, respond with 'false'.\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
+  }
+}
