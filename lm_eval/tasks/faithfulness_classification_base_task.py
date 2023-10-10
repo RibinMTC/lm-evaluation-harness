@@ -38,6 +38,8 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
     positive_label = "faithful"
     negative_label = "unfaithful"
 
+    plot_class_names = ["Unfaithful", "Faithful"]
+
     negative_samples_df = None
     positive_samples_df = None
 
@@ -236,9 +238,8 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         task_results_info_df = pd.DataFrame(self.task_results_info_list)
         predictions = task_results_info_df["prediction"].tolist()
         references = task_results_info_df["reference"].tolist()
-        class_names = ["Unfaithful", "Faithful"]
         all_plots = {"confusion_matrix": wandb.plot.confusion_matrix(y_true=references, preds=predictions,
-                                                                     class_names=class_names)}
+                                                                     class_names=self.plot_class_names)}
         return all_plots
 
 
@@ -281,11 +282,13 @@ class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
     true_label_name = "Intrinsic Hallucination"
+    plot_class_names = ["Not Intrinsic", "Intrinsic"]
 
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkExtrinsic(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
     true_label_name = "Extrinsic Hallucination"
+    plot_class_names = ["Not-Extrinsic", "Extrinsic"]
 
 
 class FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation(
