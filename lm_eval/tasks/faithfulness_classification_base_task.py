@@ -288,7 +288,7 @@ class FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic(
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkExtrinsic(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
     true_label_name = "Extrinsic Hallucination"
-    plot_class_names = ["Not-Extrinsic", "Extrinsic"]
+    plot_class_names = ["Not Extrinsic", "Extrinsic"]
 
 
 class FaithfulnessClassificationTaskExtrinsicOnlySwissText23GoldAnnotation(
