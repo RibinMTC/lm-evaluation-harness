@@ -123,8 +123,10 @@ def main():
 
     seed_string = f"seed-{args.seed}"
 
+    prompt_version_string = f"prompt-version-{args.prompt_version_per_task}"
+
     wandb_run_name = randomname.get_name() + '_' + '_'.join(
-        [model_string, few_shot_string, seed_string])
+        [model_string, few_shot_string, seed_string, prompt_version_string])
 
     wandb_run_group_name = f"llm_leaderboard_{tasks_string}_group"
     wandb.init(project="llm_leaderboard", entity="background-tool", config=vars(args), name=wandb_run_name,
