@@ -1,3 +1,4 @@
+import math
 from functools import partial
 import evaluate
 import numpy as np
@@ -73,11 +74,14 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
                     train_df = self.dataset["train"].to_pandas()
                     train_df["num_words_article"] = train_df["lead_with_article"].str.len()
                     sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
-                    negative_samples_df = sorted_train_df.loc[lambda example: example["label"] != self.true_label_name].head(100)
-                    positive_samples_df = sorted_train_df.loc[lambda example: example["label"] == self.true_label_name].head(100)
+                    negative_samples_df = sorted_train_df.loc[
+                        lambda example: example["label"] != self.true_label_name].head(100)
+                    positive_samples_df = sorted_train_df.loc[
+                        lambda example: example["label"] == self.true_label_name].head(100)
                     self._training_docs = {
                         "positive": Dataset.from_pandas(positive_samples_df),
-                        "negative": Dataset.from_pandas(negative_samples_df)
+                        "negative": Dataset.from_pandas(negative_samples_df),
+                        "full": sorted_train_df
                     }
             return self._training_docs
 
@@ -98,88 +102,209 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
     def doc_to_target(self, doc):
         if doc[self.label_key_name] == self.true_label_name:
-            return "true"
+            return self.positive_label
         else:
-            return "false"
+            return self.negative_label
 
-    def fewshot_context(
-            self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling:str=None
-    ):
-        """Returns a fewshot context string that is made up of a prepended description
-        (if provided), the `num_fewshot` number of examples, and an appended prompt example.
-
-        :param doc: str
-            The document as returned from training_docs, validation_docs, or test_docs.
-        :param num_fewshot: int
-            The number of fewshot examples to provide in the returned context string.
-        :param provide_description: bool
-            Not implemented, and this option is deprecated and will be removed in a future version in favor of a different description providing method
-        :param rnd: random.Random
-            The pseudo-random number generator used to randomly sample examples.
-            WARNING: This is currently a required arg although it's optionalized with a default `None`.
-        :param description: str
-            The task's description that will be prepended to the fewshot examples.
-        :returns: str
-            The fewshot context.
+    def _format_packed_examples(self, doc=None, rnd=None, num_samples_per_article=None):
         """
-        assert (
-                rnd is not None
-        ), "A `random.Random` generator argument must be provided to `rnd`"
-        assert not provide_description, (
-            "The `provide_description` arg will be removed in future versions. To prepend "
-            "a custom description to the context, supply the corresponding string via the "
-            "`description` arg."
-        )
+        Format the examples using the 'packed' strategy.
+
+        :param examples: List of document examples.
+        :return: A string representing the formatted examples.
+        """
+        assert doc is not None and num_samples_per_article is not None, "doc and num_samples_per_article cannot be None at the same time"
+
+        num_pos_samples = math.ceil(num_samples_per_article / 2)
+        num_neg_samples = num_samples_per_article - num_pos_samples
+        sorted_full_dataset = self._training_docs["full"]
+        sorted_unique_article_ids = list(set(sorted_full_dataset["article_id"]))[:4]
+        # selected_article_ids = rnd.sample(sorted_unique_article_ids, 4)
+        examples_per_articles = []
+        for article_id in sorted_unique_article_ids:
+            article_id_samples = sorted_full_dataset[sorted_full_dataset["article_id"] == article_id]
+            negative_samples_df = article_id_samples.loc[
+                lambda example: example["label"] != self.true_label_name]
+            positive_samples_df = article_id_samples.loc[
+                lambda example: example["label"] == self.true_label_name]
+            seed = 42
+            positive_examples = positive_samples_df.sample(n=num_pos_samples, random_state=seed)
+            negative_examples = negative_samples_df.sample(n=num_neg_samples, random_state=seed)
+            examples_per_articles.append(
+                pd.concat([positive_examples, negative_examples]).sort_index().reset_index(drop=True))
+        doc = {key: [value] for key, value in doc.items()}
+        examples_per_articles.append(pd.DataFrame(doc))
+        formatted_examples = []
+        for idx, example_per_article in enumerate(examples_per_articles, start=1):
+            example_text = f"### Example {idx}\n"
+            example_text += f"Article: {example_per_article.iloc[0][self.article_key_name]}\n"
+            last_sample = example_per_article.shape[0] == 1
+            # Iterate through sentences and labels in the example
+            for index, example in example_per_article.iterrows():
+                example_text += f"Sentence: {example[self.summary_key_name]}\n"
+                if last_sample:
+                    label_text = ""
+                else:
+                    label_text = 'true' if example[self.label_key_name] == self.true_label_name else 'false'
+                example_text += f"Label: {label_text}\n"
+            formatted_examples.append(example_text)
+
+        return "\n".join(formatted_examples) + "\n\n"
+
+    def _format_default_examples(self, rnd, num_fewshot, num_pos_samples, num_neg_samples, doc):
+        """
+        Format the examples using the default strategy.
+
+        :param examples: List of document examples.
+        :return: A string representing the formatted examples.
+        """
+        # Randomly sample positive and negative examples
+        positive_examples = rnd.sample(self._training_docs["positive"].to_list(), num_pos_samples)
+        negative_examples = rnd.sample(self._training_docs["negative"].to_list(), num_neg_samples)
+
+        # Merge and filter out the current document
+        combined_examples = positive_examples + negative_examples
+        unique_examples = [example for example in combined_examples if example != doc][:num_fewshot]
+        formatted_examples = [
+            self.doc_to_text(example) + self.doc_to_target(example) for example in unique_examples
+        ]
+        return "\n\n".join(formatted_examples) + "\n\n"
+
+    def fewshot_context(self, doc, num_fewshot, provide_description=None, rnd=None,
+                        description=None, fewshot_sampling: str = None):
+        # Ensure a random generator is provided
+        if rnd is None:
+            raise ValueError("A `random.Random` generator argument must be provided to `rnd`")
+
+        # Warn about the deprecation of 'provide_description'
         if provide_description is not None:
-            # nudge people to not specify it at all
-            print(
-                "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict"
-            )
+            print("WARNING: 'provide_description' is deprecated. Use 'description' instead.")
 
-        description = description + "\n\n" if description else ""
+        # Add a newline after the description if it's provided
+        description = f"{description}\n\n" if description else ""
 
+        # Handle case with no few-shot examples
         if num_fewshot == 0:
             labeled_examples = ""
+            prompt_for_current_doc = self.doc_to_text(doc)
         else:
-            if self.has_training_docs():
-                self._training_docs = self.training_docs()
-            else:
-                raise ValueError("Must have train set to use fewshot prompting!")
-            # Sample half from positive samples and half from negative samples
+            # Raise an error if no training documents are available
+            if not self.has_training_docs():
+                raise ValueError("Training documents are required for few-shot prompting!")
 
+            self._training_docs = self.training_docs()  # Load training documents
+
+            # Define the number of positive and negative samples based on the fewshot_sampling strategy
             if fewshot_sampling == "stratified":
                 num_pos_samples = num_fewshot // 2
-            elif fewshot_sampling == "positive_only":
-                num_pos_samples = num_fewshot
-            elif fewshot_sampling == "negative_only":
-                num_pos_samples = 0
+                num_neg_samples = num_fewshot - num_pos_samples
+            elif fewshot_sampling in ["positive_only", "negative_only"]:
+                num_pos_samples = num_fewshot if fewshot_sampling == "positive_only" else 0
+                num_neg_samples = num_fewshot - num_pos_samples
+            elif fewshot_sampling == "packed":
+                assert num_fewshot > 7 and num_fewshot % 4 == 0, (f"{num_fewshot} has to be larger than 8 and a "
+                                                                  f"multiple of 4 for fewshot_sampling strategy packed")
+                num_samples_per_article = num_fewshot // 4
+            else:  # Default or "packed" strategy
+                num_pos_samples = rnd.randint(0, num_fewshot)
+                num_neg_samples = num_fewshot - num_pos_samples
+
+            # Format the examples based on the 'packed' strategy or default
+            if fewshot_sampling == "packed":
+                labeled_examples_with_doc = self._format_packed_examples(rnd=rnd,
+                                                                         num_samples_per_article=num_samples_per_article,
+                                                                         doc=doc)
+                prompt_for_current_doc = ""
+                task_only_text = self.prompt_template.split("\n")[0]
+                labeled_examples = task_only_text + "\n" + labeled_examples_with_doc
             else:
-                print("No fewshot sampling strategy select, will select randomly between positive and negative")
-                num_pos_samples = rnd.sample(list(range(num_fewshot)))
+                labeled_examples = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
+                                                                 num_pos_samples=num_pos_samples,
+                                                                 num_neg_samples=num_neg_samples, doc=doc)
+                prompt_for_current_doc = self.doc_to_text(doc)
 
-            num_neg_samples = num_fewshot - num_pos_samples
+        full_prompt = f"{description}{labeled_examples}{prompt_for_current_doc}"
 
-            fewshotex_pos = rnd.sample(self._training_docs["positive"].to_list(), num_pos_samples)
-            fewshotex_neg = rnd.sample(self._training_docs["negative"].to_list(), num_neg_samples)
+        return full_prompt
 
-            # Combine the positive and negative samples
-            fewshotex = fewshotex_pos + fewshotex_neg
-
-            # Ensure no overlap with the current document
-            fewshotex = [x for x in fewshotex if x != doc][:num_fewshot]
-
-            labeled_examples = (
-                    "\n\n".join(
-                        [
-                            self.doc_to_text(doc) + self.doc_to_target(doc)
-                            for doc in fewshotex
-                        ]
-                    )
-                    + "\n\n"
-            )
-
-        example = self.doc_to_text(doc)
-        return description + labeled_examples + example
+    # def fewshot_context(
+    #         self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling:str=None
+    # ):
+    #     """Returns a fewshot context string that is made up of a prepended description
+    #     (if provided), the `num_fewshot` number of examples, and an appended prompt example.
+    #
+    #     :param doc: str
+    #         The document as returned from training_docs, validation_docs, or test_docs.
+    #     :param num_fewshot: int
+    #         The number of fewshot examples to provide in the returned context string.
+    #     :param provide_description: bool
+    #         Not implemented, and this option is deprecated and will be removed in a future version in favor of a different description providing method
+    #     :param rnd: random.Random
+    #         The pseudo-random number generator used to randomly sample examples.
+    #         WARNING: This is currently a required arg although it's optionalized with a default `None`.
+    #     :param description: str
+    #         The task's description that will be prepended to the fewshot examples.
+    #     :returns: str
+    #         The fewshot context.
+    #     """
+    #     assert (
+    #             rnd is not None
+    #     ), "A `random.Random` generator argument must be provided to `rnd`"
+    #     assert not provide_description, (
+    #         "The `provide_description` arg will be removed in future versions. To prepend "
+    #         "a custom description to the context, supply the corresponding string via the "
+    #         "`description` arg."
+    #     )
+    #     if provide_description is not None:
+    #         # nudge people to not specify it at all
+    #         print(
+    #             "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict"
+    #         )
+    #
+    #     description = description + "\n\n" if description else ""
+    #
+    #     if num_fewshot == 0:
+    #         labeled_examples = ""
+    #     else:
+    #         if self.has_training_docs():
+    #             self._training_docs = self.training_docs()
+    #         else:
+    #             raise ValueError("Must have train set to use fewshot prompting!")
+    #         # Sample half from positive samples and half from negative samples
+    #
+    #         if fewshot_sampling == "stratified":
+    #             num_pos_samples = num_fewshot // 2
+    #         elif fewshot_sampling == "positive_only":
+    #             num_pos_samples = num_fewshot
+    #         elif fewshot_sampling == "negative_only":
+    #             num_pos_samples = 0
+    #         else:
+    #             print("No fewshot sampling strategy select, will select randomly between positive and negative")
+    #             num_pos_samples = rnd.sample(list(range(num_fewshot)))
+    #
+    #         num_neg_samples = num_fewshot - num_pos_samples
+    #
+    #         fewshotex_pos = rnd.sample(self._training_docs["positive"].to_list(), num_pos_samples)
+    #         fewshotex_neg = rnd.sample(self._training_docs["negative"].to_list(), num_neg_samples)
+    #
+    #         # Combine the positive and negative samples
+    #         fewshotex = fewshotex_pos + fewshotex_neg
+    #
+    #         # Ensure no overlap with the current document
+    #         fewshotex = [x for x in fewshotex if x != doc][:num_fewshot]
+    #
+    #         labeled_examples = (
+    #                 "\n\n".join(
+    #                     [
+    #                         self.doc_to_text(doc) + self.doc_to_target(doc)
+    #                         for doc in fewshotex
+    #                     ]
+    #                 )
+    #                 + "\n\n"
+    #         )
+    #
+    #     example = self.doc_to_text(doc)
+    #     return description + labeled_examples + example
 
     def construct_requests(self, doc, ctx):
         ll_false, _ = rf.loglikelihood(ctx, f" {self.negative_label}")
@@ -277,6 +402,13 @@ class FaithfulnessClassificationTaskFinalSwissText23Benchmark(FaithfulnessClassi
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
     true_label_name = "Faithful"
+
+
+class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithfulFinetuned(
+    FaithfulnessClassificationTaskFinalSwissText23Benchmark):
+    true_label_name = "Faithful"
+    positive_label = "Faithful"
+    negative_label = "Hallucination"
 
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic(
