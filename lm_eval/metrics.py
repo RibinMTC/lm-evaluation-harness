@@ -264,16 +264,18 @@ def yesno(x):
         return "no"
 
 
-def complex_metric(preds, labels, average="micro", metric="bacc"):
+def complex_metric(preds, labels, metric="bacc"):
     match metric:
         case "bacc":
             return balanced_accuracy_score(y_true=labels, y_pred=preds)
-        case "f1":
-            return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average=average)
-        case "precision":
-            return precision_score(y_true=labels, y_pred=preds, average=average)
-        case "recall":
-            return recall_score(y_true=labels, y_pred=preds, average=average)
+        case "f1_macro":
+            return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average="macro")
+        case "f1_micro":
+            return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average="micro")
+        case "precision_macro":
+            return precision_score(y_true=labels, y_pred=preds, average="macro")
+        case "recall_macro":
+            return recall_score(y_true=labels, y_pred=preds, average="macro")
         case _:
             raise ValueError(f" Unknown metric {metric}")
 
@@ -281,4 +283,4 @@ def complex_metric(preds, labels, average="micro", metric="bacc"):
 def complex_metric_agg(metric, items):
     predictions, references = zip(*items)
 
-    return complex_metric(preds=predictions, labels=references, average='binary', metric=metric)
+    return complex_metric(preds=predictions, labels=references, metric=metric)
