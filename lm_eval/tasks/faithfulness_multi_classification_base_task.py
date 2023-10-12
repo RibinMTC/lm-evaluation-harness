@@ -1,5 +1,7 @@
 import math
 from functools import partial
+from typing import List
+
 import evaluate
 import numpy as np
 import wandb
@@ -103,33 +105,38 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt_target(self, doc):
         return " " + doc["label"]
 
-    def _format_packed_examples(self, doc=None, rnd=None, num_samples_per_article=None):
+    def get_article_ids_with_at_least_all_labels(self) -> List[int]:
+        grouped_df = self._training_docs["full"].groupby("article_id")["label"].nunique()
+        valid_article_ids = grouped_df[grouped_df >= 3].index
+        return list(valid_article_ids)
+
+    def _format_packed_examples(self, doc, rnd=None, num_articles: int = 0, num_samples_per_article_per_label=None):
         """
         Format the examples using the 'packed' strategy.
 
         :param examples: List of document examples.
         :return: A string representing the formatted examples.
         """
-        assert doc is not None and num_samples_per_article is not None, "doc and num_samples_per_article cannot be None at the same time"
 
-        num_pos_samples = math.ceil(num_samples_per_article / 2)
-        num_neg_samples = num_samples_per_article - num_pos_samples
         sorted_full_dataset = self._training_docs["full"]
-        sorted_unique_article_ids = list(set(sorted_full_dataset["article_id"]))[:4]
-        # selected_article_ids = rnd.sample(sorted_unique_article_ids, 4)
+        valid_article_ids = self.get_article_ids_with_at_least_all_labels()[:3]
+        valid_dataset = sorted_full_dataset[sorted_full_dataset["article_id"].isin(valid_article_ids)].sort_values(by='num_words_article', ascending=True)
+        selected_article_ids = rnd.sample(valid_article_ids, num_articles)
         examples_per_articles = []
-        for article_id in sorted_unique_article_ids:
+        seed = 42
+        for article_id in selected_article_ids:
             article_id_samples = sorted_full_dataset[sorted_full_dataset["article_id"] == article_id]
-            negative_samples_df = article_id_samples.loc[
-                lambda example: example["label"] != self.true_label_name]
-            positive_samples_df = article_id_samples.loc[
-                lambda example: example["label"] == self.true_label_name]
-            seed = 42
-            positive_examples = positive_samples_df.sample(n=num_pos_samples, random_state=seed)
-            negative_examples = negative_samples_df.sample(n=num_neg_samples, random_state=seed)
-            examples_per_articles.append(
-                pd.concat([positive_examples, negative_examples]).sort_index().reset_index(drop=True))
-        doc = {key: [value] for key, value in doc.items()}
+            samples = []
+            for choice in self.choices:
+                selected_choice_samples = article_id_samples.loc[
+                    lambda example: example["label"] == choice]
+                selected_samples = selected_choice_samples.sample(n=num_samples_per_article_per_label,
+                                                                  random_state=seed)
+                samples.append(selected_samples)
+
+            examples_per_articles.append(pd.concat(samples, ignore_index=True))
+
+        doc = {key: [value] for key, value in doc["original_doc"].items()}
         examples_per_articles.append(pd.DataFrame(doc))
         formatted_examples = []
         for idx, example_per_article in enumerate(examples_per_articles, start=1):
@@ -138,11 +145,11 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             last_sample = example_per_article.shape[0] == 1
             # Iterate through sentences and labels in the example
             for index, example in example_per_article.iterrows():
-                example_text += f"Sentence: {example[self.summary_key_name]}\n"
+                example_text += f"Sentence: {example[self.sentence_key_name]}\n"
                 if last_sample:
                     label_text = ""
                 else:
-                    label_text = 'true' if example[self.label_key_name] == self.true_label_name else 'false'
+                    label_text = example[self.label_key_name]
                 example_text += f"Label: {label_text}\n"
             formatted_examples.append(example_text)
 
@@ -183,7 +190,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
         # Handle case with no few-shot examples
         if num_fewshot == 0:
-            labeled_examples = ""
+            full_prompt = f"{doc['query']}"
         else:
             # Raise an error if no training documents are available
             if not self.has_training_docs():
@@ -198,17 +205,19 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 num_samples_per_class = num_fewshot // 3
                 labeled_examples = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
                                                                  num_samples_per_class=num_samples_per_class, doc=doc)
+                full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
             elif fewshot_sampling == "packed":
-                raise NotImplementedError
-                # assert num_fewshot > 6 and num_fewshot % 4 == 0, (f"{num_fewshot} has to be larger than 8 and a "
-                #                                                   f"multiple of 4 for fewshot_sampling strategy packed")
-                # num_samples_per_article = num_fewshot // 4
-                # #todo: implement packed strategy
-                # labeled_examples = self._format_packed_examples()
+                # raise NotImplementedError
+                assert num_fewshot > 5 and num_fewshot % 3 == 0, (f"{num_fewshot} has to be larger than 6 and a "
+                                                                  f"multiple of 3 for fewshot_sampling strategy packed")
+                num_articles = num_fewshot // 3
+                labeled_examples_with_doc = self._format_packed_examples(num_samples_per_article_per_label=1,
+                                                                num_articles=num_articles, doc=doc, rnd=rnd)
+                task_only_text = self.prompt_template.split("\n")[0]
+                labeled_examples = task_only_text + "\n" + labeled_examples_with_doc
+                full_prompt = f"{description}{labeled_examples}"
             else:  # Default or "packed" strategy
                 raise ValueError(f"Unsupported fewshot sampling strategy: {fewshot_sampling}")
-
-        full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
 
         return full_prompt
 
@@ -217,6 +226,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             "query": self.format_prompt(doc),
             "choices": self.choices,
             "gold": self.choices.index(doc["label"]),
+            "original_doc": doc
         }
         return out_doc
 
@@ -231,6 +241,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         print(f"Results: {results}, Prediction {prediction}, Truth: {truth}")
         return {"bacc": (prediction, truth),
                 "f1_macro": (prediction, truth),
+                "f1_all": (prediction, truth),
                 "f1_micro": (prediction, truth),
                 "precision_macro": (prediction, truth),
                 "recall_macro": (prediction, truth),
@@ -244,6 +255,9 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             ),
             "f1_macro": partial(
                 complex_metric_agg, "f1_macro"
+            ),
+            "f1_all": partial(
+                complex_metric_agg, "f1_all"
             ),
             "f1_micro": partial(
                 complex_metric_agg, "f1_micro"
@@ -262,6 +276,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def higher_is_better(self):
         return {"bacc": True,
                 "f1_macro": True,
+                "f1_all": True,
                 "f1_micro": True,
                 "precision_macro": True,
                 "recall_macro": True,

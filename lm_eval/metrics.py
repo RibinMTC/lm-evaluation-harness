@@ -270,6 +270,12 @@ def complex_metric(preds, labels, metric="bacc"):
             return balanced_accuracy_score(y_true=labels, y_pred=preds)
         case "f1_macro":
             return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average="macro")
+        case "f1_all":
+            f1_scores_array = sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average=None)
+            class_labels = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
+
+            f1_dict = dict(zip(class_labels, f1_scores_array))
+            return f1_dict
         case "f1_micro":
             return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average="micro")
         case "precision_macro":

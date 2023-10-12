@@ -418,7 +418,7 @@ def make_table(result_dict):
             if m + "_stderr" in dic:
                 se = dic[m + "_stderr"]
                 values.append([k, version, m, "%.4f" % v, "±", "%.4f" % se])
-            else:
+            elif not isinstance(v, dict):
                 values.append([k, version, m, "%.4f" % v, "", ""])
             k = ""
             version = ""
