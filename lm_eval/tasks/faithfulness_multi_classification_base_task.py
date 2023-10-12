@@ -64,21 +64,21 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                if not self.true_label_name:
-                    self._training_docs = self.dataset["train"]
-                else:
-                    train_df = self.dataset["train"].to_pandas()
-                    train_df["num_words_article"] = train_df["lead_with_article"].str.len()
-                    sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
-                    negative_samples_df = sorted_train_df.loc[
-                        lambda example: example["label"] != self.true_label_name].head(100)
-                    positive_samples_df = sorted_train_df.loc[
-                        lambda example: example["label"] == self.true_label_name].head(100)
-                    self._training_docs = {
-                        "positive": Dataset.from_pandas(positive_samples_df),
-                        "negative": Dataset.from_pandas(negative_samples_df),
-                        "full": sorted_train_df
-                    }
+                train_df = self.dataset["train"].to_pandas()
+                train_df["num_words_article"] = train_df["lead_with_article"].str.len()
+                sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
+                faithful_samples_df = sorted_train_df.loc[
+                    lambda example: example["label"] == self.choices[0]].head(100)
+                intrinsic_samples_df = sorted_train_df.loc[
+                    lambda example: example["label"] == self.choices[1]].head(100)
+                extrinsic_samples_df = sorted_train_df.loc[
+                    lambda example: example["label"] == self.choices[2]].head(100)
+                self._training_docs = {
+                    "faithful": Dataset.from_pandas(faithful_samples_df),
+                    "intrinsic": Dataset.from_pandas(intrinsic_samples_df),
+                    "extrinsic": Dataset.from_pandas(extrinsic_samples_df),
+                    "full": sorted_train_df
+                }
 
             return self._training_docs
 
@@ -99,6 +99,9 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         prompt = self.prompt_template.format(article=doc[self.article_key_name],
                                              sentence=doc[self.sentence_key_name])
         return prompt
+
+    def format_prompt_target(self, doc):
+        return " " + doc["label"]
 
     def _format_packed_examples(self, doc=None, rnd=None, num_samples_per_article=None):
         """
@@ -145,7 +148,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
         return "\n".join(formatted_examples) + "\n\n"
 
-    def _format_default_examples(self, rnd, num_fewshot, num_pos_samples, num_neg_samples, doc):
+    def _format_default_examples(self, rnd, num_fewshot, num_samples_per_class, doc):
         """
         Format the examples using the default strategy.
 
@@ -153,14 +156,15 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         :return: A string representing the formatted examples.
         """
         # Randomly sample positive and negative examples
-        positive_examples = rnd.sample(self._training_docs["positive"].to_list(), num_pos_samples)
-        negative_examples = rnd.sample(self._training_docs["negative"].to_list(), num_neg_samples)
+        faithful_examples = rnd.sample(self._training_docs["faithful"].to_list(), num_samples_per_class)
+        intrinsic_examples = rnd.sample(self._training_docs["intrinsic"].to_list(), num_samples_per_class)
+        extrinsic_examples = rnd.sample(self._training_docs["extrinsic"].to_list(), num_samples_per_class)
 
         # Merge and filter out the current document
-        combined_examples = positive_examples + negative_examples
+        combined_examples = faithful_examples + intrinsic_examples + extrinsic_examples
         unique_examples = [example for example in combined_examples if example != doc][:num_fewshot]
         formatted_examples = [
-            self.doc_to_text(example) + self.doc_to_target(example) for example in unique_examples
+            self.format_prompt(example) + self.format_prompt_target(example) for example in unique_examples
         ]
         return "\n\n".join(formatted_examples) + "\n\n"
 
@@ -180,7 +184,6 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         # Handle case with no few-shot examples
         if num_fewshot == 0:
             labeled_examples = ""
-            prompt_for_current_doc = self.doc_to_text(doc)
         else:
             # Raise an error if no training documents are available
             if not self.has_training_docs():
@@ -190,23 +193,20 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
             # Define the number of positive and negative samples based on the fewshot_sampling strategy
             if fewshot_sampling == "stratified":
-                num_pos_samples = num_fewshot // 2
-                num_neg_samples = num_fewshot - num_pos_samples
-            elif fewshot_sampling in ["positive_only", "negative_only"]:
-                num_pos_samples = num_fewshot if fewshot_sampling == "positive_only" else 0
-                num_neg_samples = num_fewshot - num_pos_samples
+                assert num_fewshot % 3 == 0, ("When selecting stratified strategy, num_fewshot has to be multiple of 3 "
+                                              "for the multi-labeling task")
+                num_samples_per_class = num_fewshot // 3
+                labeled_examples = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
+                                                                 num_samples_per_class=num_samples_per_class, doc=doc)
             elif fewshot_sampling == "packed":
-                assert num_fewshot > 7 and num_fewshot % 4 == 0, (f"{num_fewshot} has to be larger than 8 and a "
-                                                                  f"multiple of 4 for fewshot_sampling strategy packed")
-                num_samples_per_article = num_fewshot // 4
+                raise NotImplementedError
+                # assert num_fewshot > 6 and num_fewshot % 4 == 0, (f"{num_fewshot} has to be larger than 8 and a "
+                #                                                   f"multiple of 4 for fewshot_sampling strategy packed")
+                # num_samples_per_article = num_fewshot // 4
+                # #todo: implement packed strategy
+                # labeled_examples = self._format_packed_examples()
             else:  # Default or "packed" strategy
-                num_pos_samples = rnd.randint(0, num_fewshot)
-                num_neg_samples = num_fewshot - num_pos_samples
-
-
-            labeled_examples = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
-                                                             num_pos_samples=num_pos_samples,
-                                                             num_neg_samples=num_neg_samples, doc=doc)
+                raise ValueError(f"Unsupported fewshot sampling strategy: {fewshot_sampling}")
 
         full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
 
@@ -226,7 +226,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         # greater label(=1)
         results_probabilities = np.exp(results)
         truth = doc["gold"]
-        #true_prediction_probability = results_probabilities[truth] / np.sum(results_probabilities)
+        # true_prediction_probability = results_probabilities[truth] / np.sum(results_probabilities)
         self.task_results_info_list.append({"prediction": prediction, "reference": truth})
         print(f"Results: {results}, Prediction {prediction}, Truth: {truth}")
         return {"bacc": (prediction, truth),
@@ -234,7 +234,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 "f1_micro": (prediction, truth),
                 "precision_macro": (prediction, truth),
                 "recall_macro": (prediction, truth),
-                #"roc_auc": (true_prediction_probability, truth)
+                # "roc_auc": (true_prediction_probability, truth)
                 }
 
     def aggregation(self):
@@ -265,7 +265,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 "f1_micro": True,
                 "precision_macro": True,
                 "recall_macro": True,
-                #"roc_auc": True
+                # "roc_auc": True
                 }
 
     def get_plots(self):
