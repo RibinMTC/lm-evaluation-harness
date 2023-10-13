@@ -154,6 +154,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         # Merge and filter out the current document
         combined_examples = faithful_examples + intrinsic_examples + extrinsic_examples
         unique_examples = [example for example in combined_examples if example != doc][:num_fewshot]
+        rnd.shuffle(unique_examples)
         formatted_examples = [
             self.format_prompt(example) + self.format_prompt_target(example) for example in unique_examples
         ]

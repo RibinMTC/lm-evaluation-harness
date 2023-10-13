@@ -165,6 +165,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         # Merge and filter out the current document
         combined_examples = positive_examples + negative_examples
         unique_examples = [example for example in combined_examples if example != doc][:num_fewshot]
+        rnd.shuffle(unique_examples)
         formatted_examples = [
             self.doc_to_text(example) + self.doc_to_target(example) for example in unique_examples
         ]
