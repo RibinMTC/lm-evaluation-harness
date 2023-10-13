@@ -39,7 +39,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
     positive_label = "faithful"
     negative_label = "unfaithful"
 
-    plot_class_names = ["Unfaithful", "Faithful"]
+    plot_class_names = [negative_label, positive_label]
 
     negative_samples_df = None
     positive_samples_df = None
@@ -338,9 +338,10 @@ class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithfulGerman(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
-    true_label_name = "Faithful"
     positive_label = "Faithful"
     negative_label = "Hallucination"
+    true_label_name = positive_label
+    plot_class_names = [negative_label, positive_label]
 
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic(
