@@ -227,85 +227,6 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
         return full_prompt
 
-    # def fewshot_context(
-    #         self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling:str=None
-    # ):
-    #     """Returns a fewshot context string that is made up of a prepended description
-    #     (if provided), the `num_fewshot` number of examples, and an appended prompt example.
-    #
-    #     :param doc: str
-    #         The document as returned from training_docs, validation_docs, or test_docs.
-    #     :param num_fewshot: int
-    #         The number of fewshot examples to provide in the returned context string.
-    #     :param provide_description: bool
-    #         Not implemented, and this option is deprecated and will be removed in a future version in favor of a different description providing method
-    #     :param rnd: random.Random
-    #         The pseudo-random number generator used to randomly sample examples.
-    #         WARNING: This is currently a required arg although it's optionalized with a default `None`.
-    #     :param description: str
-    #         The task's description that will be prepended to the fewshot examples.
-    #     :returns: str
-    #         The fewshot context.
-    #     """
-    #     assert (
-    #             rnd is not None
-    #     ), "A `random.Random` generator argument must be provided to `rnd`"
-    #     assert not provide_description, (
-    #         "The `provide_description` arg will be removed in future versions. To prepend "
-    #         "a custom description to the context, supply the corresponding string via the "
-    #         "`description` arg."
-    #     )
-    #     if provide_description is not None:
-    #         # nudge people to not specify it at all
-    #         print(
-    #             "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict"
-    #         )
-    #
-    #     description = description + "\n\n" if description else ""
-    #
-    #     if num_fewshot == 0:
-    #         labeled_examples = ""
-    #     else:
-    #         if self.has_training_docs():
-    #             self._training_docs = self.training_docs()
-    #         else:
-    #             raise ValueError("Must have train set to use fewshot prompting!")
-    #         # Sample half from positive samples and half from negative samples
-    #
-    #         if fewshot_sampling == "stratified":
-    #             num_pos_samples = num_fewshot // 2
-    #         elif fewshot_sampling == "positive_only":
-    #             num_pos_samples = num_fewshot
-    #         elif fewshot_sampling == "negative_only":
-    #             num_pos_samples = 0
-    #         else:
-    #             print("No fewshot sampling strategy select, will select randomly between positive and negative")
-    #             num_pos_samples = rnd.sample(list(range(num_fewshot)))
-    #
-    #         num_neg_samples = num_fewshot - num_pos_samples
-    #
-    #         fewshotex_pos = rnd.sample(self._training_docs["positive"].to_list(), num_pos_samples)
-    #         fewshotex_neg = rnd.sample(self._training_docs["negative"].to_list(), num_neg_samples)
-    #
-    #         # Combine the positive and negative samples
-    #         fewshotex = fewshotex_pos + fewshotex_neg
-    #
-    #         # Ensure no overlap with the current document
-    #         fewshotex = [x for x in fewshotex if x != doc][:num_fewshot]
-    #
-    #         labeled_examples = (
-    #                 "\n\n".join(
-    #                     [
-    #                         self.doc_to_text(doc) + self.doc_to_target(doc)
-    #                         for doc in fewshotex
-    #                     ]
-    #                 )
-    #                 + "\n\n"
-    #         )
-    #
-    #     example = self.doc_to_text(doc)
-    #     return description + labeled_examples + example
-
     def construct_requests(self, doc, ctx):
         ll_false, _ = rf.loglikelihood(ctx, f" {self.negative_label}")
         ll_true, _ = rf.loglikelihood(ctx, f" {self.positive_label}")
@@ -327,9 +248,11 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         self.task_results_info_list.append({"prediction": prediction, "reference": truth})
         print(f"Results: {results}, Prediction {prediction}, Truth: {truth}")
         return {"bacc": (prediction, truth),
-                "f1": (prediction, truth),
-                "precision": (prediction, truth),
-                "recall": (prediction, truth),
+                "f1_macro": (prediction, truth),
+                "f1_all": (prediction, truth),
+                "f1_micro": (prediction, truth),
+                "precision_macro": (prediction, truth),
+                "recall_macro": (prediction, truth),
                 "roc_auc": (true_prediction_probability, truth)
                 }
 
@@ -338,14 +261,20 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
             "bacc": partial(
                 complex_metric_agg, "bacc"
             ),
-            "f1": partial(
-                complex_metric_agg, "f1"
+            "f1_macro": partial(
+                complex_metric_agg, "f1_macro"
             ),
-            "precision": partial(
-                complex_metric_agg, "precision"
+            "f1_all": partial(
+                complex_metric_agg, "f1_all"
             ),
-            "recall": partial(
-                complex_metric_agg, "recall"
+            "f1_micro": partial(
+                complex_metric_agg, "f1_micro"
+            ),
+            "precision_macro": partial(
+                complex_metric_agg, "precision_macro"
+            ),
+            "recall_macro": partial(
+                complex_metric_agg, "recall_macro"
             ),
             "roc_auc": partial(
                 _roc_auc_agg
@@ -354,10 +283,13 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
     def higher_is_better(self):
         return {"bacc": True,
-                "f1": True,
-                "precision": True,
-                "recall": True,
-                "roc_auc": True}
+                "f1_macro": True,
+                "f1_all": True,
+                "f1_micro": True,
+                "precision_macro": True,
+                "recall_macro": True,
+                "roc_auc": True
+                }
 
     def get_plots(self):
         task_results_info_df = pd.DataFrame(self.task_results_info_list)
@@ -404,7 +336,7 @@ class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
     true_label_name = "Faithful"
 
 
-class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithfulFinetuned(
+class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithfulGerman(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
     true_label_name = "Faithful"
     positive_label = "Faithful"

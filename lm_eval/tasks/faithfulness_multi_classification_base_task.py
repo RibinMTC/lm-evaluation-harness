@@ -1,31 +1,14 @@
-import math
 from functools import partial
 from typing import List
 
-import evaluate
 import numpy as np
 import wandb
 from datasets import Dataset
 
-from lm_eval.base import Task, rf
 from lm_eval.metrics import complex_metric_agg
 from lm_eval.tasks.base_plotter import Plotter
 from lm_eval.base import MultipleChoiceTask
 import pandas as pd
-
-roc_auc_metric = evaluate.load("roc_auc", "multiclass")
-
-
-# def _roc_auc_agg(items):
-#     predictions, references = zip(*items)
-#     try:
-#         result = roc_auc_metric.compute(
-#             prediction_scores=predictions, references=references, average="macro"
-#         )['roc_auc']
-#     except ValueError:
-#         print("Only one class. Cannot compute roc score")
-#         return 0
-#     return result
 
 
 class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
@@ -120,7 +103,8 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
         sorted_full_dataset = self._training_docs["full"]
         valid_article_ids = self.get_article_ids_with_at_least_all_labels()[:3]
-        valid_dataset = sorted_full_dataset[sorted_full_dataset["article_id"].isin(valid_article_ids)].sort_values(by='num_words_article', ascending=True)
+        valid_dataset = sorted_full_dataset[sorted_full_dataset["article_id"].isin(valid_article_ids)].sort_values(
+            by='num_words_article', ascending=True)
         selected_article_ids = rnd.sample(valid_article_ids, num_articles)
         examples_per_articles = []
         seed = 42
@@ -212,7 +196,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                                                                   f"multiple of 3 for fewshot_sampling strategy packed")
                 num_articles = num_fewshot // 3
                 labeled_examples_with_doc = self._format_packed_examples(num_samples_per_article_per_label=1,
-                                                                num_articles=num_articles, doc=doc, rnd=rnd)
+                                                                         num_articles=num_articles, doc=doc, rnd=rnd)
                 task_only_text = self.prompt_template.split("\n")[0]
                 labeled_examples = task_only_text + "\n" + labeled_examples_with_doc
                 full_prompt = f"{description}{labeled_examples}"
