@@ -6,7 +6,7 @@ import wandb
 from datasets import Dataset
 
 from lm_eval.base import Task, rf
-from lm_eval.metrics import complex_metric_agg
+from lm_eval.metrics import complex_metric_agg, complex_metric_agg_with_class_labels
 from lm_eval.tasks.base_plotter import Plotter
 import pandas as pd
 
@@ -265,7 +265,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
                 complex_metric_agg, "f1_macro"
             ),
             "f1_all": partial(
-                complex_metric_agg, "f1_all"
+                complex_metric_agg_with_class_labels, "f1_all", self.plot_class_names
             ),
             "f1_micro": partial(
                 complex_metric_agg, "f1_micro"

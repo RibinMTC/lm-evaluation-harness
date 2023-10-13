@@ -264,7 +264,7 @@ def yesno(x):
         return "no"
 
 
-def complex_metric(preds, labels, metric="bacc"):
+def complex_metric(preds, labels, metric="bacc", class_labels=None):
     match metric:
         case "bacc":
             return balanced_accuracy_score(y_true=labels, y_pred=preds)
@@ -272,8 +272,6 @@ def complex_metric(preds, labels, metric="bacc"):
             return sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average="macro")
         case "f1_all":
             f1_scores_array = sklearn.metrics.f1_score(y_true=labels, y_pred=preds, average=None)
-            class_labels = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
-
             f1_dict = dict(zip(class_labels, f1_scores_array))
             return f1_dict
         case "f1_micro":
@@ -290,3 +288,9 @@ def complex_metric_agg(metric, items):
     predictions, references = zip(*items)
 
     return complex_metric(preds=predictions, labels=references, metric=metric)
+
+
+def complex_metric_agg_with_class_labels(metric, class_labels, items):
+    predictions, references = zip(*items)
+
+    return complex_metric(preds=predictions, labels=references, metric=metric, class_labels=class_labels)
