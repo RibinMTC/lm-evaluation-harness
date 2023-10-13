@@ -333,7 +333,10 @@ class FaithfulnessClassificationTaskFinalSwissText23Benchmark(FaithfulnessClassi
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithful(
     FaithfulnessClassificationTaskFinalSwissText23Benchmark):
-    true_label_name = "Faithful"
+    positive_label = "Faithful"
+    negative_label = "Hallucination"
+    true_label_name = positive_label
+    plot_class_names = [negative_label, positive_label]
 
 
 class FaithfulnessClassificationTaskFinalSwissText23BenchmarkFaithfulGerman(
