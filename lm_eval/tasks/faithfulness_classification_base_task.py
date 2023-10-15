@@ -1,5 +1,7 @@
 import math
 from functools import partial
+from typing import List
+
 import evaluate
 import numpy as np
 import wandb
@@ -106,22 +108,51 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         else:
             return self.negative_label
 
-    def _format_packed_examples(self, doc=None, rnd=None, num_samples_per_article=None):
+    def get_unique_elements_with_preserved_order(self, sequence):
+        seen = set()
+        return [x for x in sequence if not (x in seen or seen.add(x))]
+
+    def get_num_samples_per_article_from_num_articles_and_num_fewshot(self, num_fewshot: int, num_articles: int) -> \
+    List[int]:
+        # Step 1: Divide the total by the number of slots.
+        basic_share = num_fewshot / num_articles
+
+        # Step 2: Initialize a list to hold the distribution and calculate the basic share for each slot (rounding down).
+        num_samples_per_article = [math.floor(basic_share) for _ in range(num_articles)]
+
+        # Step 3: Calculate the remainder that needs to be distributed.
+        remainder = num_fewshot - sum(num_samples_per_article)
+
+        # Step 4: Calculate the remainders for each slot.
+        remainders = [(index, basic_share - math.floor(basic_share)) for index in range(num_articles)]
+
+        # Step 5: Sort the slots by the largest remainders.
+        remainders.sort(key=lambda x: -x[1])
+
+        # Step 6: Distribute the remainder to the slots with the largest remainders.
+        for i in range(int(remainder)):
+            num_samples_per_article[remainders[i][0]] += 1
+
+        return num_samples_per_article
+
+    def _format_packed_examples(self, doc, num_samples_per_articles: List[int], rnd=None):
         """
         Format the examples using the 'packed' strategy.
 
         :param examples: List of document examples.
         :return: A string representing the formatted examples.
         """
-        assert doc is not None and num_samples_per_article is not None, "doc and num_samples_per_article cannot be None at the same time"
+        assert doc is not None and num_samples_per_articles is not None, "doc and num_samples_per_article cannot be None at the same time"
 
-        num_pos_samples = math.ceil(num_samples_per_article / 2)
-        num_neg_samples = num_samples_per_article - num_pos_samples
+        num_articles = len(num_samples_per_articles)
         sorted_full_dataset = self._training_docs["full"]
-        sorted_unique_article_ids = list(set(sorted_full_dataset["article_id"]))[:4]
-        # selected_article_ids = rnd.sample(sorted_unique_article_ids, 4)
+        sorted_unique_article_ids = self.get_unique_elements_with_preserved_order(sorted_full_dataset["article_id"])[
+                                    :20]
+        selected_article_ids = rnd.sample(sorted_unique_article_ids, num_articles)
         examples_per_articles = []
-        for article_id in sorted_unique_article_ids:
+        for article_id, num_samples_per_article in zip(selected_article_ids, num_samples_per_articles):
+            num_pos_samples = math.ceil(num_samples_per_article / 2)
+            num_neg_samples = num_samples_per_article - num_pos_samples
             article_id_samples = sorted_full_dataset[sorted_full_dataset["article_id"] == article_id]
             negative_samples_df = article_id_samples.loc[
                 lambda example: example["label"] != self.true_label_name]
@@ -203,18 +234,20 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
                 num_pos_samples = num_fewshot if fewshot_sampling == "positive_only" else 0
                 num_neg_samples = num_fewshot - num_pos_samples
             elif fewshot_sampling == "packed":
-                assert num_fewshot > 7 and num_fewshot % 4 == 0, (f"{num_fewshot} has to be larger than 8 and a "
-                                                                  f"multiple of 4 for fewshot_sampling strategy packed")
-                num_samples_per_article = num_fewshot // 4
+                assert num_fewshot > 7, f"{num_fewshot} has to be larger than 8 for fewshot_sampling strategy packed"
+                # we want to at maximum 8 samples per article
+                num_articles = math.ceil(num_fewshot / 8)
+                num_samples_per_articles = self.get_num_samples_per_article_from_num_articles_and_num_fewshot(
+                    num_fewshot=num_fewshot, num_articles=num_articles)
             else:  # Default or "packed" strategy
                 num_pos_samples = rnd.randint(0, num_fewshot)
                 num_neg_samples = num_fewshot - num_pos_samples
 
             # Format the examples based on the 'packed' strategy or default
             if fewshot_sampling == "packed":
-                labeled_examples_with_doc = self._format_packed_examples(rnd=rnd,
-                                                                         num_samples_per_article=num_samples_per_article,
-                                                                         doc=doc)
+                labeled_examples_with_doc = self._format_packed_examples(doc=doc,
+                                                                         num_samples_per_articles=num_samples_per_articles,
+                                                                         rnd=rnd)
                 prompt_for_current_doc = ""
                 task_only_text = self.prompt_template.split("\n")[0]
                 labeled_examples = task_only_text + "\n" + labeled_examples_with_doc
