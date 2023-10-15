@@ -477,6 +477,46 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled(Summ
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_shuffled"
 
 
+class MDS_WikinewsSum_SentenceChunk_1_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_1_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_1_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_1_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_3_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_3_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_3_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_3_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_5_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_5_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_5_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_5_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_10_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_10_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_10_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_10_MMR_0_5_512_sbert_comparison"
+
+
 class MDS_WikinewsSum_ClusterChunk_1_Random(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_random"
