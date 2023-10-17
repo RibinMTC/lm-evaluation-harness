@@ -108,5 +108,17 @@
     "35": "{article}\nErstelle eine Zusammenfassung mit allen oben genannten Informationen in 2 bis 3 Sätzen.\nZusammenfassung:\n",
     "36": "Generate a summary in German using all of the following information in 2 to 3 sentences.\n{article}\nSummary:\n",
     "37": "Erstelle eine Zusammenfassung mit allen folgenden Informationen in 2 bis 3 Sätzen.\n{article}\nZusammenfassung:\n"
+  },
+  "mds-cluster-chunks-experiment": {
+    "42": "Erstelle eine Zusammenfassung vom folgenden Artikel in 6 oder weniger Sätzen:\nArtikel: {article}\nZusammenfassung:\n",
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
+  },
+  "mds-sentence-chunks-experiment": {
+    "42": "Erstelle eine Zusammenfassung vom folgenden Artikel in 6 oder weniger Sätzen:\nArtikel: {article}\nZusammenfassung:\n",
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
+  },
+  "mds-ordered-chunks-experiment": {
+    "42": "Erstelle eine Zusammenfassung vom folgenden Artikel in 6 oder weniger Sätzen:\nArtikel: {article}\nZusammenfassung:\n",
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n"
   }
 }

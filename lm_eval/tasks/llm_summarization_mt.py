@@ -477,6 +477,16 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled(Summ
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_shuffled"
 
 
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_OriginalOrder(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_41_stage2_originalOrder"
+
+
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_41_stage2_shuffled"
+
+
 class MDS_WikinewsSum_SentenceChunk_1_00_512_sbert_comparison(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/ordered_chunks_sentences_1_MMR_0_0_512_sbert_comparison"

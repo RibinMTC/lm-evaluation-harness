@@ -27,7 +27,7 @@ from flair.data import Sentence
 from somajo import SoMaJo
 
 pd.set_option("display.precision", 4)
-sns.set_theme(style="darkgrid", rc={'figure.figsize': (17, 7)})
+sns.set_theme(style="darkgrid", rc={'figure.figsize': (27, 7)})
 sns.despine(bottom=True, left=True, offset=5)
 # plt.tight_layout()
 
@@ -123,6 +123,9 @@ def load_all_results(model_names, shortNames):
     df.rename(columns={"model": "model-fullname"}, inplace=True)
     df["model"] = df["model-fullname"].map(shortNames)
     df["dataset-annotation"] = df["dataset"].apply(lambda x: datasetAnnotationMap[x] if x in datasetAnnotationMap else "")
+    df["preprocessing-method"] = df["dataset"].apply(lambda x: preprocessing_method[x] if x in preprocessing_method else "")
+    df["preprocessing-parameters"] = df["dataset"].apply(lambda x: preprocessing_parameters[x] if x in preprocessing_parameters else "")
+    df["preprocessing-order"] = df["dataset"].apply(lambda x: preprocessing_order[x] if x in preprocessing_order else "")
     df["dataset"] = df["dataset"].apply(lambda x: x if x not in datasetNameMap else datasetNameMap[x])
     return df
 
@@ -558,7 +561,7 @@ def bootstrap_CI(statistic, confidence_level=0.95, num_samples=10000):
     return CI
 
 
-def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]):
+def statistics_overview(experiment_path, df, metric_names, groupbyList=["model", "promptVersion"]):
     if df.shape[0] == 0:
         return None, None, None
     confidence_level = 0.95
@@ -571,6 +574,10 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
 
     out_overview = []
     out_detail = []
+    ci_colname = f"Median {int(confidence_level * 100)}% CI"
+
+    # make sure "overview_plots" exists
+    pathlib.Path(os.path.join(experiment_path, "overview_plots")).mkdir(parents=True, exist_ok=True)
 
     # make a table showing the median of each metric (one table per metric), grouped by groupbyList
     for metric_name in metric_names:
@@ -578,13 +585,30 @@ def statistics_overview(df, metric_names, groupbyList=["model", "promptVersion"]
         df[metric_name] = df[metric_name].astype(float, copy=True)
         # calculate the table
         df_metric = df.groupby(groupbyList).agg({metric_name: ["median", bootstrap_CI(np.median, confidence_level=confidence_level)]}).reset_index()
-        col_new = groupbyList + ['median', f"Median {int(confidence_level * 100)}% CI"]
+        col_new = groupbyList + ['median', ci_colname]
         df_metric.columns = col_new
         df_metric = df_metric.round(ROUND_TO_DECIMALS)
         out_overview.append({
             "name": f"median {metric_name}",
             "df": df_metric
         })
+
+        # prepare the data for the overview-table plot showing the median + confidence interval
+        overview_x_1 = df_metric[groupbyList[0]]
+        overview_x_2 = df_metric[groupbyList[1]]
+        overview_x = [f"{x[0]}" + " / " + f"{x[1]}" for x in zip(overview_x_1, overview_x_2)]
+        overview_y = df_metric["median"]
+        overview_yerr = df_metric[ci_colname]
+        # reshape overview_yerr to (2,N) array
+        overview_yerr = np.array(overview_yerr.tolist()).T
+        # subtract y from both yerr values to get the lower and upper error bars, making sure that the lower error bar is always positive
+        overview_yerr[0] = overview_y - overview_yerr[0]
+        overview_yerr[1] = overview_yerr[1] - overview_y
+        # make the plot
+        plt.errorbar(overview_x, overview_y, yerr=overview_yerr, fmt='o')
+        save_path = os.path.join(experiment_path, "overview_plots", f"overview_{groupbyList[0]}_{groupbyList[1]}_median_plot_{metric_name}.pdf")
+        plt.savefig(save_path)
+        plt.close()
 
         # TODO: Make a plot showing this overview table -> showing median performance + confidence interval for each model and promptVersion
 
@@ -960,6 +984,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
         "best": [95, 100],
         "all": [0, 100]
     }
+    num_random_inspect_examples = 5
 
     # delete old folder if it exists
     base_folder = f"inspect-examples_{groupbyList[0]}_{groupbyList[1]}{suffix}"
@@ -971,7 +996,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
     # Initialize
     def numExamples(category):
         if category == "all":
-            return 10
+            return 5
         else:
             return 3
 
@@ -1035,7 +1060,6 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
     # Gather the examples for the inspect metrics, and make side-by-side comparisons to the other combinations in the data
     # ... also sample 10 random examples and make a side-by-side comparison to the other combinations in the data
     inspect_metrics = ["bertscore_f1"]
-    num_all_inspect_examples = 20
     inspect_exclude_columns = ['prompt_0', 'logit_0', "truth"]
     all_other_cols = [col for col in df.columns if col not in inspect_exclude_columns]
     for inspect_metric in inspect_metrics:
@@ -1071,7 +1095,7 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["model
 
         # also sample random document IDs and save them in a html file
         uniqueDocIDs = df["doc_id"].unique()
-        random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), num_all_inspect_examples), replace=False)) + [1, 85]
+        random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), num_random_inspect_examples), replace=False)) + [1, 85]
         for docID in random_docIDs:
             doc_id_gt_summaries = df[df["doc_id"] == docID]["truth"].unique().tolist()
             # loop over all the gt-summaries, make 1 html file per gt-summary
@@ -1246,7 +1270,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     """
     exclude = [
         'doc_id', 'prompt_0', 'logit_0', 'truth', 'dataset', 'promptVersion', 'model', 'model-fullname', 'lang', 'lang_score',
-        'temperature', 'precision', 'task_name', 'dataset-annotation', 'n-shot'
+        'temperature', 'precision', 'task_name', 'dataset-annotation', 'n-shot', 'preprocessing-method', 'preprocessing-parameters', 'preprocessing-order'
     ]
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -1268,7 +1292,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "least-to-most-prompting-stage2"
+experiment_name = "mds-2stage-experiment"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1308,6 +1332,33 @@ experiment_config = {
     },
     "mds-2stage-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-cluster-chunks-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "groupByListVariants": [
+            ['preprocessing-method', 'preprocessing-parameters'],
+            ['preprocessing-method', 'preprocessing-order'],
+        ],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-sentence-chunks-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "groupByListVariants": [
+            ['preprocessing-method', 'preprocessing-parameters'],
+            ['preprocessing-method', 'preprocessing-order'],
+        ],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-ordered-chunks-experiment": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "groupByListVariants": [
+            ['preprocessing-method', 'preprocessing-parameters'],
+            ['preprocessing-method', 'preprocessing-order'],
+        ],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
     },
@@ -1415,6 +1466,23 @@ datasetNameMap = {
     "WikinewsSplit": "Wikinews",
     "WikinewsSplitS2O": "Wikinews",
     "WikinewsSplitS2S": "Wikinews",
+    "WikinewsClust1C": "Wikinews",
+    "WikinewsClust1O": "Wikinews",
+    "WikinewsClust1R": "Wikinews",
+    "WikinewsClust5C": "Wikinews",
+    "WikinewsClust5O": "Wikinews",
+    "WikinewsClust5R": "Wikinews",
+    "WikinewsClust10C": "Wikinews",
+    "WikinewsClust10O": "Wikinews",
+    "WikinewsClust10R": "Wikinews",
+    "WikinewsSent1L00": "Wikinews",
+    "WikinewsSent1L05": "Wikinews",
+    "WikinewsSent3L00": "Wikinews",
+    "WikinewsSent3L05": "Wikinews",
+    "WikinewsSent5L00": "Wikinews",
+    "WikinewsSent5L05": "Wikinews",
+    "WikinewsSent10L00": "Wikinews",
+    "WikinewsSent10L05": "Wikinews",
 }
 datasetAnnotationMap = {
     "20minTS250": "20Minuten, 250 samples",
@@ -1447,7 +1515,139 @@ datasetAnnotationMap = {
     "WikinewsSplit": "2-stage summary,\nstage 1",
     "WikinewsSplitS2O": "2-stage summary,\noriginal order",
     "WikinewsSplitS2S": "2-stage summary,\nrandom order",
+    "WikinewsClust1C": "Cluster,\n 1 Sentence,\ncluster size order",
+    "WikinewsClust1O": "Cluster,\n 1 Sentence,\noriginal order",
+    "WikinewsClust1R": "Cluster,\n 1 Sentence,\nrandom order",
+    "WikinewsClust5C": "Cluster,\n 5 Sentences,\ncluster size order",
+    "WikinewsClust5O": "Cluster,\n 5 Sentences,\noriginal order",
+    "WikinewsClust5R": "Cluster,\n 5 Sentences,\nrandom order",
+    "WikinewsClust10C": "Cluster,\n10 Sentences,\ncluster size order",
+    "WikinewsClust10O": "Cluster,\n10 Sentences,\noriginal order",
+    "WikinewsClust10R": "Cluster,\n10 Sentences,\nrandom order",
+    "WikinewsSent1L00": "Embedding Similarity,\n 1 Sentence,\nMMR, lambda 0.0",
+    "WikinewsSent1L05": "Embedding Similarity,\n 1 Sentence,\nMMR, lambda 0.5",
+    "WikinewsSent3L00": "Embedding Similarity,\n 3 Sentences,\nMMR, lambda 0.0",
+    "WikinewsSent3L05": "Embedding Similarity,\n 3 Sentences,\nMMR, lambda 0.5",
+    "WikinewsSent5L00": "Embedding Similarity,\n 5 Sentences,\nMMR, lambda 0.0",
+    "WikinewsSent5L05": "Embedding Similarity,\n 5 Sentences,\nMMR, lambda 0.5",
+    "WikinewsSent10L00": "Embedding Similarity,\n10 Sentences,\nMMR, lambda 0.0",
+    "WikinewsSent10L05": "Embedding Similarity,\n10 Sentences,\nMMR, lambda 0.5",
 }
+preprocessing_method = {
+    "Wikinews": "-",
+    "WikinewsClean": "cleaning",
+    "WikinewsSimple": "-",
+    "WikinewsSimpleS": "-",
+    "WikinewsSimpleA": "article idx ann.",
+    "WikinewsSimpleAS": "article ids ann.",
+    "WikinewsSC32": "token prefix",
+    "WikinewsSC64": "token prefix",
+    "WikinewsSC128": "token prefix",
+    "WikinewsSC256": "token prefix",
+    "WikinewsSC512": "token prefix",
+    "WikinewsSCS2": "sentence prefix",
+    "WikinewsSCS4": "sentence prefix",
+    "WikinewsSCS8": "sentence prefix",
+    "WikinewsSCS16": "sentence prefix",
+    "WikinewsSCS32": "sentence prefix",
+    "WikinewsSplit": "-",
+    "WikinewsSplitS2O": "2-stage summary",
+    "WikinewsSplitS2S": "2-stage summary",
+    "WikinewsClust1C": "Cluster",
+    "WikinewsClust1O": "Cluster",
+    "WikinewsClust1R": "Cluster",
+    "WikinewsClust5C": "Cluster",
+    "WikinewsClust5O": "Cluster",
+    "WikinewsClust5R": "Cluster",
+    "WikinewsClust10C": "Cluster",
+    "WikinewsClust10O": "Cluster",
+    "WikinewsClust10R": "Cluster",
+    "WikinewsSent1L00": "Embedding Similarity",
+    "WikinewsSent1L05": "Embedding Similarity",
+    "WikinewsSent3L00": "Embedding Similarity",
+    "WikinewsSent3L05": "Embedding Similarity",
+    "WikinewsSent5L00": "Embedding Similarity",
+    "WikinewsSent5L05": "Embedding Similarity",
+    "WikinewsSent10L00": "Embedding Similarity",
+    "WikinewsSent10L05": "Embedding Similarity",
+}
+preprocessing_parameters = {
+    "Wikinews": "-",
+    "WikinewsClean": "-",
+    "WikinewsSimple": "-",
+    "WikinewsSimpleS": "-",
+    "WikinewsSimpleA": "-",
+    "WikinewsSimpleAS": "-",
+    "WikinewsSC32": " 32 tokens",
+    "WikinewsSC64": " 64 tokens",
+    "WikinewsSC128": "128 tokens",
+    "WikinewsSC256": "256 tokens",
+    "WikinewsSC512": "512 tokens",
+    "WikinewsSCS2": " 2 sentences",
+    "WikinewsSCS4": " 4 sentences",
+    "WikinewsSCS8": " 8 sentences",
+    "WikinewsSCS16": "16 sentences",
+    "WikinewsSCS32": "32 sentences",
+    "WikinewsSplit": "-",
+    "WikinewsSplitS2O": "-",
+    "WikinewsSplitS2S": "-",
+    "WikinewsClust1C": " 1 Sentence",
+    "WikinewsClust1O": " 1 Sentence",
+    "WikinewsClust1R": " 1 Sentence",
+    "WikinewsClust5C": " 5 Sentences",
+    "WikinewsClust5O": " 5 Sentences",
+    "WikinewsClust5R": " 5 Sentences",
+    "WikinewsClust10C": "10 Sentences",
+    "WikinewsClust10O": "10 Sentences",
+    "WikinewsClust10R": "10 Sentences",
+    "WikinewsSent1L00": " 1 Sentence",
+    "WikinewsSent1L05": " 1 Sentence",
+    "WikinewsSent3L00": " 3 Sentences",
+    "WikinewsSent3L05": " 3 Sentences",
+    "WikinewsSent5L00": " 5 Sentences",
+    "WikinewsSent5L05": " 5 Sentences",
+    "WikinewsSent10L00": "10 Sentences",
+    "WikinewsSent10L05": "10 Sentences",
+}
+preprocessing_order = {
+    "Wikinews": "original",
+    "WikinewsClean": "original",
+    "WikinewsSimple": "original",
+    "WikinewsSimpleS": "random",
+    "WikinewsSimpleA": "original",
+    "WikinewsSimpleAS": "random",
+    "WikinewsSC32": "original",
+    "WikinewsSC64": "original",
+    "WikinewsSC128": "original",
+    "WikinewsSC256": "original",
+    "WikinewsSC512": "original",
+    "WikinewsSCS2": "original",
+    "WikinewsSCS4": "original",
+    "WikinewsSCS8": "original",
+    "WikinewsSCS16": "original",
+    "WikinewsSCS32": "original",
+    "WikinewsSplit": "-",
+    "WikinewsSplitS2O": "original",
+    "WikinewsSplitS2S": "random",
+    "WikinewsClust1C": "cluster size",
+    "WikinewsClust1O": "original",
+    "WikinewsClust1R": "random",
+    "WikinewsClust5C": "cluster size",
+    "WikinewsClust5O": "original",
+    "WikinewsClust5R": "random",
+    "WikinewsClust10C": "cluster size",
+    "WikinewsClust10O": "original",
+    "WikinewsClust10R": "random",
+    "WikinewsSent1L00": "MMR, lambda 0.0",
+    "WikinewsSent1L05": "MMR, lambda 0.5",
+    "WikinewsSent3L00": "MMR, lambda 0.0",
+    "WikinewsSent3L05": "MMR, lambda 0.5",
+    "WikinewsSent5L00": "MMR, lambda 0.0",
+    "WikinewsSent5L05": "MMR, lambda 0.5",
+    "WikinewsSent10L00": "MMR, lambda 0.0",
+    "WikinewsSent10L05": "MMR, lambda 0.5",
+}
+
 metric_0_1_range = ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1", "coverage"]
 
 
@@ -1542,7 +1742,6 @@ def make_report_plots():
         df_all_langs = pd.concat([df, df_non_german])
 
         metric_names, _ = get_metrics_info(df)
-        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
 
         # Make plots showing the failure rate
         failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="temperature")
@@ -1553,7 +1752,8 @@ def make_report_plots():
         # make violin (distribution) plot showing distribution of metric values per model and prompt
         # ... group by model (comparing prompts)
         # ... group by prompt (comparing models)
-        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList, file_suffix="")
+        for gbl in [groupByList] + experiment_config[experiment_name].get("groupByListVariants", []):
+            _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=gbl, file_suffix="")
         _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
         _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
 
@@ -1578,7 +1778,7 @@ def make_report_plots():
         # ... showing 1 table for (model, prompt)
         # ... showing 1 table for (model) -> comparing prompts
         # ... showing 1 table for (prompt) -> comparing models
-        tables_overview, tables_detail, agg_names = statistics_overview(df, metric_names, groupbyList=groupByList)
+        tables_overview, tables_detail, agg_names = statistics_overview(experiment_path, df, metric_names, groupbyList=groupByList)
 
         pathlib.Path(os.path.join(experiment_path, "overview_table")).mkdir(parents=True, exist_ok=True)
         pathlib.Path(os.path.join(experiment_path, "detail_table")).mkdir(parents=True, exist_ok=True)
@@ -1590,6 +1790,7 @@ def make_report_plots():
                 table["df"].to_csv(os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"), index=False)
 
         # save inspect examples in JSON
+        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, suffix="")
         with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
             json.dump(inspect_examples, f, indent=4)
         # with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:

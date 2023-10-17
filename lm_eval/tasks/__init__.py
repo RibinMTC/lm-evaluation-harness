@@ -402,9 +402,10 @@ TASK_REGISTRY = {
     "MDS2S_WikinewsSplit_2_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,
     "MDS2S_WikinewsSplit_40_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,
     "MDS2S_WikinewsSplit_41_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,
-    "MDS2S_WikinewsSplitS2P41_41_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,  # TODO
-    "MDS2S_WikinewsSplitS2O_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder,
-    "MDS2S_WikinewsSplitS2S_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled,
+    "MDS2S_WikinewsSplitS2OP41_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,  # TODO
+    "MDS2S_WikinewsSplitS2SP41_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs,  # TODO
+    "MDS2S_WikinewsSplitS2O_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_OriginalOrder,
+    "MDS2S_WikinewsSplitS2S_52_8b": llm_summarization_mt.SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_Shuffled,
     "MDS_WikinewsClust1R_42_8b": llm_summarization_mt.MDS_WikinewsSum_ClusterChunk_1_Random,
     "MDS_WikinewsClust1O_42_8b": llm_summarization_mt.MDS_WikinewsSum_ClusterChunk_1_Original_Order,
     "MDS_WikinewsClust1C_42_8b": llm_summarization_mt.MDS_WikinewsSum_ClusterChunk_1_Cluster_Size,
