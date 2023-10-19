@@ -37,6 +37,14 @@ class Palm2CompletionsLM(LM):
         aiplatform.init(project=project, location='us-central1', credentials=credentials, experiment='llm-master-thesis')
         palm.configure(credentials=credentials, location='us-central1')
 
+        # API_URL = 'https://us-central1-aiplatform.googleapis.com'
+        # GET: https://us-central1-aiplatform.googleapis.com/v1/projects/llm-master-thesis/locations/us-central1/endpoints/text-bison@001
+        # POST: https://us-central1-aiplatform.googleapis.com/v1/projects/llm-master-thesis/locations/us-central1/endpoints/text-bison@001:predict
+
+        # make a http request to predict the text (prepare REST authentication, make the request, parse the response)
+
+        # TODO: List endpoints at the us-central1 location
+
         self.engine = engine
 
     # @property
@@ -128,31 +136,32 @@ class Palm2CompletionsLM(LM):
                 max_output_tokens=256,
                 top_k=40,
                 top_p=1.0,
-                safety_settings=[
-                    {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_DEROGATORY,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_TOXICITY,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_VIOLENCE,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_SEXUAL,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_MEDICAL,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }, {
-                        "category": safety_types.HarmCategory.HARM_CATEGORY_DANGEROUS,
-                        "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
-                    }
-                ],
             )
+
+            # safety_settings = [
+            #                       {
+            #                           "category": safety_types.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+            #                           "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #                       }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_DEROGATORY,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_TOXICITY,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_VIOLENCE,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_SEXUAL,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_MEDICAL,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }, {
+            #         "category": safety_types.HarmCategory.HARM_CATEGORY_DANGEROUS,
+            #         "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #     }
+            #                   ],
 
             prediction = result.result
             results.append(prediction)
