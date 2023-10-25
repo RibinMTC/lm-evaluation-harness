@@ -610,6 +610,14 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["model",
         plt.savefig(save_path)
         plt.close()
 
+        # make a second plot where seaborn calculates the errorbars
+        for (a, b) in [(0, 1), (1, 0)]:
+            sns.pointplot(data=df, x=groupbyList[a], y=metric_name, hue=groupbyList[b], estimator=np.median, errorbar=('ci', 95), n_boot=1000, dodge=True,
+                          linestyles='')  # , err_kws={"markersize": 10, "capsize": 0.1, "errwidth": 1.5, "palette": "colorblind"}
+            save_path = os.path.join(experiment_path, "overview_plots", f"overview_seaborn_{groupbyList[a]}_{groupbyList[b]}_median_plot_{metric_name}.pdf")
+            plt.savefig(save_path)
+            plt.close()
+
         # TODO: Make a plot showing this overview table -> showing median performance + confidence interval for each model and promptVersion
 
     # loop over models (looking at them separately), and over the metrics (looking at them separately)
@@ -1292,7 +1300,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-2stage-experiment"
+experiment_name = "versions-experiment-llama2-gpt4-palm2-prompts-2-4"
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1308,6 +1316,12 @@ experiment_config = {
         "groupByList": ["promptVersion", "model"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["20Minuten"]
+    },
+    "least-to-most-prompting-stage1+2": {
+        "groupByList": ["promptVersion", "dataset-annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"],
+        "additional_prompts": [21, 22, 30, 31, 32, 33]
     },
     "least-to-most-prompting-stage2": {
         "groupByList": ["promptVersion", "dataset-annotation"],
@@ -1333,7 +1347,8 @@ experiment_config = {
     "mds-2stage-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["Wikinews"]
+        "datasets": ["Wikinews"],
+        "additional_prompts": [2, 41]
     },
     "mds-cluster-chunks-experiment": {
         "groupByList": ["promptVersion", "dataset-annotation"],
@@ -1402,6 +1417,30 @@ experiment_config = {
         ],
         "datasets": ["20Minuten"]
     },
+    "versions-experiment-llama2-gpt4-palm2": {
+        "groupByList": ["promptVersion", "model"],
+        "models": [
+            "gpt-4",
+            "palm2",
+            # "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            # "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "datasets": ["20Minuten"]
+    },
+    "versions-experiment-llama2-gpt4-palm2-prompts-2-4": {
+        "groupByList": ["promptVersion", "model"],
+        "models": [
+            "gpt-4",
+            "palm2",
+            # "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            # "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "datasets": ["20Minuten"]
+    },
     "versions-experiment-gpt4-only": {
         "groupByList": ["promptVersion", "model"],
         "models": ["gpt-4"],
@@ -1466,6 +1505,8 @@ datasetNameMap = {
     "WikinewsSplit": "Wikinews",
     "WikinewsSplitS2O": "Wikinews",
     "WikinewsSplitS2S": "Wikinews",
+    "WikinewsSplitS2OP41": "Wikinews",
+    "WikinewsSplitS2SP41": "Wikinews",
     "WikinewsClust1C": "Wikinews",
     "WikinewsClust1O": "Wikinews",
     "WikinewsClust1R": "Wikinews",
@@ -1490,12 +1531,12 @@ datasetAnnotationMap = {
     "20min1": "20Minuten, shard 2",
     "20min2": "20Minuten, shard 3",
     "20min3": "20Minuten, shard 4",
-    "20minLtm2p22S": "20Min, Prompt 22,\nPrompt at start",
-    "20minLtm2p22E": "20Min, Prompt 22,\nPrompt at end",
-    "20minLtm2p31S": "20Min, Prompt 31,\nPrompt at start",
-    "20minLtm2p31E": "20Min, Prompt 31,\nPrompt at end",
-    "20minLtm2p33S": "20Min, Prompt 33,\nPrompt at start",
-    "20minLtm2p33E": "20Min, Prompt 33,\nPrompt at end",
+    "20minLtm2p22S": "20Min, Bulletpoints,\nArticle-Bulletpoints",
+    "20minLtm2p22E": "20Min, Bulletpoints,\nBulletpoints-Article",
+    "20minLtm2p31S": "20Min, Questions+Instr.,\nQ&A-Article",
+    "20minLtm2p31E": "20Min, Questions+Instr.,\nArticle-Q&A",
+    "20minLtm2p33S": "20Min, Instr.+Questions,\nQ&A-Article",
+    "20minLtm2p33E": "20Min, Instr.+Questions,\nArticle-Q&A",
     "Wikinews": "basic,\nfull articles,\noriginal order",
     "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
@@ -1513,8 +1554,10 @@ datasetAnnotationMap = {
     "WikinewsSCS16": "sentence prefix,\n16 sentences",
     "WikinewsSCS32": "sentence prefix,\n32 sentences",
     "WikinewsSplit": "2-stage summary,\nstage 1",
-    "WikinewsSplitS2O": "2-stage summary,\noriginal order",
-    "WikinewsSplitS2S": "2-stage summary,\nrandom order",
+    "WikinewsSplitS2O": "2-stage summary,\n3 sent. interm. summary,\noriginal order",
+    "WikinewsSplitS2S": "2-stage summary,\n3 sent. interm. summary,\nrandom order",
+    "WikinewsSplitS2OP41": "2-stage summary,\n10 sent. interm. summary,\noriginal order",
+    "WikinewsSplitS2SP41": "2-stage summary,\n10 sent. interm. summary,\nrandom order",
     "WikinewsClust1C": "Cluster,\n 1 Sentence,\ncluster size order",
     "WikinewsClust1O": "Cluster,\n 1 Sentence,\noriginal order",
     "WikinewsClust1R": "Cluster,\n 1 Sentence,\nrandom order",
@@ -1553,6 +1596,8 @@ preprocessing_method = {
     "WikinewsSplit": "-",
     "WikinewsSplitS2O": "2-stage summary",
     "WikinewsSplitS2S": "2-stage summary",
+    "WikinewsSplitS2OP41": "2-stage summary",
+    "WikinewsSplitS2SP41": "2-stage summary",
     "WikinewsClust1C": "Cluster",
     "WikinewsClust1O": "Cluster",
     "WikinewsClust1R": "Cluster",
@@ -1591,6 +1636,8 @@ preprocessing_parameters = {
     "WikinewsSplit": "-",
     "WikinewsSplitS2O": "-",
     "WikinewsSplitS2S": "-",
+    "WikinewsSplitS2OP41": "-",
+    "WikinewsSplitS2SP41": "-",
     "WikinewsClust1C": " 1 Sentence",
     "WikinewsClust1O": " 1 Sentence",
     "WikinewsClust1R": " 1 Sentence",
@@ -1629,6 +1676,8 @@ preprocessing_order = {
     "WikinewsSplit": "-",
     "WikinewsSplitS2O": "original",
     "WikinewsSplitS2S": "random",
+    "WikinewsSplitS2OP41": "original",
+    "WikinewsSplitS2SP41": "random",
     "WikinewsClust1C": "cluster size",
     "WikinewsClust1O": "original",
     "WikinewsClust1R": "random",
