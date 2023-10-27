@@ -15,6 +15,33 @@ import pandas as pd
 roc_auc_metric = evaluate.load("roc_auc")
 
 
+def get_unique_elements_with_preserved_order(sequence):
+    seen = set()
+    return [x for x in sequence if not (x in seen or seen.add(x))]
+
+def get_num_samples_per_article_from_num_articles_and_num_fewshot(num_fewshot: int, num_articles: int) -> \
+        List[int]:
+    # Step 1: Divide the total by the number of slots.
+    basic_share = num_fewshot / num_articles
+
+    # Step 2: Initialize a list to hold the distribution and calculate the basic share for each slot (rounding down).
+    num_samples_per_article = [math.floor(basic_share) for _ in range(num_articles)]
+
+    # Step 3: Calculate the remainder that needs to be distributed.
+    remainder = num_fewshot - sum(num_samples_per_article)
+
+    # Step 4: Calculate the remainders for each slot.
+    remainders = [(index, basic_share - math.floor(basic_share)) for index in range(num_articles)]
+
+    # Step 5: Sort the slots by the largest remainders.
+    remainders.sort(key=lambda x: -x[1])
+
+    # Step 6: Distribute the remainder to the slots with the largest remainders.
+    for i in range(int(remainder)):
+        num_samples_per_article[remainders[i][0]] += 1
+
+    return num_samples_per_article
+
 def _roc_auc_agg(items):
     predictions, references = zip(*items)
     try:
@@ -108,33 +135,6 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
         else:
             return self.negative_label
 
-    def get_unique_elements_with_preserved_order(self, sequence):
-        seen = set()
-        return [x for x in sequence if not (x in seen or seen.add(x))]
-
-    def get_num_samples_per_article_from_num_articles_and_num_fewshot(self, num_fewshot: int, num_articles: int) -> \
-    List[int]:
-        # Step 1: Divide the total by the number of slots.
-        basic_share = num_fewshot / num_articles
-
-        # Step 2: Initialize a list to hold the distribution and calculate the basic share for each slot (rounding down).
-        num_samples_per_article = [math.floor(basic_share) for _ in range(num_articles)]
-
-        # Step 3: Calculate the remainder that needs to be distributed.
-        remainder = num_fewshot - sum(num_samples_per_article)
-
-        # Step 4: Calculate the remainders for each slot.
-        remainders = [(index, basic_share - math.floor(basic_share)) for index in range(num_articles)]
-
-        # Step 5: Sort the slots by the largest remainders.
-        remainders.sort(key=lambda x: -x[1])
-
-        # Step 6: Distribute the remainder to the slots with the largest remainders.
-        for i in range(int(remainder)):
-            num_samples_per_article[remainders[i][0]] += 1
-
-        return num_samples_per_article
-
     def _format_packed_examples(self, doc, num_samples_per_articles: List[int], rnd=None):
         """
         Format the examples using the 'packed' strategy.
@@ -146,7 +146,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
 
         num_articles = len(num_samples_per_articles)
         sorted_full_dataset = self._training_docs["full"]
-        sorted_unique_article_ids = self.get_unique_elements_with_preserved_order(sorted_full_dataset["article_id"])[
+        sorted_unique_article_ids = get_unique_elements_with_preserved_order(sorted_full_dataset["article_id"])[
                                     :20]
         selected_article_ids = rnd.sample(sorted_unique_article_ids, num_articles)
         examples_per_articles = []
@@ -237,7 +237,7 @@ class FaithfulnessClassificationBaseTask(Task, Plotter):
                 assert num_fewshot > 7, f"{num_fewshot} has to be larger than 8 for fewshot_sampling strategy packed"
                 # we want to at maximum 8 samples per article
                 num_articles = math.ceil(num_fewshot / 8)
-                num_samples_per_articles = self.get_num_samples_per_article_from_num_articles_and_num_fewshot(
+                num_samples_per_articles = get_num_samples_per_article_from_num_articles_and_num_fewshot(
                     num_fewshot=num_fewshot, num_articles=num_articles)
             else:  # Default or "packed" strategy
                 num_pos_samples = rnd.randint(0, num_fewshot)

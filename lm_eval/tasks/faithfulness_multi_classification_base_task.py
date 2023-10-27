@@ -1,15 +1,36 @@
+import math
 from functools import partial
 from typing import List
 
 import numpy as np
 import wandb
 from datasets import Dataset
+from pandas import DataFrame
 
 from lm_eval.metrics import complex_metric_agg, complex_metric_agg_with_class_labels
 from lm_eval.tasks.base_plotter import Plotter
 from lm_eval.base import MultipleChoiceTask
 import pandas as pd
 
+from lm_eval.tasks.faithfulness_classification_base_task import \
+    get_num_samples_per_article_from_num_articles_and_num_fewshot, get_unique_elements_with_preserved_order
+
+
+def get_article_ids_above_min_number_of_rows_per_label(dataset_df: DataFrame, min_number_of_rows_per_label: int) -> \
+List[int]:
+    # grouped_df = self._training_docs["full"].groupby("article_id")["label"].nunique()
+    # valid_article_ids = grouped_df[grouped_df >= 3].index
+    # return list(valid_article_ids)
+    # First, group by both article_id and label and count the number of rows for each combination
+    grouped_label_counts = dataset_df.groupby(["article_id", "label"]).size().unstack()
+
+    # Check for each label whether the count is greater than min_number_of_rows_per_label
+    valid_rows_for_each_label = (grouped_label_counts > min_number_of_rows_per_label).all(axis=1)
+
+    # Filter out the article_ids that satisfy the condition for all labels
+    valid_article_ids = valid_rows_for_each_label[valid_rows_for_each_label].index
+
+    return list(valid_article_ids)
 
 class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     VERSION = 0
@@ -58,11 +79,22 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                     lambda example: example["label"] == self.choices[1]].head(100)
                 extrinsic_samples_df = sorted_train_df.loc[
                     lambda example: example["label"] == self.choices[2]].head(100)
+                # consider only article ids, which have at least 3 samples per label for easier implementation
+                article_ids_with_at_least_3_samples_per_label = get_article_ids_above_min_number_of_rows_per_label(
+                    dataset_df=sorted_train_df, min_number_of_rows_per_label=3)
+                valid_sorted_dataset = sorted_train_df[
+                    sorted_train_df["article_id"].isin(article_ids_with_at_least_3_samples_per_label)]
+                valid_sorted_article_ids = get_unique_elements_with_preserved_order(valid_sorted_dataset["article_id"])
+                assert len(valid_sorted_article_ids) > 3, (
+                    f"We don't have enough article with "
+                    f"at least 3 samples per label for"
+                    f" num_articles: {3}")
                 self._training_docs = {
                     "faithful": Dataset.from_pandas(faithful_samples_df),
                     "intrinsic": Dataset.from_pandas(intrinsic_samples_df),
                     "extrinsic": Dataset.from_pandas(extrinsic_samples_df),
-                    "full": sorted_train_df
+                    "full": sorted_train_df,
+                    "sorted_article_ids_with_at_least_3_samples_per_label": valid_sorted_article_ids
                 }
 
             return self._training_docs
@@ -88,37 +120,31 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt_target(self, doc):
         return " " + doc["label"]
 
-    def get_article_ids_with_at_least_all_labels(self) -> List[int]:
-        grouped_df = self._training_docs["full"].groupby("article_id")["label"].nunique()
-        valid_article_ids = grouped_df[grouped_df >= 3].index
-        return list(valid_article_ids)
-
-    def _format_packed_examples(self, doc, rnd=None, num_articles: int = 0, num_samples_per_article_per_label=None):
+    def _format_packed_examples(self, num_samples_per_articles: List[int], doc, rnd=None):
         """
         Format the examples using the 'packed' strategy.
 
         :param examples: List of document examples.
         :return: A string representing the formatted examples.
         """
-
+        num_articles = len(num_samples_per_articles)
         sorted_full_dataset = self._training_docs["full"]
-        valid_article_ids = self.get_article_ids_with_at_least_all_labels()[:3]
-        valid_dataset = sorted_full_dataset[sorted_full_dataset["article_id"].isin(valid_article_ids)].sort_values(
-            by='num_words_article', ascending=True)
-        selected_article_ids = rnd.sample(valid_article_ids, num_articles)
+        valid_sorted_article_ids = self._training_docs["sorted_article_ids_with_at_least_3_samples_per_label"]
+        selected_article_ids = rnd.sample(valid_sorted_article_ids[:10], num_articles)
         examples_per_articles = []
         seed = 42
-        for article_id in selected_article_ids:
+        for article_id, samples_per_article in zip(selected_article_ids, num_samples_per_articles):
+            samples_per_article_per_label = int(samples_per_article / 3)
             article_id_samples = sorted_full_dataset[sorted_full_dataset["article_id"] == article_id]
             samples = []
             for choice in self.choices:
                 selected_choice_samples = article_id_samples.loc[
                     lambda example: example["label"] == choice]
-                selected_samples = selected_choice_samples.sample(n=num_samples_per_article_per_label,
+                selected_samples = selected_choice_samples.sample(n=samples_per_article_per_label,
                                                                   random_state=seed)
                 samples.append(selected_samples)
-
-            examples_per_articles.append(pd.concat(samples, ignore_index=True))
+            shuffled_and_concatenated_samples = pd.concat(samples).sample(frac=1, random_state=seed).reset_index(drop=True)
+            examples_per_articles.append(shuffled_and_concatenated_samples)
 
         doc = {key: [value] for key, value in doc["original_doc"].items()}
         examples_per_articles.append(pd.DataFrame(doc))
@@ -193,11 +219,13 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
             elif fewshot_sampling == "packed":
                 # raise NotImplementedError
-                assert num_fewshot > 5 and num_fewshot % 3 == 0, (f"{num_fewshot} has to be larger than 6 and a "
+                assert num_fewshot > 8 and num_fewshot % 3 == 0, (f"{num_fewshot} has to be larger than 6 and a "
                                                                   f"multiple of 3 for fewshot_sampling strategy packed")
-                num_articles = num_fewshot // 3
-                labeled_examples_with_doc = self._format_packed_examples(num_samples_per_article_per_label=1,
-                                                                         num_articles=num_articles, doc=doc, rnd=rnd)
+                num_articles = math.ceil(num_fewshot / 9)
+                num_samples_per_articles = get_num_samples_per_article_from_num_articles_and_num_fewshot(
+                    num_fewshot=num_fewshot, num_articles=num_articles)
+                labeled_examples_with_doc = self._format_packed_examples(
+                    num_samples_per_articles=num_samples_per_articles, doc=doc, rnd=rnd)
                 task_only_text = self.prompt_template.split("\n")[0]
                 labeled_examples = task_only_text + "\n" + labeled_examples_with_doc
                 full_prompt = f"{description}{labeled_examples}"
