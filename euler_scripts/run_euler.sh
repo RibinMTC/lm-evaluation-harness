@@ -1,8 +1,5 @@
 # Provide as first argument the path to the euler config file
 
-# Provide as optional second argument the path to the inference prompt file
-
-# example: bash run_euler.sh configs/flan_t5_inference_config.json data/inference.json
 
 if [ -z "$1" ]
   then
@@ -24,23 +21,36 @@ CODE_PATH=$(python3 utils/euler_config_parser.py \
                 --euler_config_path "$1" \
                 --retreive_key code_path)
 
-CONFIG_FILE=$(python3 utils/euler_config_parser.py \
+if [ "$#" -ge 2 ]; then
+    CONFIG_FILE=$2
+else
+    CONFIG_FILE=$(python3 utils/euler_config_parser.py \
                 --euler_config_path "$1" \
                 --retreive_key config_file)
+fi
+
 
 scp "$1" euler:$CODE_PATH/euler_scripts
-#scp utils/bash_euler_commands_helper.py euler:$CODE_PATH/euler_scripts/utils/bash_euler_commands_helper.py
-scp ../lm_eval/tasks/xsum_faith_hallucination_classification.py euler:$CODE_PATH/lm_eval/tasks/xsum_faith_hallucination_classification.py
-#scp ../lm_eval/models/huggingface.py euler:$CODE_PATH/lm_eval/models/huggingface.py
-#scp ../main.py euler:$CODE_PATH/main.py
+#scp ../lm_eval/tasks/seahorse_classification.py euler:$CODE_PATH/lm_eval/tasks/seahorse_classification.py
+#scp ../lm_eval/tasks/swisstext23_faithfulness_classification.py euler:$CODE_PATH/lm_eval/tasks/swisstext23_faithfulness_classification.py
+#scp ../lm_eval/tasks/swisstext23_summarization.py euler:$CODE_PATH/lm_eval/tasks/swisstext23_summarization.py
+#scp ../lm_eval/tasks/faithfulness_classification_base_task.py euler:$CODE_PATH/lm_eval/tasks/faithfulness_classification_base_task.py
+#scp ../lm_eval/evaluator.py euler:$CODE_PATH/lm_eval/evaluator.py
+#scp ../configs/prompt_templates/swisstext23_summarization.json euler:$CODE_PATH/configs/prompt_templates/swisstext23_summarization.json
+#scp ../configs/prompt_templates/seahorse_classification.json euler:$CODE_PATH/configs/prompt_templates/seahorse_classification.json
+#scp ../configs/prompt_templates/faithfulness_benchmark_final_swisstext23_multi_label.json euler:$CODE_PATH/configs/prompt_templates/faithfulness_benchmark_final_swisstext23_multi_label.json
+#scp ../configs/prompt_templates/faithfulness_benchmark_final_swisstext23_benchmark.json euler:$CODE_PATH/configs/prompt_templates/faithfulness_benchmark_final_swisstext23_benchmark.json
+PARENT_DIR=$(dirname "$CONFIG_FILE")
+#echo "parent dir: $PARENT_DIR"
+echo "config file: $CONFIG_FILE"
+ssh euler "
+    if [[ ! -d $CODE_PATH/$PARENT_DIR ]]; then
+        mkdir -p $CODE_PATH/$PARENT_DIR && echo 'Directory created'
+    else
+        echo 'Directory already exists'
+    fi
+  "
 scp ../"$CONFIG_FILE" euler:$CODE_PATH/$CONFIG_FILE
-
-if [ -z "$2" ]
-  then
-    echo "No inference.json path provided"
-  else
-    scp ../"$2" euler:"$CODE_PATH"/"$2"
-fi
 
 ssh euler ARG1=\"$1\" \
           ARG4=\"$LOAD_MODULES\" \
@@ -59,11 +69,11 @@ ssh euler ARG1=\"$1\" \
     export PYTHONPATH="${PYTHONPATH}:$ARG7/"
 
     # Load all updates
-    echo "### Pulling commits..."
-    echo ""
-    git pull
-    git checkout "$ARG6"
-    echo ""
+#    echo "### Pulling commits..."
+#    echo ""
+#    git pull
+#    git checkout "$ARG6"
+#    echo ""
 
     # LOAD MODULES AFTER ACTIVATING ENVIRONMENT TO AVOID LIBRARY ERRORS!
     echo "### Loading modules..."
