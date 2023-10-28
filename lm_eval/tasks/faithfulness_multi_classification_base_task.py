@@ -143,7 +143,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 selected_samples = selected_choice_samples.sample(n=samples_per_article_per_label,
                                                                   random_state=seed)
                 samples.append(selected_samples)
-            shuffled_and_concatenated_samples = pd.concat(samples).sample(frac=1, random_state=seed).reset_index(drop=True)
+            shuffled_and_concatenated_samples = pd.concat(samples).sample(frac=1).reset_index(drop=True)
             examples_per_articles.append(shuffled_and_concatenated_samples)
 
         doc = {key: [value] for key, value in doc["original_doc"].items()}
