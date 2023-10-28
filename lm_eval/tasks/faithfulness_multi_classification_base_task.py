@@ -17,7 +17,7 @@ from lm_eval.tasks.faithfulness_classification_base_task import \
 
 
 def get_article_ids_above_min_number_of_rows_per_label(dataset_df: DataFrame, min_number_of_rows_per_label: int) -> \
-List[int]:
+        List[int]:
     # grouped_df = self._training_docs["full"].groupby("article_id")["label"].nunique()
     # valid_article_ids = grouped_df[grouped_df >= 3].index
     # return list(valid_article_ids)
@@ -31,6 +31,7 @@ List[int]:
     valid_article_ids = valid_rows_for_each_label[valid_rows_for_each_label].index
 
     return list(valid_article_ids)
+
 
 class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     VERSION = 0
@@ -120,6 +121,10 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt_target(self, doc):
         return " " + doc["label"]
 
+    @staticmethod
+    def cantor_pairing(doc_id, article_id):
+        return int(0.5 * (doc_id + article_id) * (doc_id + article_id + 1) + article_id)
+
     def _format_packed_examples(self, num_samples_per_articles: List[int], doc, rnd=None):
         """
         Format the examples using the 'packed' strategy.
@@ -127,6 +132,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         :param examples: List of document examples.
         :return: A string representing the formatted examples.
         """
+        doc_id = doc["original_doc"]["id"]
         num_articles = len(num_samples_per_articles)
         sorted_full_dataset = self._training_docs["full"]
         valid_sorted_article_ids = self._training_docs["sorted_article_ids_with_at_least_3_samples_per_label"]
@@ -137,13 +143,16 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             samples_per_article_per_label = int(samples_per_article / 3)
             article_id_samples = sorted_full_dataset[sorted_full_dataset["article_id"] == article_id]
             samples = []
+            unique_doc_article_id_seed = self.cantor_pairing(doc_id=doc_id, article_id=article_id)
             for choice in self.choices:
                 selected_choice_samples = article_id_samples.loc[
                     lambda example: example["label"] == choice]
                 selected_samples = selected_choice_samples.sample(n=samples_per_article_per_label,
                                                                   random_state=seed)
                 samples.append(selected_samples)
-            shuffled_and_concatenated_samples = pd.concat(samples).sample(frac=1).reset_index(drop=True)
+            shuffled_and_concatenated_samples = pd.concat(samples).sample(frac=1,
+                                                                          random_state=unique_doc_article_id_seed).reset_index(
+                drop=True)
             examples_per_articles.append(shuffled_and_concatenated_samples)
 
         doc = {key: [value] for key, value in doc["original_doc"].items()}
