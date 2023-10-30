@@ -45,8 +45,8 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
 
-    negative_samples_df = None
-    positive_samples_df = None
+    #negative_samples_df = None
+    #positive_samples_df = None
 
     default_prompt_template = (
         "Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information "

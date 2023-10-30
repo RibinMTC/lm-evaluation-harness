@@ -75,6 +75,7 @@ from . import seahorse_classification
 from . import swisstext23_faithfulness_classification
 from . import faithfulness_classification_base_task
 from . import faithfulness_multi_classification_base_task
+from . import faithfulness_multi_classification_with_explanation_task
 
 ########################################
 # Translation tasks
@@ -347,6 +348,7 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_final_swisstext23_benchmark_intrinsic": faithfulness_classification_base_task.FaithfulnessClassificationTaskFinalSwissText23BenchmarkIntrinsic,
     "faithfulness_benchmark_final_swisstext23_benchmark_extrinsic": faithfulness_classification_base_task.FaithfulnessClassificationTaskFinalSwissText23BenchmarkExtrinsic,
     "faithfulness_benchmark_final_swisstext23_multi_label": faithfulness_multi_classification_base_task.FaithfulnessMultiClassificationBaseTask,
+    "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FaithfulnessMultiClassificationWithExplanationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
