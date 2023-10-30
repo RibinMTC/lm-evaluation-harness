@@ -91,6 +91,7 @@ class HuggingFaceAutoLM(BaseLM):
             load_in_8bit: Optional[bool] = False,
             trust_remote_code: Optional[bool] = False,
             gptq_use_triton: Optional[bool] = False,
+            use_flash_attention_2: Optional[bool] = False,
             # temperature: float = 1.0
             **kwargs
     ):
@@ -153,6 +154,8 @@ class HuggingFaceAutoLM(BaseLM):
                 Use Triton for GPTQ inference.
             temperature (float, defaults to 1.0):
                 Temperature for generation configuration.
+            use_flash_attention_2 (bool, optional, defaults to False):
+                Indicates whether flash attention 2 should be used.
         """
         super().__init__()
 
@@ -212,6 +215,7 @@ class HuggingFaceAutoLM(BaseLM):
             subfolder=subfolder,
             torch_dtype=_get_dtype(dtype, self._config),
             gptq_use_triton=gptq_use_triton,
+            use_flash_attention_2=use_flash_attention_2,
             **model_kwargs,
         )
         # note: peft_path can be different than pretrained model path
@@ -260,6 +264,7 @@ class HuggingFaceAutoLM(BaseLM):
             trust_remote_code: Optional[bool] = False,
             torch_dtype: Optional[Union[str, torch.dtype]] = None,
             gptq_use_triton: Optional[bool] = False,
+            use_flash_attention_2: Optional[bool] = False
     ) -> transformers.AutoModel:
         """Returns a pre-trained pytorch model from a pre-trained model configuration."""
         if not quantized:
@@ -272,6 +277,7 @@ class HuggingFaceAutoLM(BaseLM):
                 load_in_8bit=load_in_8bit,
                 trust_remote_code=trust_remote_code,
                 torch_dtype=torch_dtype,
+                use_flash_attention_2=use_flash_attention_2
             )
         else:
             from auto_gptq import AutoGPTQForCausalLM
