@@ -15,5 +15,8 @@
     },
   "ehartford/dolphin": {
     "all_labels_english": "<|im_start|>system\nYou are an expert German linguist<|im_end|>\n<|im_start|>user\nAnalyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'.\nArticle: {article}\nSentence: {sentence}<|im_end|>\n<|im_start|>assistant\n"
+  },
+  "mtc/ehartford-dolphin": {
+    "all_labels_english": "<|im_start|>system\nYou are an expert German linguist<|im_end|>\n<|im_start|>user\nAnalyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'.\nArticle: {article}\nSentence: {sentence}<|im_end|>\n<|im_start|>assistant\n"
   }
 }
