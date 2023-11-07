@@ -10,6 +10,10 @@ class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassi
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination", INVALID_ANS]
 
+    # def test_docs(self):
+    #     if self.has_test_docs():
+    #         return map(self._process_doc, self.dataset["validation"])
+
     def construct_requests(self, doc, ctx):
         completion = rf.greedy_until(ctx, {"until": []})
         return completion
@@ -44,3 +48,8 @@ class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassi
                 "precision_macro": (prediction, truth),
                 "recall_macro": (prediction, truth)
                 }
+
+
+class FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask(
+    FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/final_german_faithfulness_benchmark_with_full_disagreements"
