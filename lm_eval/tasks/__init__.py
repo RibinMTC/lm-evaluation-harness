@@ -75,6 +75,7 @@ from . import seahorse_classification
 from . import faithfulness_classification_base_task
 from . import faithfulness_multi_classification_base_task
 from . import faithfulness_multi_classification_with_explanation_task
+from . import domain_adaptation_summarization
 
 ########################################
 # Translation tasks
@@ -348,6 +349,9 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_final_swisstext23_multi_label": faithfulness_multi_classification_base_task.FaithfulnessMultiClassificationBaseTask,
     "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FaithfulnessMultiClassificationWithExplanationTask,
     "full_disagreements_faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask,
+    "arxiv_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask,
+    "govreport_domain_adaptation_summarization": domain_adaptation_summarization.GovReportDomainAdaptationSummarizationTask,
+    "pubmed_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
