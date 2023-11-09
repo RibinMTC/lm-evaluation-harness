@@ -72,7 +72,6 @@ from . import frank_hallucination_classification
 from . import xsum_faith_hallucination_classification
 from . import swisstext23_summarization
 from . import seahorse_classification
-from . import swisstext23_faithfulness_classification
 from . import faithfulness_classification_base_task
 from . import faithfulness_multi_classification_base_task
 from . import faithfulness_multi_classification_with_explanation_task
@@ -337,7 +336,6 @@ TASK_REGISTRY = {
     "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
-    "swisstext23_faithfulness_classification": swisstext23_faithfulness_classification.SwissText23FaithfulnessClassificationTask,
     "faithfulness_benchmark_factcc": faithfulness_classification_base_task.FaithfulnessClassificationTaskFactCC,
     "faithfulness_benchmark_frank": faithfulness_classification_base_task.FaithfulnessClassificationTaskFrank,
     "faithfulness_benchmark_swisstext23_gold_annotation": faithfulness_classification_base_task.FaithfulnessClassificationTaskSwissText23GoldAnnotation,

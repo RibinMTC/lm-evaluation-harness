@@ -1,0 +1,45 @@
+python -m scripts.write_out \
+    --output_base_path "pawsx_results" \
+    --tasks "pawsx_de" \
+    --sets "train, test" \
+    --num_fewshot 1 \
+    --num_examples 1
+
+python -m scripts.write_out \
+    --output_base_path "swisstext23_summarization_results" \
+    --tasks "swisstext23_summarization" \
+    --sets "test" \
+    --num_fewshot 2 \
+    --num_examples 1
+
+python -m scripts.write_out \
+        --output_base_path "seahorse_classification_results" \
+        --tasks "seahorse_classification" \
+        --sets "test" \
+        --num_fewshot 0 \
+        --num_examples 2
+python -m scripts.write_out \
+        --output_base_path "swisstext23_faithfulness_classification_results" \
+        --tasks "faithfulness_benchmark_extrinsic_only_swisstext23_gold_annotation,faithfulness_benchmark_intrinsic_only_swisstext23_gold_annotation" \
+        --sets "test" \
+        --num_fewshot 0 \
+        --num_examples 1
+
+python -m scripts.write_out \
+        --output_base_path "faithfulness_benchmark_final_swisstext23_benchmark" \
+        --tasks "faithfulness_benchmark_final_swisstext23_benchmark" \
+        --sets "test" \
+        --num_fewshot 0 \
+        --num_examples 1
+
+
+
+
+python main.py \
+        --model hf-seq2seq \
+        --model_args pretrained=google/flan-t5-small,device=cuda:0\
+        --tasks "germanquad_open_qa" \
+        --num_fewshot 3 \
+        --limit 10 \
+    --write_out \
+    --output_base_path "germanquad_results/flan_t5"

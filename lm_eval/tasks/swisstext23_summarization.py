@@ -56,7 +56,7 @@ class SwissText23SummarizationTask(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-                self._training_docs = list(self.dataset["train"])[:2]
+                self._training_docs = list(self.dataset["train"])[:4]
             return self._training_docs
 
     def validation_docs(self):
