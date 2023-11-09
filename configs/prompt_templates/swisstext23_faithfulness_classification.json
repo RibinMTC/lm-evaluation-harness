@@ -1,5 +1,0 @@
-{
-  "stabilityai/StableBeluga": {
-    "1": "### System:\nYou are StableBeluga, an AI that follows instructions extremely well. Help as much as you can.\n\n### User: You'll be given a German sentence and a German article. Your task is to determine if the sentence accurately reflects the content of the article without adding any unmentioned details or contradicting any information from the article. It's not necessary for the sentence to cover all the main ideas of the article, just that the details it does mention are correctly derived from the text. Provide your judgment by outputting only 'faithful' if the sentence is faithful, and 'unfaithful' if it's not.\nArticle: {article}\nSentence: {sentence}\n\n### Assistant:\n",
-    }
-}

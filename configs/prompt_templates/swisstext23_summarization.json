@@ -24,5 +24,12 @@
   },
   "DAMO-NLP-MT/polylm" : {
     "1": "Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\nSummary:\n"
+  },
+  "mtc/NousResearch-Llama-2": {
+    "summarization_training_prompt": "### Instruction:\nGenerate a summary in German for the provided article. The summary should be around 2 to 3 sentences.\nArticle: {article}\n\n### Assistant:\n"
+  },
+  "NousResearch/Llama-2": {
+    "summarization_training_prompt": "### Instruction:\nGenerate a summary in German for the provided article. The summary should be around 2 to 3 sentences.\nArticle: {article}\n\n### Assistant:\n",
+    "german_summarization_prompt": "Erstelle eine Zusammenfassung vom folgenden Artikel in 3 oder weniger Sätzen:\nArtikel: {article}\nZusammenfassung:\n"
   }
 }

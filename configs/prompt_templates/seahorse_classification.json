@@ -16,5 +16,12 @@
   },
   "google/flan-ul2": {
     "attribution_1": "Given an article and its summary in {lang}, determine if all information in the summary originates from the article. Reply with True if it is, and False if not.\nArticle: {article}\nSummary: {summary}\n"
+  },
+  "NousResearch/Llama-2": {
+    "attribution_training_prompt": "### Instruction:\nGiven a {lang} article and its summary, determine if all information in the summary originates from the article. Return True if it is, and False if not.\nArticle: {article}\nSummary:{summary}\n\n### Assistant:\n"
+  },
+  "mtc/NousResearch-Llama-2": {
+    "attribution_training_prompt": "### Instruction:\nGiven a {lang} article and its summary, determine if all information in the summary originates from the article. Return True if it is, and False if not.\nArticle: {article}\nSummary:{summary}\n\n### Assistant:\n"
   }
+
 }
