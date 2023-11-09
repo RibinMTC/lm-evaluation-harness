@@ -4,11 +4,11 @@
     "code_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness",
     "log_file_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness/euler_outputs/",
     "num_cpus": 4,
-    "run_duration_hours": "01:00",
+    "run_duration_hours": "02:00",
     "shareholder_group": "es_mtc",
     "memory_per_cpu_gb": 8,
     "gpu": "a100_80gb",
     "num_gpus": 1,
-    "config_file":"configs/eval_config.yaml",
+    "config_file":"configs/faithfulness_benchmark_final_configs/LeoLM-leo-hessianai-13b/num_fewshot_0/all_labels_LeoLM-leo-hessianai-13b_num_fewshot_0_eval_config.yaml",
     "main_command": "python3 main.py --config "
 }

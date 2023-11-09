@@ -9,28 +9,23 @@ model_names = [
 num_fewshots = [8, 16, 24]
 few_shot_sampling_strategies = ["stratified"]
 seeds = [42]
-selected_prompt_version_names = ["all_labels_german"]
-
-prompt_to_task_map = {
-    "faithfulness": "faithfulness_benchmark_final_swisstext23_benchmark_faithful",
-    "intrinsic": "faithfulness_benchmark_final_swisstext23_benchmark_intrinsic",
-    "extrinsic": "faithfulness_benchmark_final_swisstext23_benchmark_extrinsic",
-    "all_labels": "faithfulness_benchmark_final_swisstext23_multi_label"
-}
+selected_tasks_with_prompt_version_names = []
 
 model_name_to_type_map = {
     "NousResearch/Llama-2": "hf-causal-experimental",
     "google/flan-ul2": "hf-seq2seq",
     "LeoLM/leo": "hf-causal-experimental",
-    "mtc/LeoLM": "hf-causal-experimental"
+    "mtc/LeoLM": "hf-causal-experimental",
+    "ehartford/dolphin": "hf-causal-experimental",
+    "mtc/ehartford-dolphin": "hf-causal-experimental"
 }
 
 
-def get_task_name_from_prompt(prompt_name: str) -> str:
-    for prompt, task_name in prompt_to_task_map.items():
-        if prompt in prompt_name:
-            return task_name
-    raise ValueError(f"Prompt: {prompt_name} could not be mapped to a task")
+# def get_task_name_from_prompt(prompt_name: str) -> str:
+#     for prompt, task_name in prompt_to_task_map.items():
+#         if prompt in prompt_name:
+#             return task_name
+#     raise ValueError(f"Prompt: {prompt_name} could not be mapped to a task")
 
 
 def get_model_type_from_name(model_name: str):
@@ -66,13 +61,12 @@ def main():
         cleaned_model_name = model_name.replace("/", "-")
         model_type = get_model_type_from_name(model_name=model_name)
 
-        for prompt_version_name in selected_prompt_version_names:
+        for task_name, prompt_version_name in selected_tasks_with_prompt_version_names:
             for num_fewshot in num_fewshots:
                 for seed in seeds:
                     for few_shot_sampling_strategy in few_shot_sampling_strategies:
                         new_config = base_config_yaml.copy()
                         models_args = base_models_args.format(model_name=model_name)
-                        task_name = get_task_name_from_prompt(prompt_name=prompt_version_name)
                         new_config["model"] = model_type
                         new_config["model_args"] = models_args
                         new_config["tasks"] = task_name

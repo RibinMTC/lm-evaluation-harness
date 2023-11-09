@@ -69,11 +69,11 @@ ssh euler ARG1=\"$1\" \
     export PYTHONPATH="${PYTHONPATH}:$ARG7/"
 
     # Load all updates
-#    echo "### Pulling commits..."
-#    echo ""
-#    git pull
-#    git checkout "$ARG6"
-#    echo ""
+    echo "### Pulling commits..."
+    echo ""
+    git pull
+    git checkout "$ARG6"
+    echo ""
 
     # LOAD MODULES AFTER ACTIVATING ENVIRONMENT TO AVOID LIBRARY ERRORS!
     echo "### Loading modules..."
