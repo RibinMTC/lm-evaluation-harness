@@ -455,6 +455,11 @@ class HuggingFaceAutoLM(BaseLM):
             stop = request_args.get("until", None)
             stop_sequences = stop if isinstance(stop, list) else [stop]
             max_generation_length = request_args.get("max_length", None)
+            request_suffix = request_args.get("request_suffix", None)
+            batched_request_suffix_encoding = None
+            if request_suffix:
+                batched_request_suffix = [request_suffix for _ in range(len(context))]
+                batched_request_suffix_encoding = self.tok_encode_batch(batched_request_suffix)
 
             assert (
                     isinstance(max_generation_length, int) or max_generation_length is None
@@ -474,11 +479,19 @@ class HuggingFaceAutoLM(BaseLM):
 
             token_context = self.tok_encode_batch(context)
 
-            responses = self._model_generate(
-                inputs=token_context,
-                max_tokens=max_tokens,
-                stop=until,
-            )
+            if batched_request_suffix_encoding:
+                responses = self._model_generate_with_suffix(
+                    inputs=token_context,
+                    max_tokens=max_tokens,
+                    stop=until,
+                    batched_request_suffix_encoding=batched_request_suffix_encoding
+                )
+            else:
+                responses = self._model_generate(
+                    inputs=token_context,
+                    max_tokens=max_tokens,
+                    stop=until
+                )
             responses = self.tok_decode(responses.tolist())
 
             for response in responses:
@@ -489,6 +502,46 @@ class HuggingFaceAutoLM(BaseLM):
                 self.cache_hook.add_partial("greedy_until", (context, until), response)
                 results.append(response)
         return reorder.get_original(results)
+
+    def _model_generate_with_suffix(
+            self,
+            inputs: transformers.BatchEncoding,
+            max_tokens: int,
+            stop: Optional[List[str]] = None,
+            batched_request_suffix_encoding: transformers.BatchEncoding = None
+    ) -> TokenSequence:
+        # Ensure that the context does not encroach into the `space`
+        # for the generation.
+        batched_request_suffix_input_ids = batched_request_suffix_encoding["input_ids"]
+        batched_request_suffix_attention_mask = batched_request_suffix_encoding["attention_mask"]
+        num_suffix_tokens = batched_request_suffix_input_ids.shape[1]
+        input_ids = inputs["input_ids"][:, : self.max_length - (self.max_gen_toks + num_suffix_tokens)]
+        attention_mask = inputs["attention_mask"][
+                         :, :self.max_length - (self.max_gen_toks + num_suffix_tokens)]
+        input_ids_with_suffix = torch.cat((input_ids, batched_request_suffix_input_ids), dim=1)
+        attention_mask_with_suffix = torch.cat((attention_mask, batched_request_suffix_attention_mask), dim=1)
+        input_ids_with_suffix = input_ids_with_suffix.to(self.device)
+        # assert input_ids_with_suffix.shape[1] == input_ids.shape[1] + num_suffix_tokens
+        # test = self.tok_decode(input_ids_with_suffix)
+        attention_mask_with_suffix = attention_mask_with_suffix.to(self.device)
+
+        stopping_criteria = stop_sequences_criteria(
+            self.tokenizer, stop, input_ids_with_suffix.shape[1], input_ids.shape[0]
+        )
+
+        generations = self.model.generate(
+            input_ids=input_ids_with_suffix,
+            attention_mask=attention_mask_with_suffix,
+            stopping_criteria=stopping_criteria,
+            temperature=self.temperature,
+            max_new_tokens=max_tokens,
+            do_sample=self.do_sample,
+            pad_token_id=self.eot_token_id
+        )
+        # test_out = self.tok_decode(generations)
+        return utils.select_continuation_from_batch_left_padding(
+            generations, max_context_size=input_ids_with_suffix.shape[1]
+        )
 
 
 class AutoCausalLM(HuggingFaceAutoLM):
@@ -526,7 +579,7 @@ class AutoCausalLM(HuggingFaceAutoLM):
             self,
             inputs: transformers.BatchEncoding,
             max_tokens: int,
-            stop: Optional[List[str]] = None,
+            stop: Optional[List[str]] = None
     ) -> TokenSequence:
         # Ensure that the context does not encroach into the `space`
         # for the generation.

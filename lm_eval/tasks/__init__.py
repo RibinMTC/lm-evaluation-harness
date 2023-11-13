@@ -440,7 +440,7 @@ def load_prompt(task_name, model_id, prompt_version):
             file_path = os.path.join(root_prompt_template_dir, f"{filename}.json")
             break
 
-    if not os.path.exists(file_path):
+    if not file_path or not os.path.exists(file_path):
         return None
 
     with open(file_path, 'r') as f:

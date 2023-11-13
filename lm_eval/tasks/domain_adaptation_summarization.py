@@ -40,8 +40,12 @@ class DomainAdaptationSummarizationBaseTask(Task):
     article_key = ""
     summary_key = ""
 
-    default_prompt_template = (
-        "You are an expert at summarization. Proceed to summarize the following text. TEXT:{article}\nSUMMARY:\n")
+    system_message = "You are an expert at summarization."
+    prompt_suffix = "\nSUMMARY:\n"
+    zero_shot_prompt_template = "Proceed to summarize the following text. TEXT: {article}"
+    few_shot_prompt_template = zero_shot_prompt_template + prompt_suffix + "{summary}\n"
+
+    max_generation_length = None
 
     def has_training_docs(self):
         return True
@@ -62,14 +66,16 @@ class DomainAdaptationSummarizationBaseTask(Task):
         if self.has_validation_docs():
             return self.dataset["validation"]
 
+    @staticmethod
+    def count_words(text):
+        words = text.split()  # Split the text into words
+        return len(words)
+
     def test_docs(self):
         if self.has_test_docs():
             return self.dataset["test"]
 
     def doc_to_text(self, doc):
-        if self.prompt_template is None:
-            self.prompt_template = self.default_prompt_template
-
         if "{summary}" in self.prompt_template:
             prompt = self.prompt_template.format(article=doc[self.article_key], summary=doc[self.summary_key])
         else:
@@ -93,8 +99,46 @@ class DomainAdaptationSummarizationBaseTask(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, {"until": ["\n"]})
+        continuation = rf.greedy_until(ctx, {"until": ["\n"], "max_length": self.max_generation_length,
+                                             "request_suffix": self.prompt_suffix})
         return continuation
+
+    def get_fewshot_prompt(self, doc, num_fewshot, rnd):
+        # Raise an error if no training documents are available
+        if not self.has_training_docs():
+            raise ValueError("Training documents are required for few-shot prompting!")
+
+        training_docs = self.training_docs().to_list()  # Load training documents
+
+        selected_few_shot_samples = rnd.sample(training_docs, num_fewshot)
+
+        self.prompt_template = self.few_shot_prompt_template
+        formatted_few_shot_examples = [
+            self.doc_to_text(selected_few_shot_sample) for selected_few_shot_sample in selected_few_shot_samples
+        ]
+        formatted_few_shot_examples = ''.join(formatted_few_shot_examples)
+
+        self.prompt_template = self.zero_shot_prompt_template
+        zero_shot_example = self.doc_to_text(doc)
+
+        full_few_shot_prompt = self.system_message + formatted_few_shot_examples + zero_shot_example
+
+        return full_few_shot_prompt
+
+    def fewshot_context(self, doc, num_fewshot, provide_description=None, rnd=None,
+                        description=None, fewshot_sampling: str = None):
+        # Ensure a random generator is provided
+        if rnd is None:
+            raise ValueError("A `random.Random` generator argument must be provided to `rnd`")
+
+        # Handle case with no few-shot examples
+        if num_fewshot == 0:
+            self.prompt_template = self.zero_shot_prompt_template
+            full_prompt = self.system_message + self.doc_to_text(doc)
+        else:
+            full_prompt = self.get_fewshot_prompt(doc, num_fewshot, rnd)
+
+        return full_prompt
 
     def postprocess_text(self, prediction, reference):
         prediction = prediction.strip()
@@ -120,16 +164,12 @@ class DomainAdaptationSummarizationBaseTask(Task):
         """
         assert len(results) == 1
 
-        prediction, reference = self.postprocess_text(results[0], doc["summary"])
-        article = doc["article"]
-        fragment = Fragments(article, prediction, language=self.LANGUAGE)
+        prediction, reference = self.postprocess_text(results[0], doc[self.summary_key])
 
         return {
             "rouge1": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge1")),
             "rouge2": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge2")),
-            "rougeL": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rougeL")),
-            'coverage': self.round_to_3_decimals(fragment.coverage()),
-            'density': self.round_to_3_decimals(fragment.density())
+            "rougeL": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rougeL"))
         }
 
     def aggregation(self):
@@ -141,9 +181,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
         return {
             "rouge1": mean,
             "rouge2": mean,
-            "rougeL": mean,
-            'coverage': mean,
-            'density': mean
+            "rougeL": mean
         }
 
     def higher_is_better(self):
@@ -152,7 +190,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
                     A dictionary where keys are the names of submetrics and values are
                     whether a higher value of the submetric is better
                 """
-        return {"rouge1": True, "rouge2": True, "rougeL": True, "coverage": False, "density": False}
+        return {"rouge1": True, "rouge2": True, "rougeL": True}
 
 
 class ArxivDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
@@ -161,6 +199,7 @@ class ArxivDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTa
 
     article_key = "article"
     summary_key = "abstract"
+    max_generation_length = 256
 
 
 class GovReportDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
@@ -168,6 +207,7 @@ class GovReportDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBa
 
     article_key = "report"
     summary_key = "summary"
+    max_generation_length = 256
 
 
 class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
@@ -176,3 +216,4 @@ class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseT
 
     article_key = "article"
     summary_key = "abstract"
+    max_generation_length = 1024
