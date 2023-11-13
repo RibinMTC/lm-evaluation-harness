@@ -40,7 +40,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
     article_key = ""
     summary_key = ""
 
-    system_message = "You are an expert at summarization."
+    system_message = "You are an expert at summarization. "
     prompt_suffix = "\nSUMMARY:\n"
     zero_shot_prompt_template = "Proceed to summarize the following text. TEXT: {article}"
     few_shot_prompt_template = zero_shot_prompt_template + prompt_suffix + "{summary}\n"
