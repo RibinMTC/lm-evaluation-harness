@@ -41,7 +41,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
     summary_key = ""
 
     system_message = "You are an expert at summarization. "
-    prompt_suffix = "\nSUMMARY:\n"
+    prompt_suffix = "\nSUMMARY:"
     zero_shot_prompt_template = "Proceed to summarize the following text. TEXT: {article}"
     few_shot_prompt_template = zero_shot_prompt_template + prompt_suffix + "{summary}\n"
 
@@ -99,7 +99,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, {"until": ["\n"], "max_length": self.max_generation_length,
+        continuation = rf.greedy_until(ctx, {"max_length": self.max_generation_length,
                                              "request_suffix": self.prompt_suffix})
         return continuation
 
@@ -202,12 +202,11 @@ class ArxivDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTa
     max_generation_length = 256
 
 
-class GovReportDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
-    DATASET_PATH = "ccdv/govreport-summarization"
-
-    article_key = "report"
+class Arxiv2ShotDomainAdaptationSummarizationTask(ArxivDomainAdaptationSummarizationTask):
+    DATASET_PATH = "anumafzal94/arxiv_2-shot"
+    DATASET_NAME = None
+    article_key = "text"
     summary_key = "summary"
-    max_generation_length = 256
 
 
 class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
@@ -216,4 +215,19 @@ class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseT
 
     article_key = "article"
     summary_key = "abstract"
+    max_generation_length = 256
+
+
+class Pubmed2ShotDomainAdaptationSummarizationTask(PubmedDomainAdaptationSummarizationTask):
+    DATASET_PATH = "anumafzal94/pubmed_2-shot"
+    DATASET_NAME = None
+    article_key = "text"
+    summary_key = "summary"
+
+
+class GovReportDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTask):
+    DATASET_PATH = "ccdv/govreport-summarization"
+
+    article_key = "report"
+    summary_key = "summary"
     max_generation_length = 1024

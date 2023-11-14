@@ -350,8 +350,10 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FaithfulnessMultiClassificationWithExplanationTask,
     "full_disagreements_faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask,
     "arxiv_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask,
+    "arxiv_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Arxiv2ShotDomainAdaptationSummarizationTask,
     "govreport_domain_adaptation_summarization": domain_adaptation_summarization.GovReportDomainAdaptationSummarizationTask,
     "pubmed_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask,
+    "pubmed_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Pubmed2ShotDomainAdaptationSummarizationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
