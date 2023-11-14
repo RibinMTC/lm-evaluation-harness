@@ -471,6 +471,7 @@ class HuggingFaceAutoLM(BaseLM):
                 until = [self.eot_token]
             else:
                 until = stop_sequences + [self.eot_token]
+            until = [x for x in until if x is not None]
 
             if max_generation_length is None:
                 max_tokens = self.max_gen_toks
@@ -493,6 +494,7 @@ class HuggingFaceAutoLM(BaseLM):
                     stop=until
                 )
             responses = self.tok_decode(responses.tolist())
+            print(f"Final output: {responses}")
 
             for response in responses:
                 # Ensure the generated responses do not contain the stop sequences.
@@ -522,8 +524,10 @@ class HuggingFaceAutoLM(BaseLM):
         attention_mask_with_suffix = torch.cat((attention_mask, batched_request_suffix_attention_mask), dim=1)
         input_ids_with_suffix = input_ids_with_suffix.to(self.device)
         # assert input_ids_with_suffix.shape[1] == input_ids.shape[1] + num_suffix_tokens
-        truncated_input_prompt = self.tok_decode(input_ids_with_suffix)
-        print(f"Input ids size: {input_ids_with_suffix.shape[1]} \nInput prompt truncated: {truncated_input_prompt}")
+        # truncated_input_prompt = self.tok_decode(input_ids_with_suffix)
+        # print(
+        #     f"Input ids size: {input_ids_with_suffix.shape[1]} \nModel max length: {self.max_length}\n"
+        #     f"Input prompt truncated: {truncated_input_prompt}")
         attention_mask_with_suffix = attention_mask_with_suffix.to(self.device)
 
         stopping_criteria = stop_sequences_criteria(
@@ -539,8 +543,8 @@ class HuggingFaceAutoLM(BaseLM):
             do_sample=self.do_sample,
             pad_token_id=self.eot_token_id
         )
-        summary_output = self.tok_decode(generations)
-        print(f"Output: {summary_output}")
+        # summary_output = self.tok_decode(generations)
+        # print(f"Output: {summary_output}")
         return utils.select_continuation_from_batch_left_padding(
             generations, max_context_size=input_ids_with_suffix.shape[1]
         )
