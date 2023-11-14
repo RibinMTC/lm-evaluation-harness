@@ -61,6 +61,7 @@ def parse_args():
     parser.add_argument("--write_out", action="store_true", default=False)
     parser.add_argument("--output_base_path", type=str, default=None)
     parser.add_argument("--wandb_on", type=bool, default=False)
+    parser.add_argument("--wandb_project_name", type=str, default=None)
     parser.add_argument('--config', action=jsonargparse.ActionConfigFile)
 
     return parser.parse_args()
@@ -123,13 +124,19 @@ def main():
 
     seed_string = f"seed-{args.seed}"
 
+    if not args.prompt_version_per_task:
+        args.prompt_version_per_task = "default_prompt"
     prompt_version_string = f"prompt-version-{args.prompt_version_per_task}"
 
     wandb_run_name = randomname.get_name() + '_' + '_'.join(
         [model_string, few_shot_string, seed_string, prompt_version_string])
 
-    wandb_run_group_name = f"llm_leaderboard_{tasks_string}_group"
-    wandb.init(project="llm_leaderboard", entity="background-tool", config=vars(args), name=wandb_run_name,
+    wandb_project_name = "llm_leaderboard"
+    if args.wandb_project_name:
+        wandb_project_name = args.wandb_project_name
+
+    wandb_run_group_name = f"{wandb_project_name}_{tasks_string}_group"
+    wandb.init(project=wandb_project_name, entity="background-tool", config=vars(args), name=wandb_run_name,
                mode=wandb_mode, group=wandb_run_group_name)
 
     results = evaluator.simple_evaluate(
