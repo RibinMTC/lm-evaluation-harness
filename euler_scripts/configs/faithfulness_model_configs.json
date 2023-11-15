@@ -1,0 +1,36 @@
+{
+  "base_config_dir": "configs/faithfulness_benchmark_final_configs",
+  "model_checkpoints": [
+    "LeoLM/leo-hessianai-13b",
+    "google/flan-ul2",
+    "LeoLM/leo-hessianai-7b",
+    "LeoLM/leo-mistral-hessianai-7b",
+    "NousResearch/Llama-2-7b-hf",
+    "NousResearch/Llama-2-13b-hf",
+    "mtc/LeoLM-leo-hessianai-13b-all-labels-classification-english-one-epoch-qlora-4bit-merged",
+    "mtc/LeoLM-leo-hessianai-13b-all-labels-classification-one-epoch-qlora-4bit-merged",
+    "mtc/LeoLM-leo-hessianai-13b-all-labels-german-classification-with-explanation-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-classification-with-explanation-neftune-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-classification-with-explanation-3-epochs-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-with-explanation-500-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-with-explanation-250-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-with-explanation-100-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-with-explanation-50-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-with-explanation-finetuned",
+    "mtc/LeoLM-leo-mistral-hessianai-7b-all-labels-german-classification-finetuned",
+    "ehartford/dolphin-2.2.1-mistral-7b",
+    "mtc/ehartford-dolphin-2.2.1-mistral-7b-classification-finetuned",
+    "mtc/ehartford-dolphin-2.2.1-mistral-7b-classification-with-explanation-finetuned"
+  ],
+  "few_shot_values": {"lower_range":  0,
+    "upper_range": 32
+  },
+  "tasks_with_prompt_templates": {
+    "faithfulness_benchmark_final_swisstext23_benchmark": "configs/prompt_templates/faithfulness_benchmark_final_swisstext23_benchmark.json",
+    "faithfulness_benchmark_final_swisstext23_multi_label": "configs/prompt_templates/faithfulness_benchmark_final_swisstext23_multi_label.json",
+    "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": "configs/prompt_templates/faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json",
+    "full_disagreements_faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": "configs/prompt_templates/full_disagreements_faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json"
+  },
+  "seeds": [5, 10, 42, 100],
+  "few_shot_sampling_strategies" : ["stratified", "packed"]
+}

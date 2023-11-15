@@ -1,13 +1,13 @@
-batch_size: '1'
+batch_size: 'auto'
 check_integrity: false
 data_sampling: null
 decontamination_ngrams_path: null
 description_dict_path: null
 device: null
-fewshot_sampling: stratified
-limit: 5
+fewshot_sampling: random
+limit: 10
 model: hf-causal-experimental
-model_args: pretrained=meta-llama/Llama-2-70b-chat-hf,trust_remote_code=False,use_accelerate=True,load_in_8bit=True,dtype=float16
+model_args: pretrained=meta-llama/Llama-2-70b-chat-hf,trust_remote_code=False,use_accelerate=True,load_in_8bit=True,dtype=bfloat16,use_flash_attention_2=True
 no_cache: true
 num_fewshot: 0
 output_base_path: results
@@ -16,4 +16,5 @@ prompt_version_per_task: summarization_english
 seed: 42
 tasks: arxiv_domain_adaptation_summarization
 wandb_on: true
+wandb_project_name: "domain_adaptation"
 write_out: true

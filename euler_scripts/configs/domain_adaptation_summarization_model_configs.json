@@ -1,0 +1,23 @@
+{
+  "base_config_dir": "configs/domain_adaptation_configs",
+  "model_checkpoints": [
+    "tiiuae/falcon-40b-instruct",
+    "tiiuae/falcon-7b-instruct",
+    "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-13b-chat-hf",
+    "meta-llama/Llama-2-7b-chat-hf",
+    "mistralai/Mistral-7B-Instruct-v0.1",
+    "lmsys/vicuna-13b-v1.5-16k"
+  ],
+  "few_shot_values": {"lower_range":  0,
+    "upper_range": 7
+  },
+  "tasks_with_prompt_templates": {
+    "arxiv_domain_adaptation_summarization": "default",
+    "arxiv_2shot_domain_adaptation_summarization": "default",
+    "pubmed_domain_adaptation_summarization": "default",
+    "pubmed_2shot_domain_adaptation_summarization": "default"
+  },
+  "seeds": [42],
+  "few_shot_sampling_strategies" : ["random"]
+}

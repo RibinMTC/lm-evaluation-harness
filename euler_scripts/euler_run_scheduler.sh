@@ -10,7 +10,9 @@ models=($1)
 num_shots=($2)
 fewshot_strategies=($3)
 seeds=($4)
-BASE_CONFIG_DIR="configs/faithfulness_benchmark_final_configs/{model}/num_fewshot_{num_shots}/fewshot_strategy_{fewshot_strategy}/seed_{seed}"
+task_name=$5
+base_config_dir=$6
+BASE_CONFIG_DIR="${base_config_dir}/{model}/task_{task_name}/num_fewshot_{num_shots}/fewshot_strategy_{fewshot_strategy}/seed_{seed}"
 
 for model in "${models[@]}"; do
   model=${model//\//-}
@@ -19,6 +21,7 @@ for model in "${models[@]}"; do
       for seed in "${seeds[@]}"; do
          # Format the base string with the 'model' and 'num_shot' variables
         formatted_config_dir=${BASE_CONFIG_DIR//\{model\}/$model}
+        formatted_config_dir=${formatted_config_dir//\{task_name\}/$task_name}
         formatted_config_dir=${formatted_config_dir//\{num_shots\}/$num_shot}
         formatted_config_dir=${formatted_config_dir//\{fewshot_strategy\}/$fewshot_strategy}
         formatted_config_dir=${formatted_config_dir//\{seed\}/$seed}
