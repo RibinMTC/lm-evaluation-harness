@@ -62,6 +62,7 @@ def parse_args():
     parser.add_argument("--output_base_path", type=str, default=None)
     parser.add_argument("--wandb_on", type=bool, default=False)
     parser.add_argument("--wandb_project_name", type=str, default=None)
+    parser.add_argument("--wandb_entity_name", type=str, default=None)
     parser.add_argument('--config', action=jsonargparse.ActionConfigFile)
 
     return parser.parse_args()
@@ -135,8 +136,12 @@ def main():
     if args.wandb_project_name:
         wandb_project_name = args.wandb_project_name
 
+    wandb_entity_name = "background-tool"
+    if args.wandb_entity_name:
+        wandb_entity_name = args.wandb_entity_name
+
     wandb_run_group_name = f"{wandb_project_name}_{tasks_string}_group"
-    wandb.init(project=wandb_project_name, entity="background-tool", config=vars(args), name=wandb_run_name,
+    wandb.init(project=wandb_project_name, entity=wandb_entity_name, config=vars(args), name=wandb_run_name,
                mode=wandb_mode, group=wandb_run_group_name)
 
     results = evaluator.simple_evaluate(
