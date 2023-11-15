@@ -21,7 +21,7 @@ setuptools.setup(
     ],
     python_requires=">=3.9",
     install_requires=[
-        "datasets>=2.0.0",
+        "datasets>=2.6.0",
         "jsonlines",
         "numexpr",
         "openai>=0.6.4",
@@ -36,7 +36,7 @@ setuptools.setup(
         "sqlitedict",
         "torch>=1.7",
         "tqdm-multiprocess",
-        "transformers>=4.1",
+        "transformers>=4.15",
         "zstandard",
         "accelerate>=0.17.1",
         "jsonargparse",
@@ -49,7 +49,17 @@ setuptools.setup(
         "evaluate",
         "accelerate",
         "bitsandbytes",
-        "sentencepiece"
+        "sentencepiece",
+        "numpy",
+        "scipy",
+        "tdqm",
+        "protobuf==3.20.*",
+        "nltk",
+        "spacy>=3.4",
+        "matplotlib",
+        "seaborn",
+        "rouge-score"
+
     ],
     extras_require={
         "dev": ["black", "flake8", "pre-commit", "pytest", "pytest-cov"],
