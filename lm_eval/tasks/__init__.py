@@ -1,5 +1,6 @@
 import glob
 import os
+from dataclasses import dataclass
 from pprint import pprint
 from typing import List, Union, Dict
 
@@ -76,6 +77,7 @@ from . import faithfulness_classification_base_task
 from . import faithfulness_multi_classification_base_task
 from . import faithfulness_multi_classification_with_explanation_task
 from . import domain_adaptation_summarization
+from ..utils import TaskConfig
 
 ########################################
 # Translation tasks
@@ -349,6 +351,8 @@ TASK_REGISTRY = {
     "faithfulness_benchmark_final_swisstext23_multi_label": faithfulness_multi_classification_base_task.FaithfulnessMultiClassificationBaseTask,
     "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FaithfulnessMultiClassificationWithExplanationTask,
     "full_disagreements_faithfulness_benchmark_final_swisstext23_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask,
+    "xnli_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.XnliFaithfulnessMultiClassificationWithExplanationTask,
+    "seahorse_attribution_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.SeahorseFaithfulnessMultiClassificationWithExplanationTask,
     "arxiv_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask,
     "arxiv_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Arxiv2ShotDomainAdaptationSummarizationTask,
     "govreport_domain_adaptation_summarization": domain_adaptation_summarization.GovReportDomainAdaptationSummarizationTask,
@@ -464,6 +468,33 @@ def load_prompt(task_name, model_id, prompt_version):
     return matched_prompt
 
 
+def load_prompt_from_template(task_config: TaskConfig, model_id):
+    """Load the appropriate prompt based on prompt template and model prefix, and version."""
+
+    if not task_config.prompt_template or not os.path.exists(task_config.prompt_template):
+        print(f"Could not find prompt template: {task_config.prompt_template}")
+        return None
+
+    with open(task_config.prompt_template, 'r') as f:
+        all_prompts = json.load(f)
+
+    # Find the model name starting with the given prefix
+    matched_model_name = next((name for name in all_prompts.keys() if model_id.startswith(name)), None)
+
+    if not matched_model_name:
+        print(
+            f"Did not find a prompt for the model with id {model_id} and prompt version {task_config.prompt_version}. "
+            f"Using default prompt for task {task_config.task_name}")
+        return None
+    matched_prompt = all_prompts[matched_model_name].get(task_config.prompt_version, None)
+    if not matched_prompt:
+        print(
+            f"Did not find a prompt for the given prompt version {task_config.prompt_version}. Using default prompt "
+            f"for task {task_config.task_name}")
+        return None
+    return matched_prompt
+
+
 def get_task_dict(task_name_list: List[Union[str, lm_eval.base.Task]], model_id: str,
                   prompt_version_per_task: str = None):
     prompt_templates = {}
@@ -494,3 +525,23 @@ def get_task_dict(task_name_list: List[Union[str, lm_eval.base.Task]], model_id:
         "Task name collision between string and object tasks."
 
     return {**task_name_dict, **task_name_from_object_dict}
+
+
+def get_task_dict_from_task_config(task_config_list: List[TaskConfig], model_id: str):
+    prompt_templates = {}
+
+    for task_config in task_config_list:
+        prompt = load_prompt_from_template(task_config=task_config, model_id=model_id)
+        if prompt:
+            task_name = task_config.task_name
+            prompt_templates[task_name] = prompt
+            print(
+                f"Selected prompt version: {task_config.prompt_version} for task {task_name}.\nFinal prompt: {prompt}")
+
+    task_name_dict = {
+        task_config.task_name: get_task(task_config.task_name)(
+            prompt_template=prompt_templates.get(task_config.task_name, None))
+        for task_config in task_config_list
+    }
+
+    return {**task_name_dict}

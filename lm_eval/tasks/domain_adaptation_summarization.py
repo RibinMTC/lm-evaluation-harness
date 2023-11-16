@@ -219,7 +219,7 @@ class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseT
 
 
 class Pubmed2ShotDomainAdaptationSummarizationTask(PubmedDomainAdaptationSummarizationTask):
-    DATASET_PATH = "anumafzal94/pubmed_2-shot"
+    DATASET_PATH = "anumafzal94/pubmed-2shot-4096"
     DATASET_NAME = None
     article_key = "text"
     summary_key = "summary"

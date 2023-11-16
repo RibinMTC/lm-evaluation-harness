@@ -10,6 +10,7 @@ import randomname as randomname
 import wandb as wandb
 
 from lm_eval import tasks, evaluator, utils
+from lm_eval.utils import TaskConfig
 
 logging.getLogger("openai").setLevel(logging.WARNING)
 
@@ -42,6 +43,7 @@ def parse_args():
     parser.add_argument("--model", required=True)
     parser.add_argument("--model_args", default="")
     parser.add_argument("--tasks", default=None, choices=MultiChoice(tasks.ALL_TASKS))
+    parser.add_argument("--task_configs", default=None)
     parser.add_argument("--prompt_version_per_task", type=str, default=None)
     parser.add_argument("--provide_description", action="store_true")
     parser.add_argument("--num_fewshot", type=int, default=0)
@@ -91,10 +93,19 @@ def main():
             "WARNING: --limit SHOULD ONLY BE USED FOR TESTING. REAL METRICS SHOULD NOT BE COMPUTED USING LIMIT."
         )
 
-    if args.tasks is None:
-        task_names = tasks.ALL_TASKS
-    else:
+    task_names = []
+    task_config_list = []
+    if args.task_configs:
+        task_config_list = []
+        for task_config in args.task_configs:
+            task_config_list.append(TaskConfig(**task_config))
+        task_names = [task_config.task_name for task_config in task_config_list]
+    elif args.tasks:
         task_names = pattern_match(args.tasks.split(","), tasks.ALL_TASKS)
+
+    if len(task_names) == 0:
+        print("No tasks selected!")
+        return
 
     print(f"Selected Tasks: {task_names}")
 
@@ -125,9 +136,13 @@ def main():
 
     seed_string = f"seed-{args.seed}"
 
-    if not args.prompt_version_per_task:
-        args.prompt_version_per_task = "default_prompt"
-    prompt_version_string = f"prompt-version-{args.prompt_version_per_task}"
+    prompt_versions = "default_prompt"
+    if args.prompt_version_per_task:
+        prompt_versions = "_".join(args.args.prompt_version_per_task.split(","))
+    elif task_config_list:
+        prompt_versions = "_".join([task_config.prompt_version for task_config in task_config_list])
+
+    prompt_version_string = f"prompt-version-{prompt_versions}"
 
     wandb_run_name = randomname.get_name() + '_' + '_'.join(
         [model_string, few_shot_string, seed_string, prompt_version_string])
@@ -150,6 +165,7 @@ def main():
         model_args=args.model_args,
         tasks=task_names,
         prompt_version_per_task=args.prompt_version_per_task,
+        task_config_list=task_config_list,
         num_fewshot=args.num_fewshot,
         batch_size=args.batch_size,
         device=args.device,

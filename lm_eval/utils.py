@@ -5,6 +5,7 @@ import collections
 import functools
 import inspect
 import sys
+from dataclasses import dataclass
 from typing import List, Union
 
 import torch
@@ -246,3 +247,9 @@ def run_task_tests(task_list: List[str]):
         raise ValueError(
             f"Not all tests for the specified tasks ({task_list}) ran successfully! Error code: {pytest_return_val}"
         )
+
+@dataclass
+class TaskConfig:
+    task_name: str = ""
+    prompt_template: str = ""
+    prompt_version: str = ""
