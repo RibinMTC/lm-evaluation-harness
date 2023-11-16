@@ -164,7 +164,7 @@ def main():
         model_id=model_args_dict["pretrained"],
         model_args=args.model_args,
         tasks=task_names,
-        prompt_version_per_task=args.prompt_version_per_task,
+        prompt_version_per_task=prompt_versions,
         task_config_list=task_config_list,
         num_fewshot=args.num_fewshot,
         batch_size=args.batch_size,

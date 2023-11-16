@@ -1,5 +1,7 @@
 import collections
 import itertools
+from typing import List
+
 import numpy as np
 import random
 import lm_eval.metrics
@@ -7,7 +9,7 @@ import lm_eval.models
 import lm_eval.tasks
 import lm_eval.base
 from lm_eval.tasks.base_plotter import Plotter
-from lm_eval.utils import positional_deprecated, run_task_tests
+from lm_eval.utils import positional_deprecated, run_task_tests, TaskConfig
 import json
 import pathlib
 
@@ -17,8 +19,9 @@ def simple_evaluate(
         model,
         model_id=None,
         model_args=None,
-        tasks=[],
-        prompt_version_per_task: str = None,
+        tasks=None,
+        prompt_version_per_task=None,
+        task_config_list:List[TaskConfig]=None,
         num_fewshot=0,
         batch_size=None,
         device=None,
@@ -72,7 +75,9 @@ def simple_evaluate(
     random.seed(1234)
     np.random.seed(1234)
 
-    assert tasks != [], "No tasks specified"
+    if task_config_list == [] and not tasks:
+        "No tasks specified"
+        return
 
     if isinstance(model, str):
         if model_args is None:
@@ -98,10 +103,18 @@ def simple_evaluate(
             + ".db",
         )
 
-    task_dict = lm_eval.tasks.get_task_dict(tasks, model_id=model_id, prompt_version_per_task=prompt_version_per_task)
+    if task_config_list:
+        task_list = [task_config.task_name for task_config in task_config_list]
+        task_dict = lm_eval.tasks.get_task_dict_from_task_config(task_config_list=task_config_list, model_id=model_id)
+    elif tasks and prompt_version_per_task:
+        task_list = tasks
+        task_dict = lm_eval.tasks.get_task_dict(task_name_list=task_list, model_id=model_id,
+                                                prompt_version_per_task=prompt_version_per_task)
+    else:
+        raise ValueError("task_config_list and task config parameters cannot be both null")
 
     if check_integrity:
-        run_task_tests(task_list=tasks)
+        run_task_tests(task_list=task_list)
 
     results = evaluate(
         lm=lm,
