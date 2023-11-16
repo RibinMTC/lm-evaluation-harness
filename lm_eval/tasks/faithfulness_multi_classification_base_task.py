@@ -75,11 +75,11 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 train_df["num_words_article"] = train_df["lead_with_article"].str.len()
                 sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
                 faithful_samples_df = sorted_train_df.loc[
-                    lambda example: example["label"] == self.choices[0]].head(100)
+                    lambda example: example[self.label_key_name] == self.choices[0]].head(100)
                 intrinsic_samples_df = sorted_train_df.loc[
-                    lambda example: example["label"] == self.choices[1]].head(100)
+                    lambda example: example[self.label_key_name] == self.choices[1]].head(100)
                 extrinsic_samples_df = sorted_train_df.loc[
-                    lambda example: example["label"] == self.choices[2]].head(100)
+                    lambda example: example[self.label_key_name] == self.choices[2]].head(100)
                 # consider only article ids, which have at least 3 samples per label for easier implementation
                 article_ids_with_at_least_3_samples_per_label = get_article_ids_above_min_number_of_rows_per_label(
                     dataset_df=sorted_train_df, min_number_of_rows_per_label=3)
@@ -119,7 +119,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         return prompt
 
     def format_prompt_target(self, doc):
-        return " " + doc["label"]
+        return " " + doc[self.label_key_name]
 
     @staticmethod
     def cantor_pairing(doc_id, article_id):
@@ -146,7 +146,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             unique_doc_article_id_seed = self.cantor_pairing(doc_id=doc_id, article_id=article_id)
             for choice in self.choices:
                 selected_choice_samples = article_id_samples.loc[
-                    lambda example: example["label"] == choice]
+                    lambda example: example[self.label_key_name] == choice]
                 selected_samples = selected_choice_samples.sample(n=samples_per_article_per_label,
                                                                   random_state=seed)
                 samples.append(selected_samples)
@@ -247,7 +247,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         out_doc = {
             "query": self.format_prompt(doc),
             "choices": self.choices,
-            "gold": self.choices.index(doc["label"]),
+            "gold": self.choices.index(doc[self.label_key_name]),
             "original_doc": doc
         }
         return out_doc
