@@ -203,7 +203,7 @@ class ArxivDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTa
 
 
 class Arxiv2ShotDomainAdaptationSummarizationTask(ArxivDomainAdaptationSummarizationTask):
-    DATASET_PATH = "anumafzal94/arxiv_2-shot"
+    DATASET_PATH = "anumafzal94/arxiv-2shot-4096"
     DATASET_NAME = None
     article_key = "text"
     summary_key = "summary"
