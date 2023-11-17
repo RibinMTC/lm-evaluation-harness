@@ -138,7 +138,7 @@ def main():
 
     prompt_versions = "default_prompt"
     if args.prompt_version_per_task:
-        prompt_versions = "_".join(args.args.prompt_version_per_task.split(","))
+        prompt_versions = "_".join(args.prompt_version_per_task.split(","))
     elif task_config_list:
         prompt_versions = "_".join([task_config.prompt_version for task_config in task_config_list])
 
