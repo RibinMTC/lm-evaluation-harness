@@ -1,16 +1,20 @@
 import json
 import os
 import re
+from dataclasses import asdict
 from typing import Dict, List
 
 import yaml
+
+from lm_eval.utils import TaskConfig
 
 model_names = [
     "LeoLM/leo-hessianai-13b"]
 num_fewshots = [8, 16, 24]
 few_shot_sampling_strategies = ["stratified"]
 seeds = [42]
-selected_tasks_with_prompt_version_names = []
+#selected_tasks_with_prompt_version_names = []
+task_config_list: List[TaskConfig] = []
 load_in_8bit = False
 use_flash_attention_2 = False
 
@@ -83,7 +87,8 @@ def main():
         cleaned_model_name = model_name.replace("/", "-")
         model_type = get_model_type_from_name(model_name=model_name)
 
-        for task_name, prompt_version_name in selected_tasks_with_prompt_version_names:
+        #for task_name, prompt_version_name in selected_tasks_with_prompt_version_names:
+        for task_config in task_config_list:
             for num_fewshot in num_fewshots:
                 for seed in seeds:
                     for few_shot_sampling_strategy in few_shot_sampling_strategies:
@@ -92,19 +97,20 @@ def main():
                         updated_model_args = update_model_args(models_args)
                         new_config["model"] = model_type
                         new_config["model_args"] = updated_model_args
-                        new_config["tasks"] = task_name
-                        new_config["prompt_version_per_task"] = prompt_version_name
+                        #new_config["tasks"] = task_name
+                        #new_config["prompt_version_per_task"] = prompt_version_name
+                        new_config["task_configs"] = asdict(task_config)
                         new_config["num_fewshot"] = num_fewshot
                         new_config["seed"] = seed
                         new_config["fewshot_sampling"] = few_shot_sampling_strategy
                         new_config_yaml_out_file_name = config_out_yaml_template.format(
-                            prompt_version=prompt_version_name,
+                            prompt_version=task_config.prompt_version,
                             model_name=cleaned_model_name,
                             num_fewshot=num_fewshot,
                             seed=seed,
                             fewshot_sampling=few_shot_sampling_strategy)
                         new_config_yaml_out_file_path = os.path.join(base_yaml_config_path, cleaned_model_name,
-                                                                     f"task_{task_name}",
+                                                                     f"task_{task_config.task_name}",
                                                                      f"num_fewshot_{num_fewshot}",
                                                                      f"fewshot_strategy_{few_shot_sampling_strategy}",
                                                                      f"seed_{seed}")

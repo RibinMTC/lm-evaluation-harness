@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox
 from typing import List, Dict, Tuple
 from subprocess import call
 import euler_scripts.euler_config_generators_and_run_manager as config_generator
+from lm_eval.utils import TaskConfig
 
 
 @dataclass
@@ -173,20 +174,6 @@ class EulerConfigAndRunUIManager:
         for item in possible_prompt_versions:
             self.selected_prompt_versions_listbox.insert(tk.END, item)
 
-    # def extract_task_and_prompt_versions(self, selected_tasks_with_prompt_version_names: List[str]) -> List[
-    #     Tuple[str, str]]:
-    #     extracted_task_prompt_version_tuples = []
-    #     for selected_task_with_prompt_version_name in selected_tasks_with_prompt_version_names:
-    #         task_match = re.search(r"Task:\s*(.*?)\s*-", selected_task_with_prompt_version_name)
-    #         prompt_match = re.search(r"Prompt Version:\s*(.*)", selected_task_with_prompt_version_name)
-    #
-    #         task_name = task_match.group(1) if task_match else None
-    #         prompt_version = prompt_match.group(1) if prompt_match else None
-    #
-    #         extracted_task_prompt_version_tuples.append((task_name, prompt_version))
-    #
-    #     return extracted_task_prompt_version_tuples
-
     def execute_create_config_files_script(self):
         # Fetch the values from UI
         model_names = [self.model_listbox.get(i) for i in self.model_listbox.curselection()]
@@ -198,6 +185,10 @@ class EulerConfigAndRunUIManager:
                          self.tasks_listbox.curselection()][0]
         selected_prompt_version_names = [self.selected_prompt_versions_listbox.get(i) for i in
                                          self.selected_prompt_versions_listbox.curselection()]
+        selected_prompt_template = self.config_ui_values.tasks_with_prompt_templates[selected_task]
+        task_config_list = [
+            TaskConfig(task_name=selected_task, prompt_template=selected_prompt_template, prompt_version=prompt_version)
+            for prompt_version in selected_prompt_version_names]
 
         if len(model_names) == 0 or len(fewshots) == 0 or len(seeds) == 0 or len(
                 few_shot_sampling_strategies) == 0 or len(
@@ -211,7 +202,8 @@ class EulerConfigAndRunUIManager:
         config_generator.base_yaml_config_path = self.config_ui_values.base_config_dir
         config_generator.model_names = model_names
         config_generator.num_fewshots = fewshots
-        config_generator.selected_tasks_with_prompt_version_names = selected_prompt_version_names
+        # config_generator.selected_tasks_with_prompt_version_names = selected_prompt_version_names
+        config_generator.task_config_list = task_config_list
         config_generator.seeds = seeds
         config_generator.few_shot_sampling_strategies = few_shot_sampling_strategies
         config_generator.load_in_8bit = self.load_in_8bit_checkbox_value.get()
@@ -252,8 +244,8 @@ class EulerConfigAndRunUIManager:
 
 
 def main():
-    # config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
-    config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
+    config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
+    #config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
     EulerConfigAndRunUIManager(config_values_file=config_values_file)
 
 
