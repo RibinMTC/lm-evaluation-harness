@@ -1,41 +1,12 @@
-import json
-import os
-import re
+
 import tkinter as tk
-from dataclasses import dataclass
 from tkinter import ttk, messagebox
-from typing import List, Dict, Tuple
+from typing import List
 from subprocess import call
-import euler_scripts.euler_config_generators_and_run_manager as config_generator
+from euler_config_generation_utils import *
+
+
 from lm_eval.utils import TaskConfig
-
-
-@dataclass
-class UIConfigValues:
-    base_config_dir: str
-    model_name_values: List[str]
-    few_shot_values: List[int]
-    tasks_with_prompt_templates: Dict[str, str]
-    seeds: List[int]
-    few_shot_sampling_strategies: List[str]
-
-
-def read_json(json_file_name: str):
-    with open(json_file_name, 'r') as file:
-        json_file = json.load(file)
-    return json_file
-
-
-def get_model_prompt_versions(model_name: str, prompt_template_json: Dict) -> List:
-    for prompt_model_name, prompts in prompt_template_json.items():
-        if prompt_model_name in model_name:
-            return list(prompts.keys())
-    print(f"The model {model_name} has no corresponding prompts defined in the template")
-    return []
-
-
-# def get_task_name_from_prompt_template(selected_prompt_template: str):
-#     return os.path.splitext(os.path.basename(selected_prompt_template))[0]
 
 
 class EulerConfigAndRunUIManager:
@@ -154,8 +125,8 @@ class EulerConfigAndRunUIManager:
         selected_task = tasks_names[0]
         selected_prompt_template = self.config_ui_values.tasks_with_prompt_templates[selected_task]
         possible_prompt_versions = None
-        if selected_prompt_template == "default":
-            possible_prompt_versions = [selected_prompt_template]
+        if not selected_prompt_template:
+            possible_prompt_versions = ["default"]
         else:
             model_names = [self.model_listbox.get(i) for i in self.model_listbox.curselection()]
             if len(model_names) == 0:
@@ -191,25 +162,22 @@ class EulerConfigAndRunUIManager:
             for prompt_version in selected_prompt_version_names]
 
         if len(model_names) == 0 or len(fewshots) == 0 or len(seeds) == 0 or len(
-                few_shot_sampling_strategies) == 0 or len(
-            selected_prompt_version_names) == 0:
+                few_shot_sampling_strategies) == 0 or len(selected_prompt_version_names) == 0:
             messagebox.showwarning("Warning", "Please select at least one value from each of the boxes!")
             return
 
-        selected_prompt_version_names = [(selected_task, prompt_version) for prompt_version in
-                                         selected_prompt_version_names]
         # You can set these values in the config_generator.py script and then run its main()
-        config_generator.base_yaml_config_path = self.config_ui_values.base_config_dir
-        config_generator.model_names = model_names
-        config_generator.num_fewshots = fewshots
-        # config_generator.selected_tasks_with_prompt_version_names = selected_prompt_version_names
-        config_generator.task_config_list = task_config_list
-        config_generator.seeds = seeds
-        config_generator.few_shot_sampling_strategies = few_shot_sampling_strategies
-        config_generator.load_in_8bit = self.load_in_8bit_checkbox_value.get()
-        config_generator.use_flash_attention_2 = self.use_flash_attention_2_checkbox_value.get()
+        selected_ui_config_values = SelectedUIConfigValues(
+            base_config_dir=self.config_ui_values.base_config_dir,
+            model_name_values=model_names,
+            few_shot_values=fewshots,
+            tasks_config_list=task_config_list,
+            seeds=seeds,
+            few_shot_sampling_strategies=few_shot_sampling_strategies,
+            load_in_8bit=self.load_in_8bit_checkbox_value.get(),
+            use_flash_attention_2=self.use_flash_attention_2_checkbox_value.get())
 
-        config_generator.main()
+        save_config_files(selected_ui_config_values=selected_ui_config_values)
 
         # Provide feedback
         self.output_label.config(text="Script executed successfully!")
@@ -244,8 +212,8 @@ class EulerConfigAndRunUIManager:
 
 
 def main():
-    config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
-    #config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
+    # config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
+    config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
     EulerConfigAndRunUIManager(config_values_file=config_values_file)
 
 
