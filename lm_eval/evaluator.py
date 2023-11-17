@@ -21,12 +21,13 @@ def simple_evaluate(
         model_args=None,
         tasks=None,
         prompt_version_per_task=None,
-        task_config_list:List[TaskConfig]=None,
+        task_config_list: List[TaskConfig] = None,
         num_fewshot=0,
         batch_size=None,
         device=None,
         no_cache=False,
-        limit=None,
+        start_range=None,
+        end_range=None,
         bootstrap_iters=100000,
         description_dict=None,
         check_integrity=False,
@@ -57,9 +58,7 @@ def simple_evaluate(
         PyTorch device (e.g. "cpu" or "cuda:0") for running models
     :param no_cache: bool
         Whether or not to cache
-    :param limit: int or float, optional
-        Limit the number of examples per task (only use this for testing), If <1, limit is a percentage of the total number of examples.
-    :param bootstrap_iters:
+      :param bootstrap_iters:
         Number of iterations for bootstrap statistics
     :param description_dict: dict[str, str]
         Dictionary of custom task descriptions of the form: `task_name: description`
@@ -85,7 +84,7 @@ def simple_evaluate(
         lm = lm_eval.models.get_model(model).create_from_arg_string(
             model_args, {"batch_size": batch_size, "device": device}
         )
-        #todo: remove this hack to solve multi gpu problem
+        # todo: remove this hack to solve multi gpu problem
         if "pretraining_tp" in model_args:
             print(f"Current pretraining_tp config: {lm.model.config.pretraining_tp}. Setting to 1")
             lm.model.config.pretraining_tp = 1
@@ -120,7 +119,8 @@ def simple_evaluate(
         lm=lm,
         task_dict=task_dict,
         num_fewshot=num_fewshot,
-        limit=limit,
+        start_range=start_range,
+        end_range=end_range,
         bootstrap_iters=bootstrap_iters,
         description_dict=description_dict,
         decontamination_ngrams_path=decontamination_ngrams_path,
@@ -138,7 +138,8 @@ def simple_evaluate(
         "batch_size": batch_size,
         "device": device,
         "no_cache": no_cache,
-        "limit": limit,
+        "start_range": start_range,
+        "end_range": end_range,
         "bootstrap_iters": bootstrap_iters,
         "description_dict": description_dict,
     }
@@ -155,14 +156,15 @@ def evaluate(
         task_dict,
         provide_description=None,
         num_fewshot=0,
-        limit=None,
+        start_range=None,
+        end_range=None,
         bootstrap_iters=100000,
         description_dict=None,
         decontamination_ngrams_path=None,
         write_out=False,
         output_base_path=None,
-        seed:int=42,
-        fewshot_sampling:str=None
+        seed: int = 42,
+        fewshot_sampling: str = None
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -174,7 +176,9 @@ def evaluate(
         Not implemented, and this option is deprecated and will be removed in a future version in favor of a different description providing method
     :param num_fewshot: int
         Number of examples in few-shot context
-    :param limit: int, optional
+    :param start_range: int, optional
+        Limit the number of examples per task (only use this for testing)
+    :param end_range: int, optional
         Limit the number of examples per task (only use this for testing)
     :param bootstrap_iters:
         Number of iterations for bootstrap statistics
@@ -242,7 +246,7 @@ def evaluate(
         task_docs = list(task_doc_func())
         rnd = random.Random()
         rnd.seed(seed)
-        #rnd.shuffle(task_docs)
+        # rnd.shuffle(task_docs)
         print(f"Task: {task_name}; number of docs: {len(task_docs)}")
 
         if write_out:
@@ -253,10 +257,14 @@ def evaluate(
             if description_dict and task_name in description_dict
             else ""
         )
-        if limit is not None:
-            limit = int(len(task_docs) * limit) if limit < 1.0 else int(limit)
+        # if limit is not None:
+        #     limit = int(len(task_docs) * limit) if limit < 1.0 else int(limit)
 
-        for doc_id, doc in enumerate(itertools.islice(task_docs, 0, limit)):
+        start_index = 0
+        if start_range:
+            start_index = start_range
+
+        for doc_id, doc in enumerate(itertools.islice(task_docs, start_index, end_range)):
             if decontaminate and task.should_decontaminate():
                 docs_for_decontamination[(task_name, task_set)].append(
                     task.doc_to_decontamination_query(doc)
@@ -300,7 +308,7 @@ def evaluate(
 
         print("Finding train/test overlap, please wait...")
         overlaps = get_train_overlap(
-            docs_for_decontamination, decontamination_ngrams_path, limit
+            docs_for_decontamination, decontamination_ngrams_path, end_range
         )
 
     # all responses for each (task, doc)

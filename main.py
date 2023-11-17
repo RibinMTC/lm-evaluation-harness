@@ -52,9 +52,13 @@ def parse_args():
     parser.add_argument("--batch_size", type=str, default=None)
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--output_path", default=None)
-    parser.add_argument("--limit", type=float, default=None,
-                        help="Limit the number of examples per task. "
-                             "If <1, limit is a percentage of the total number of examples.")
+    # parser.add_argument("--limit", type=float, default=None,
+    #                     help="Limit the number of examples per task. "
+    #                          "If <1, limit is a percentage of the total number of examples.")
+    parser.add_argument("--start_range", type=int, default=None,
+                        help="The start index of the sample from which evaluation should begin")
+    parser.add_argument("--end_range", type=int, default=None,
+                        help="The end index of the sample from which evaluation should end")
     parser.add_argument("--data_sampling", type=float, default=None)
     parser.add_argument("--no_cache", action="store_true")
     parser.add_argument("--decontamination_ngrams_path", default=None)
@@ -88,9 +92,10 @@ def main():
 
     assert not args.provide_description  # not implemented
 
-    if args.limit:
+    if args.start_range or args.end_range:
         print(
-            "WARNING: --limit SHOULD ONLY BE USED FOR TESTING. REAL METRICS SHOULD NOT BE COMPUTED USING LIMIT."
+            "WARNING: --start_range and --end_range SHOULD ONLY BE USED FOR TESTING. REAL METRICS SHOULD NOT BE "
+            "COMPUTED USING LIMIT."
         )
 
     task_names = []
@@ -170,7 +175,8 @@ def main():
         batch_size=args.batch_size,
         device=args.device,
         no_cache=args.no_cache,
-        limit=args.limit,
+        start_range=args.start_range,
+        end_range=args.end_range,
         description_dict=description_dict,
         decontamination_ngrams_path=args.decontamination_ngrams_path,
         check_integrity=args.check_integrity,
@@ -188,8 +194,9 @@ def main():
             f.write(dumped)
 
     print(
-        f"{args.model} ({args.model_args}), limit: {args.limit}, provide_description: {args.provide_description}, "
-        f"num_fewshot: {args.num_fewshot}, batch_size: {args.batch_size}"
+        f"{args.model} ({args.model_args}), start_range: {args.start_range}, end_range: {args.end_range}, "
+        f"provide_description: {args.provide_description}, num_fewshot: {args.num_fewshot}, "
+        f"batch_size: {args.batch_size}"
     )
 
     if args.wandb_on:
