@@ -45,6 +45,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # To supress: Warning : `load_model` does not return WordVectorModel or SupervisedModel any more, but a `FastText` object which is very similar.
 fasttext.FastText.eprint = lambda x: None
 
+
 def rename_hf_model(model_name):
     # replace / with -
     model_name = model_name.replace("/", "-")
@@ -143,6 +144,13 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
     df["Has Prompt-Summary Separator"] = df["Prompt ID"].apply(lambda x: prompt_annotation[x] if x in prompt_annotation else "[ERROR]")
     df["Prompt Desc. [ID]"] = df.apply(lambda row: f"{row['Prompt Description']} [{row['Prompt ID']}]", axis=1)
 
+    tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
+    text_to_bpe = lambda x: tiktoken_encoder.encode(x)
+    text_to_tokens = lambda x: list(itertools.chain.from_iterable(list(somajo_tokenizer.tokenize_text([x]))))
+
+    df["#Predicted Tokens"] = df["Prediction"].apply(lambda x: len(text_to_bpe(x)))
+    df["#Predicted Full Tokens"] = df["Prediction"].apply(lambda x: len(text_to_tokens(x)))
+
     # change the type of the following columns to string
     str_cols = ["N-Shot", "Prompt ID"]
     for col in str_cols:
@@ -159,6 +167,9 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
     if reload_preprocessed_dataset:
         # List directories in the folder, load the datasets, use the filename as Split Idenfitier
         for dataset in os.listdir(in__dataset_path):
+            # skip if not a directory
+            if not os.path.isdir(os.path.join(in__dataset_path, dataset)):
+                continue
             dataset_path = os.path.join(in__dataset_path, dataset)
             dataset_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path)]
             dataset_dfs = []
@@ -173,8 +184,7 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         # Calculate the number of input documents and number of input tokens
         # Pre-calculate for all relevant datasets, store in a map, use map to fill df
         dataset_names = df["Dataset"].unique()
-        tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
-        assert dataset_names in ["20Minuten", "Wikinews"], "Dataset names must be supported in load_all_results"
+        assert dataset_names in ["20Minuten", "Wikinews", "Klexikon"], "Dataset names must be supported in load_all_results"
         for dataset_name in datasets:
             dataset_df = datasets[dataset_name]
             isMDS = "article_list" in dataset_df.columns
@@ -189,11 +199,15 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
 
                 article = row["article"]
                 summary = row["summary"]
-                article_bpe = tiktoken_encoder.encode(article)
-                article_tokens = list(itertools.chain.from_iterable(list(somajo_tokenizer.tokenize_text([article]))))
+                article_bpe = text_to_bpe(article)
+                article_tokens = text_to_tokens(article)
+                summary_bpe = text_to_bpe(summary)
+                summary_tokens = text_to_tokens(summary)
                 datasets[dataset_name].at[idx, "num_input_docs"] = n_input_docs
                 datasets[dataset_name].at[idx, "num_article_bpe"] = len(article_bpe)
                 datasets[dataset_name].at[idx, "num_article_tokens"] = len(article_tokens)
+                datasets[dataset_name].at[idx, "num_summary_bpe"] = len(summary_bpe)
+                datasets[dataset_name].at[idx, "num_summary_tokens"] = len(summary_tokens)
 
         # save the prepared datasets
         for dataset_name in datasets:
@@ -211,6 +225,44 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
                 dataset_df.rename(columns={"index": "id"}, inplace=True)
 
             datasets[dataset_name] = dataset_df
+
+    # make a length-statistic plot for all datasets
+    dataset_insights_path = os.path.join("reports", "_dataset_insights")
+    pathlib.Path(dataset_insights_path).mkdir(parents=True, exist_ok=True)
+    for dataset_name in datasets:
+        metric_plt_theme = {
+            "style": "darkgrid", "rc": {"figure.figsize": (15, 18), "font.size": 24, },
+        }
+        sns.set_theme(**metric_plt_theme)
+        # Box-Plot
+        fig, axes = plt.subplots(1, 2)
+        box_plot_1 = sns.boxplot(data=datasets[dataset_name], y="num_article_bpe", flierprops={"marker": "x"}, notch=True, bootstrap=1000, ax=axes[0])
+        box_plot_1.set_xlabel('Article', fontsize=18)
+        box_plot_1.set_ylabel("Length (BPE)", fontsize=18)
+        box_plot_1.tick_params(labelsize=16)
+        box_plot_2 = sns.boxplot(data=datasets[dataset_name], y="num_summary_bpe", flierprops={"marker": "x"}, notch=True, bootstrap=1000, ax=axes[1])
+        box_plot_2.set_xlabel('Summary', fontsize=18)
+        box_plot_2.set_ylabel("Length (BPE)", fontsize=18)
+        box_plot_2.tick_params(labelsize=16)
+        # save
+        box_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_length_box.pdf")
+        plt.savefig(box_plot_path)
+        plt.close()
+
+        # Violin-Plot
+        fig, axes = plt.subplots(1, 2)
+        violin_plot_1 = sns.violinplot(data=datasets[dataset_name], y="num_article_bpe", flierprops={"marker": "x"}, notch=True, bootstrap=1000, ax=axes[0])
+        violin_plot_1.set_xlabel('Article', fontsize=18)
+        violin_plot_1.set_ylabel("Length (BPE)", fontsize=18)
+        violin_plot_1.tick_params(labelsize=16)
+        violin_plot_2 = sns.violinplot(data=datasets[dataset_name], y="num_summary_bpe", flierprops={"marker": "x"}, notch=True, bootstrap=1000, ax=axes[1])
+        violin_plot_2.set_xlabel('Summary', fontsize=18)
+        violin_plot_2.set_ylabel("Length (BPE)", fontsize=18)
+        violin_plot_2.tick_params(labelsize=16)
+        # save
+        violin_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_length_violin.pdf")
+        plt.savefig(violin_plot_path)
+        sns.set_theme(**DEFAULT_THEME)
 
     # Fill the df with the calculated values
     for idx, row in df.iterrows():
@@ -235,6 +287,20 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         df.at[idx, "N-Input Docs"] = candidate_rows.iloc[0]['num_input_docs']
         df.at[idx, "#Input Article Tokens"] = candidate_rows.iloc[0]['num_article_bpe']
         df.at[idx, "#Input Article Full Tokens"] = candidate_rows.iloc[0]['num_article_tokens']
+        df.at[idx, "#GT-Summary Tokens"] = candidate_rows.iloc[0]['num_summary_bpe']
+        df.at[idx, "#GT-Summary Full Tokens"] = candidate_rows.iloc[0]['num_summary_tokens']
+
+        # recalculate the compression ratio
+        if df.iloc[idx]["#Predicted Tokens"] == 0:
+            compression = 0
+        else:
+            compression = df.iloc[idx]["#Input Article Tokens"] / df.iloc[idx]["#Predicted Tokens"]
+        if df.iloc[idx]["#Predicted Full Tokens"] == 0:
+            compression_full = 0
+        else:
+            compression_full = df.iloc[idx]["#Input Article Full Tokens"] / df.iloc[idx]["#Predicted Full Tokens"]
+        df.at[idx, "Compression"] = compression
+        df.at[idx, "Compression (Full)"] = compression_full
 
     return df
 
@@ -623,7 +689,7 @@ def sentence_splitting(text: str, approximation: bool = True) -> Tuple[List[str]
     return sentences, tokens
 
 
-def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], approximation=True, file_suffix=""):
+def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gblExtension=[], approximation=True, file_suffix=""):
     if df.shape[0] == 0:
         return None
     print("Calculating length statistics...")
@@ -661,7 +727,17 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], ap
     # calculate the impact of the prompt on the number of tokens and sentences
     df_prompt_length_impact = df_len.groupby(groupbyList).agg({num_sentences_colname: "mean", num_full_tokens_colname: "mean", num_bpe_tokens_colname: "mean"}).reset_index()
 
+    for gbl in gblExtension:
+        for agg_func in ['mean', 'median', 'min', 'max']:
+            df_prompt_length_impact_gbl = df_len.groupby(gbl).agg({num_sentences_colname: agg_func, num_full_tokens_colname: agg_func, num_bpe_tokens_colname: agg_func}).reset_index()
+            length_impact_path = os.path.join(save_base_path, f"length-statistics", f"length_impact_{gbl[0]}_{gbl[1]}_{agg_func}.csv")
+            df_prompt_length_impact_gbl.to_csv(length_impact_path, index=False)
+
     for lbl, (a, b) in zip(["", "_flipped"], [(0, 1), (1, 0)]):
+        if lbl == "_flipped":
+            aspect_ratio = 0.75
+        else:
+            aspect_ratio = 6
         num_bins = 20
 
         # subplot grid: one-for each dimension in group-by-list
@@ -676,10 +752,19 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], ap
         ]
         for tgt_label, plot_type_list in tgt_label_list:
             for plt_type in plot_type_list:
-                sns.catplot(df_len, row=groupbyList[a], col=groupbyList[b], x=tgt_label, height=10, aspect=1.5, kind=plt_type)
-                metrics_n_in_docs_plt_path = os.path.join(save_base_path, f"length-statistics", f"length_statistics_{tgt_label}_{plt_type}_{groupbyList[0]}_{groupbyList[1]}{lbl}.pdf")
-                plt.savefig(metrics_n_in_docs_plt_path)
-                plt.close()
+                for gbl in gblExtension:
+                    row_order = get_sorted_labels(df_len, gbl[a])
+                    col_order = get_sorted_labels(df_len, gbl[b])
+                    sns.set(font_scale=3)
+                    len_plt = sns.catplot(df_len, row=gbl[a], col=gbl[b], row_order=row_order, col_order=col_order, x=tgt_label, height=5, aspect=aspect_ratio, kind=plt_type)
+                    sns.set(font_scale=3)
+                    # len_plt.set_xlabel(gbl[0], fontsize=18)
+                    # len_plt.set_ylabel(metric_name, fontsize=18)
+                    # len_plt.tick_params(labelsize=16)
+                    metrics_n_in_docs_plt_path = os.path.join(save_base_path, f"length-statistics", f"length_statistics_{tgt_label}_{plt_type}_{gbl[0]}_{gbl[1]}{lbl}.pdf")
+                    plt.savefig(metrics_n_in_docs_plt_path)
+                    plt.close()
+        sns.set_theme(**DEFAULT_THEME)
         #
         # # make plots showing the two distributions (with a subplot grid, one for each dimension in the group-by list) (just showing the number of tokens)
         # # make a subplot grid with one plot for each dimension in the group-by list
@@ -1029,12 +1114,13 @@ def sentence_similarity_matcher(reference, target, count=2, ref_name="Reference"
     return similarity_fragment
 
 
-def save_inspect_examples_to_html(df, html_path, extendedGroupByList, newline_columns=['Prompt', 'Prediction', 'GT-Summary'],
+def save_inspect_examples_to_html(df, html_path, extendedGroupByList, applySimilarityMatcher=True, newline_columns=['Prompt', 'Prediction', 'GT-Summary'],
                                   similarity_matcher=[{'ref': "Prompt", 'tgt': "Prediction", 'col': "source-similarity"}, {'ref': "Prediction", 'tgt': "GT-Summary", 'col': "truth-similarity"},
                                                       {'ref': "Prompt", 'tgt': "GT-Summary", 'col': "ground-truth-similarity"}]):
     # add similarity matching columns
-    for matcher in similarity_matcher:
-        df.loc[:, matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
+    if applySimilarityMatcher:
+        for matcher in similarity_matcher:
+            df.loc[:, matcher['col']] = df.apply(lambda row: sentence_similarity_matcher(row[matcher['ref']], row[matcher['tgt']], ref_name=matcher['ref'], tgt_name=matcher['tgt']), axis=1)
 
     # prepare the html output
     df = df.transpose()
@@ -1058,7 +1144,7 @@ def save_inspect_examples_to_html(df, html_path, extendedGroupByList, newline_co
     pathlib.Path(html_example_subpath).mkdir(parents=True, exist_ok=True)
     for groupbyList in extendedGroupByList:
         assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
-        for (a,b) in [(0,1), (1,0)]:
+        for (a, b) in [(0, 1), (1, 0)]:
             for group_label in df[groupbyList[a]].unique():
                 df_group = df[df[groupbyList[a]] == group_label]
                 df_group = df_group.sort_values(by=groupbyList[b])
@@ -1285,7 +1371,6 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["Model
         pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric)).mkdir(parents=True, exist_ok=True)
         for cat in interesting_docIds:
             pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric, cat)).mkdir(parents=True, exist_ok=True)
-        pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric, "random")).mkdir(parents=True, exist_ok=True)
 
         # for each document ID, get all the predictions for that document and save them in a html file
         for cat in interesting_docIds:
@@ -1302,17 +1387,61 @@ def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["Model
                     html_path = os.path.join(experiment_path, base_folder, inspect_metric, cat)
                     save_inspect_examples_to_html(df_docID, html_path, extendedGroupByList=extendedGroupByList, newline_columns=['Prompt', 'Prediction', 'GT-Summary'])
 
-        # also sample random document IDs and save them in a html file
-        uniqueDocIDs = df["doc_id"].unique()
-        random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), num_random_inspect_examples), replace=False)) + [1, 85]
-        for docID in random_docIDs:
-            doc_id_gt_summaries = df[df["doc_id"] == docID]["GT-Summary"].unique().tolist()
-            # loop over all the gt-summaries, make 1 html file per gt-summary
-            for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
-                df_docID = df[df['GT-Summary'].apply(lambda x: x.strip()) == gt_summary.strip()]
+        def inspect_docIDs(docIDs, dst_folder, applySimilarityMatcher=True):
+            pathlib.Path(os.path.join(experiment_path, base_folder, inspect_metric, dst_folder)).mkdir(parents=True, exist_ok=True)
+            for docID in docIDs:
+                doc_id_gt_summaries = df[df["doc_id"] == docID]["GT-Summary"].unique().tolist()
+                # loop over all the gt-summaries, make 1 html file per gt-summary
+                for summ_idx, gt_summary in enumerate(doc_id_gt_summaries):
+                    df_docID = df[df['GT-Summary'].apply(lambda x: x.strip()) == gt_summary.strip()]
 
-                html_path = os.path.join(experiment_path, base_folder, inspect_metric, "random")
-                save_inspect_examples_to_html(df_docID, html_path, extendedGroupByList=extendedGroupByList, newline_columns=['Prompt', 'Prediction', 'GT-Summary'])
+                    html_path = os.path.join(experiment_path, base_folder, inspect_metric, dst_folder)
+                    save_inspect_examples_to_html(df_docID, html_path, applySimilarityMatcher=applySimilarityMatcher, extendedGroupByList=extendedGroupByList, newline_columns=['Prompt', 'Prediction', 'GT-Summary'])
+
+        def df_get_uniqueDocIDs(df, n):
+            uniqueDocIDs = df["doc_id"].unique()
+            random_docIDs = list(np.random.choice(uniqueDocIDs, size=min(len(uniqueDocIDs), n), replace=False))
+            return random_docIDs
+
+        # Sample some
+        print("Sampling random, long, short examples ...")
+        df_num_sample = 50
+        # Long Inputs
+        df_long_inputs = df.sample(n=df_num_sample, replace=False, weights=df["#Input Article Tokens"] ** 2)
+        long_inputs_IDs = df_get_uniqueDocIDs(df_long_inputs, num_random_inspect_examples)
+        inspect_docIDs(long_inputs_IDs, "long_inputs", applySimilarityMatcher=False)
+        # Short Inputs
+        df_short_inputs = df.sample(n=df_num_sample, replace=False, weights=(1 / df["#Input Article Tokens"]) ** 2)
+        short_inputs_IDs = df_get_uniqueDocIDs(df_short_inputs, num_random_inspect_examples)
+        inspect_docIDs(short_inputs_IDs, "short_inputs", applySimilarityMatcher=False)
+        # Long GT-Summaries
+        df_long_gt_summaries = df.sample(n=df_num_sample, replace=False, weights=df["#GT-Summary Tokens"] ** 2)
+        long_gt_summaries_IDs = df_get_uniqueDocIDs(df_long_gt_summaries, num_random_inspect_examples)
+        inspect_docIDs(long_gt_summaries_IDs, "long_gt_summaries", applySimilarityMatcher=False)
+        # Short GT-Summaries
+        df_short_gt_summaries = df.sample(n=df_num_sample, replace=False, weights=(1 / df["#GT-Summary Tokens"]) ** 2)
+        short_gt_summaries_IDs = df_get_uniqueDocIDs(df_short_gt_summaries, num_random_inspect_examples)
+        inspect_docIDs(short_gt_summaries_IDs, "short_gt_summaries", applySimilarityMatcher=False)
+        # Output much longer than GT-Summary Length
+        df_longer_output = df.sample(n=df_num_sample, replace=False, weights=(df["#Predicted Tokens"] / df["#GT-Summary Tokens"]) ** 2)
+        longer_output_IDs = df_get_uniqueDocIDs(df_longer_output, num_random_inspect_examples)
+        inspect_docIDs(longer_output_IDs, "longer_output_vs_gt", applySimilarityMatcher=False)
+        # Output much shorter than GT-Summary Length
+        df_shorter_output = df.sample(n=df_num_sample, replace=False, weights=(df["#GT-Summary Tokens"] / df["#Predicted Tokens"]) ** 2)
+        shorter_output_IDs = df_get_uniqueDocIDs(df_shorter_output, num_random_inspect_examples)
+        inspect_docIDs(shorter_output_IDs, "shorter_output_vs_gt", applySimilarityMatcher=False)
+        # High Compression
+        df_high_compression = df.sample(n=df_num_sample, replace=False, weights=df["Compression"] ** 2)
+        high_compression_IDs = df_get_uniqueDocIDs(df_high_compression, num_random_inspect_examples)
+        inspect_docIDs(high_compression_IDs, "high_compression", applySimilarityMatcher=False)
+        # Low-Compression
+        df_low_compression = df.sample(n=df_num_sample, replace=False, weights=(1 / df["Compression"]) ** 2)
+        low_compression_IDs = df_get_uniqueDocIDs(df_low_compression, num_random_inspect_examples)
+        inspect_docIDs(low_compression_IDs, "low_compression", applySimilarityMatcher=False)
+
+        # also sample random document IDs and save them in a html file
+        random_docIDs = df_get_uniqueDocIDs(df, num_random_inspect_examples)  + [1, 85]
+        inspect_docIDs(random_docIDs, "random", applySimilarityMatcher=False)
 
     return out
 
@@ -1334,7 +1463,8 @@ def get_sorted_labels(data_df, column):
     return sorted_axis_labels
 
 
-def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["Model", "Prompt ID"], groupByListExtension=[], file_suffix="", facet_col_n_docs="N-Input Docs", facet_col_size="#Input Article Tokens") -> Tuple[List[List[str]], List[List[str]]]:
+def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["Model", "Prompt ID"], groupByListExtension=[], file_suffix="", facet_col_n_docs="N-Input Docs", facet_col_size="#Input Article Tokens") -> Tuple[
+    List[List[str]], List[List[str]]]:
     if df.shape[0] == 0:
         return [], []
     print("Making metric distribution figures...")
@@ -1365,8 +1495,8 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     # Loop over the metrics -> make 1 figure per metric, comparing groupByList[0] with groupByList[1] (with hue) -> make plot in both directions
     for metric_name in metric_names:
 
-        figsizes = [None, (20, 10)]
-        save_suffixes = [("pdf", {}), ("png", {"dpi": 300})]
+        figsizes = [None, (20, 10), (18, 10)]
+        save_suffixes = [("pdf", {}), ("png", {"dpi": 300}), ("png", {"dpi": 250})]
         for fig_size, (suffix, suffix_kwargs) in zip(figsizes, save_suffixes):
             for gbl in fullGroupByList:
                 sorted_x_axis_labels = get_sorted_labels(df, gbl[0])
@@ -1406,6 +1536,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 box_plot = sns.boxplot(data=df, x=gbl[0], hue=gbl[1], y=metric_name, flierprops={"marker": "x"}, notch=True, bootstrap=1000, order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
+                # box_plot.axes.set_title("Title", fontsize=50)
+                box_plot.set_xlabel(gbl[0], fontsize=18)
+                box_plot.set_ylabel(metric_name, fontsize=18)
+                box_plot.tick_params(labelsize=16)
+                plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
+                plt.setp(box_plot.get_legend().get_title(), fontsize='16')
                 # save
                 box_plot_path = os.path.join(metric_plt_base_path, f"{metric_name}_{gbl[0]}_{gbl[1]}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
                 plt.savefig(box_plot_path, **suffix_kwargs)
@@ -1549,7 +1685,8 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         'temperature', 'precision', 'task_name', 'dataset-annotation', 'n-shot', 'preprocessing-method', 'preprocessing-parameters', 'preprocessing-order',
         "prompt-description", "prompt-variant", "prompt-separator", "prompt-desc-id"
     ]]
-    exclude += ['doc_id', 'N-Input Docs', '#Input Article Tokens', '#Input Article Full Tokens']
+    exclude += ['doc_id', 'N-Input Docs', '#Input Article Tokens', '#Input Article Full Tokens',
+                '#Predicted Tokens', '#Predicted Full Tokens', '#GT-Summary Tokens', '#GT-Summary Full Tokens']
 
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -1562,10 +1699,12 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
         "Coverage": False,
         "Density": False,
         "Compression": False,
+        "Compression (Prompt)": False,
+        "Compression (Full)": False,
     }
 
     # sort metric-names ascending
-    metric_names.sort(key=lambda x: label_sort_key_func(x))
+    metric_names.sort()
 
     return metric_names, {metric_name: metric_ordering_all[metric_name] for metric_name in metric_names}
 
@@ -1574,7 +1713,9 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment" # base-experiment-temperature
+experiment_name = "mds-ordered-chunks-initial-1sentence"
+# mds-cluster-chunks-vs-2stage-experiment
+# mds-cluster-chunks-experiment
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -1600,6 +1741,9 @@ experiment_config = {
     "least-to-most-prompting-stage2": {
         "groupByList": ["Prompt ID", "Dataset Annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Description", "Dataset Annotation"],
+        ],
         "datasets": ["20Minuten"],
         "additional_prompts": [21, 22, 30, 31, 32, 33]
     },
@@ -1670,9 +1814,20 @@ experiment_config = {
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
     },
-    "mds-ordered-chunks-experiment": {
+    "mds-ordered-chunks-initial-overview": {
         "groupByList": ["Prompt ID", "Dataset Annotation"],
         "groupByListVariants": [
+            ["Preprocessing Method", "Preprocessing Parameters"],
+            ["Preprocessing Method", "Preprocessing Order"],
+        ],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["Wikinews"]
+    },
+    "mds-ordered-chunks-initial-1sentence": {
+        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByListVariants": [
+            ["Dataset Annotation", "Prompt Description"],  # VERY GOOD PLOT DIMENSIONS
+            ["Prompt Description", "Dataset Annotation"],
             ["Preprocessing Method", "Preprocessing Parameters"],
             ["Preprocessing Method", "Preprocessing Order"],
         ],
@@ -1742,8 +1897,8 @@ experiment_config = {
             # "garage-bAInd/Platypus2-70B-instruct",
         ],
         "groupByListVariants": [
-            ["Prompt Desc. [ID]", "Model"],
             ["Prompt Description", "Model"],
+            ["Prompt Desc. [ID]", "Model"],
         ],
         "datasets": ["20Minuten"]
     },
@@ -1772,18 +1927,34 @@ experiment_config = {
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["20Minuten"]
     },
+    "prompt-experiment-large-llama2-vs-leolm": {
+        "groupByList": ["Prompt ID", "Model"],
+        "models": [
+            "meta-llama/Llama-2-70b-chat-hf",
+            "LeoLM/leo-hessianai-7b",
+            "LeoLM/leo-hessianai-13b",
+        ],
+        "groupByListVariants": [
+            ["Prompt Description", "Has Prompt-Summary Separator"],
+            ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
+        ],
+        "datasets": ["20Minuten"]
+    },
     "prompt-experiment-large-NZZ": {
         "groupByList": ["Prompt ID", "Model"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "groupByListVariants": [
-            ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
             ["Prompt Description", "Has Prompt-Summary Separator"],
+            ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
         ],
         "datasets": ["20Minuten"]
     },
     "prompt-experiment-large-output-size": {
         "groupByList": ["Prompt ID", "Model"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Variant", "Model"],
+        ],
         "datasets": ["20Minuten"]
     },
     "prompt-experiment-large-variants-only": {
@@ -1827,6 +1998,8 @@ shortNames = {
     "bigscience/bloomz-7b1-mt": "BloomZ  7b",
     "fangloveskari/ORCA_LLaMA_70B_QLoRA": "OrcaLlama2 70B",
     "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
+    "LeoLM/leo-hessianai-7b": "LeoLM  7B",
+    "LeoLM/leo-hessianai-13b": "LeoLM 13B",
 }
 datasetNameMap = {
     "20minTS250": "20Minuten",
@@ -2095,6 +2268,8 @@ prompt_description = {  # short description of the prompt to ID it instead of th
     "51": "MDS",
     "52": "MDS",
 }
+if experiment_name.startswith("mds"):
+    prompt_description["42"] = "MDS"
 prompt_variant = {  # general variant of the prompt (not the langage)
     "1": "2-3 Sentences",
     "2": "<=  3 Sentences",
@@ -2197,7 +2372,7 @@ column_rename_map = {
     "bertscore_f1": "BertScore F1",
     "coverage": "Coverage",
     "density": "Density",
-    "compression": "Compression",
+    "compression": "Compression (Prompt)",
     "promptVersion": "Prompt ID",
     "model": "Model",
     "model-fullname": "Model-Identifier",
@@ -2226,7 +2401,6 @@ metric_0_1_range = [column_rename_map[x] for x in ["rouge1", "rouge2", "rougeL",
 
 # Main function
 def main(reload_data=True, reload_preprocessed_dataset=False):
-
     sep_str = '=' * 100
     print(f"{sep_str}\n\tExperiment: {experiment_name}\n{sep_str}\n")
 
@@ -2261,7 +2435,7 @@ def main(reload_data=True, reload_preprocessed_dataset=False):
         create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
 
 
-def make_report_plots():
+def make_report_plots(prioritize_inspect_examples=False):
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
     with open(prompts_bag_path, "r") as f:
@@ -2322,6 +2496,12 @@ def make_report_plots():
 
         metric_names, _ = get_metrics_info(df)
 
+        if prioritize_inspect_examples:
+            inspectGBL = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
+            inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, extendedGroupByList=inspectGBL, suffix="")
+            with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
+                json.dump(inspect_examples, f, indent=4)
+
         # Make plots showing the failure rate
         bucket_size = 1000
         bucket_colname = f"#Input Article Tokens Bucket"
@@ -2374,16 +2554,18 @@ def make_report_plots():
                     table["df"].to_csv(os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"), index=False)
 
         # create the statistics for the token lengths and number of sentences
-        df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList, approximation=True)
-        _ = length_statistics(df_all, experiment_path, groupbyList=groupByList, approximation=True, file_suffix="_all")
+        gblExtension = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
+        df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList, gblExtension=gblExtension, approximation=True)
+        _ = length_statistics(df_all, experiment_path, groupbyList=groupByList, gblExtension=gblExtension, approximation=True, file_suffix="_all")
         if df_prompt_length_impact is not None:
-            df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact.csv"), index=False)
+            df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact_mean.csv"), index=False)
 
         # save inspect examples in JSON
-        inspectGBL = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
-        inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, extendedGroupByList=inspectGBL, suffix="")
-        with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
-            json.dump(inspect_examples, f, indent=4)
+        if not prioritize_inspect_examples:
+            inspectGBL = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
+            inspect_examples = find_inspect_examples(df, experiment_path, metric_names, groupbyList=groupByList, extendedGroupByList=inspectGBL, suffix="")
+            with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}.json"), "w") as f:
+                json.dump(inspect_examples, f, indent=4)
         # with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:
         #     json.dump(inspect_examples_all, f, indent=4)
         # with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
@@ -2396,4 +2578,6 @@ if __name__ == "__main__":
         reload_data = "--reload" in sys.argv
         reload_preprocessed_dataset = "--base_dataset_reload" in sys.argv
         main(reload_data=reload_data, reload_preprocessed_dataset=reload_preprocessed_dataset)
-    make_report_plots()
+
+    prioritize_inspect_examples_data = "--inspect-examples" in sys.argv
+    make_report_plots(prioritize_inspect_examples=prioritize_inspect_examples_data)
