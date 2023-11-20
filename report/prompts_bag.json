@@ -135,6 +135,12 @@
     "6": "Summarize the article: {article}",
     "7": "Fasse den Artikel zusammen: {article}"
   },
+  "few-shot-experiment-full": {
+    "100": "Erstelle eine Zusammenfassung vom folgenden Artikel.\nArtikel: {article}\nZusammenfassung:"
+  },
+  "few-shot-experiment-clustering": {
+    "100": "Erstelle eine Zusammenfassung vom folgenden Artikel.\nArtikel: {article}\nZusammenfassung:"
+  },
   "versions-experiment": {
     "1": "Generate a summary in German for the following article. The summary should be around 2 to 3 sentences.\nArticle: {article}\nSummary:\n",
     "2": "Erstelle eine Zusammenfassung vom folgenden Artikel in 3 oder weniger Sätzen:\nArtikel: {article}\nZusammenfassung:\n",

@@ -10,5 +10,5 @@ local_folder="results"
 outputs_folder="euler_outputs"
 
 # Using rsync to synchronize
-rsync -r "euler:${remote_path}/" "${local_folder}/"
-rsync -r "euler:${outputs_path}/" "${outputs_folder}/"
+rsync -rav "euler:${remote_path}/" "${local_folder}/"
+rsync -rav "euler:${outputs_path}/" "${outputs_folder}/"
