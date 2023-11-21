@@ -376,6 +376,7 @@ TASK_REGISTRY = {
     # "SummLtM2_20min032_34_8b": llm_summarization_mt.SummarizationTask_20Minuten,
     # "SummLtM2_20min031_35_8b": llm_summarization_mt.SummarizationTask_20Minuten,
     # "SummLtM2_20min033_35_8b": llm_summarization_mt.SummarizationTask_20Minuten,
+    "MDSChain_WikinewsS2_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_Stage2_SDS_Prep,
     "MDSFCO_WikiCh1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Cheat_1024,
     "MDSFCO_WikiCh1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Cheat_1536,
     "MDSFCO_WikiLe1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Lead_1024,

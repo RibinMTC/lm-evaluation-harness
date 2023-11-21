@@ -658,6 +658,11 @@ class SummarizationTask_Klexikon(SummarizationTaskBase):
 
 
 
+class MDS_CHAIN_Wikinews_Stage2_SDS_Prep(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_S2_clust_total_2048_leave_512"
+
+
 class MDS_FCO_Wikinews_Cheat_1024(SummarizationFCO_Fewshot_Base):
     VERSION = 0
     DATASET_PATH = "roysc/mds_FCO_cheat_orig_0shot_chunk_1024"

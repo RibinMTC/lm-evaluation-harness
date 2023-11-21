@@ -1821,7 +1821,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "few-shot-experiment-full"
+experiment_name = "few-shot-experiment-clustering"
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
 
