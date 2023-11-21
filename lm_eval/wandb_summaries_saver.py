@@ -46,10 +46,11 @@ def domain_adaptation_summary_tables_post_processing(summary_tables_path: str):
         common_values = part1_values.intersection(part2_values)
 
         print(f"Number of common values between part1 and part2: {common_values}")
-        #assert len(common_values) == 0
+        # assert len(common_values) == 0
         combined_df = pd.concat([task_dfs["part1"], task_dfs["part2"]], ignore_index=True)
         out_csv_name = f"{summary_tables_path}/combined_MODEL_{model_name}_TASK_{task_name}"
         combined_df.to_csv(out_csv_name, index=False)
+
 
 def load_wandb_tables_by_project(entity: str, project: str, out_dir: str, selected_run_ids: Optional[List[str]] = None):
     # initialize API client
@@ -98,9 +99,9 @@ def load_wandb_domain_adaptation_summarization_data(out_dir: str):
 
 
 def main():
-    out_dir = "anum_code/generated_summaries"
+    out_dir = "generated_summaries"
     # load_wandb_domain_adaptation_summarization_data(out_dir)
-    domain_adaptation_summary_tables_post_processing(out_dir)
+    # domain_adaptation_summary_tables_post_processing(out_dir)
 
 
 if __name__ == "__main__":
