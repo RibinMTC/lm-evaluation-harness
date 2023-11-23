@@ -1,6 +1,6 @@
 import math
 from functools import partial
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import wandb
@@ -45,8 +45,8 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
 
-    #negative_samples_df = None
-    #positive_samples_df = None
+    # negative_samples_df = None
+    # positive_samples_df = None
 
     default_prompt_template = (
         "Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information "
@@ -243,11 +243,14 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
         return full_prompt
 
+    def convert_label(self, label: Union[str, int]) -> str:
+        return label
+
     def _process_doc(self, doc):
         out_doc = {
             "query": self.format_prompt(doc),
             "choices": self.choices,
-            "gold": self.choices.index(doc[self.label_key_name]),
+            "gold": self.choices.index(self.convert_label(doc[self.label_key_name])),
             "original_doc": doc
         }
         return out_doc
@@ -312,3 +315,21 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         all_plots = {"confusion_matrix": wandb.plot.confusion_matrix(y_true=references, preds=predictions,
                                                                      class_names=self.choices)}
         return all_plots
+
+
+class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
+    DATASET_PATH = "xnli"
+    DATASET_NAME = "de"
+    article_key_name = "premise"
+    sentence_key_name = "hypothesis"
+    label_key_name = "label"
+
+    def convert_label(self, label: int) -> str:
+        if label == 0:
+            return "Faithful"
+        elif label == 1:
+            return "Extrinsic Hallucination"
+        elif label == 2:
+            return "Intrinsic Hallucination"
+        else:
+            raise ValueError(f"Unsupported value for label {label}")
