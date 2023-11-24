@@ -130,8 +130,11 @@ def main():
 
     tasks_string = "TASK_" + "-".join(task_names)
     model_args_dict = utils.simple_parse_args_string(args.model_args)
-    model_id = model_args_dict["pretrained"].replace("/", "-")
-    model_string = f"MODEL_{model_id}"
+    if args.model in ["gpt3.5", "gpt4"]:
+        model_id = model_args_dict["engine"]
+    else:
+        model_id = model_args_dict["pretrained"]
+    model_string = f"MODEL_{model_id.replace('/', '-')}"
     few_shot_string = f"{args.num_fewshot}-SHOT"
 
     args.output_base_path = os.path.join(args.output_base_path, model_id)
@@ -166,7 +169,7 @@ def main():
 
     results = evaluator.simple_evaluate(
         model=args.model,
-        model_id=model_args_dict["pretrained"],
+        model_id=model_id,
         model_args=args.model_args,
         tasks=task_names,
         prompt_version_per_task=prompt_versions,

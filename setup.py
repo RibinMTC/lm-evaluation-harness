@@ -58,7 +58,9 @@ setuptools.setup(
         "spacy>=3.4",
         "matplotlib",
         "seaborn",
-        "rouge-score"
+        "rouge-score",
+        "openai",
+        "tiktoken"
 
     ],
     extras_require={
