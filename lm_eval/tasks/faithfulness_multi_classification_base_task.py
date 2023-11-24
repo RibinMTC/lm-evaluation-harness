@@ -243,7 +243,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
         return full_prompt
 
-    def convert_label(self, label: Union[str, int]) -> str:
+    def convert_label(self, label: Union[str, int]) -> Union[str, int]:
         return label
 
     def _process_doc(self, doc):

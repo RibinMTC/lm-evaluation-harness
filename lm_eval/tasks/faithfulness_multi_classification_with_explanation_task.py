@@ -16,7 +16,7 @@ class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassi
         completion = rf.greedy_until(ctx, {"until": []})
         return completion
 
-    def convert_label(self, label) -> int:
+    def get_label_index(self, label) -> int:
         label_index = self.choices.index(self.INVALID_ANS)
         try:
             label_index = self.choices.index(label)
@@ -29,9 +29,9 @@ class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassi
         if match:
             match_str = match.group(1).strip()
             match_str = match_str.replace(",", "")
-            return self.convert_label(label=match_str)
+            return self.get_label_index(label=match_str)
         else:
-            return self.convert_label(label=self.INVALID_ANS)
+            return self.get_label_index(label=self.INVALID_ANS)
 
     def process_results(self, doc, results):
         completion = results[0]
