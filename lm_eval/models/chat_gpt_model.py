@@ -4,6 +4,8 @@ This code has been adapted from https://raw.githubusercontent.com/EleutherAI/lm-
 import os
 import time
 import openai
+import torch
+
 from lm_eval.base import LM
 from typing import List, Tuple
 from tqdm import tqdm
@@ -134,9 +136,19 @@ class OpenaiCompletionsLM(LM):
         results = []
         for request in tqdm(requests):
             request_suffix = request[1].get("request_suffix", "")
-            messages = [{"role": "user", "content": request[0] + request_suffix}]
             max_generation_length = request[1].get("max_length", None)
-            # TODO: temperature parameter -> is it accessible here?
+            message = request[0]
+            #todo: very inefficient way to truncating the message, is there a simpler way?
+            tokenized_message = self.tok_encode(message)
+            tokenized_suffix = self.tok_encode(request_suffix)
+            # buffer length to account for the system message length
+            system_message_prefix = 10
+            truncated_size = self.max_length - max_generation_length - len(tokenized_suffix) - system_message_prefix
+            truncated_tokenized_message = tokenized_message[:truncated_size]
+            truncated_tokenized_message_with_suffix = truncated_tokenized_message + tokenized_suffix
+            decoded_message = self.tok_decode(truncated_tokenized_message_with_suffix)
+            messages = [{"role": "user", "content": decoded_message}]
+
             response = oa_completion(
                 model=self.engine,
                 messages=messages,
