@@ -3,13 +3,11 @@ This code has been adapted from https://raw.githubusercontent.com/EleutherAI/lm-
 """
 import os
 import time
-import openai
-import torch
 
 from lm_eval.base import LM
 from typing import List, Tuple
 from tqdm import tqdm
-from lm_eval import utils
+
 from dotenv import load_dotenv
 
 
