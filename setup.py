@@ -60,7 +60,8 @@ setuptools.setup(
         "seaborn",
         "rouge-score",
         "openai",
-        "tiktoken"
+        "tiktoken",
+        "ctransformers"
 
     ],
     extras_require={

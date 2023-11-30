@@ -4,6 +4,7 @@ from . import huggingface
 from . import textsynth
 from . import dummy
 from . import chat_gpt_model
+from . import cpu_ctransformers
 
 MODEL_REGISTRY = {
     "hf": gpt2.HFLM,
@@ -16,6 +17,7 @@ MODEL_REGISTRY = {
     "gpt4": chat_gpt_model.OpenaiCompletionsLM,
     "textsynth": textsynth.TextSynthLM,
     "dummy": dummy.DummyLM,
+    "ctransformers-casual": cpu_ctransformers.CTransformersAutoLM
 }
 
 
