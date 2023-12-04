@@ -314,6 +314,18 @@ class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
         return continuation
 
 
+class SummarizationFCO_Fewshot_Base(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_sample_250"
+
+    def construct_requests(self, doc, ctx):
+        continuation = rf.greedy_until(ctx, {"until": ["---"]})  # ["\n"]
+        return continuation
+
+class SummSampleSmolSmol_20Minuten(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/20minuten_sample_10"
+
 class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"
@@ -375,6 +387,7 @@ class SummarizationTask_20Minuten(SummarizationTaskBase):
     DATASET_PATH = "roysc/20minuten"
     # DATASET_PATH = "roysc/20minuten_sample_250"
 
+
 class SummLtM2_20min_prompt22_start(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/20minuten_LtM1_22_processed_header_start_de"
@@ -418,6 +431,16 @@ class SummarizationTask_Wikinewssum_Cleaned(SummarizationTaskBase):
 class SummarizationTask_Wikinewssum_Simple(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_simple"
+
+
+class SummarizationTask_Wikinewssum_SingleLine(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_single_line"
+
+
+class SummarizationTask_Wikinewssum_SingleLine_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_simple_single_line_shuffled"
 
 
 class SummarizationTask_Wikinewssum_Simple_Shuffled(SummarizationTaskBase):
@@ -489,6 +512,7 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs(SummarizationTaskBas
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_input_doc_split"
 
+
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_originalOrder"
@@ -497,6 +521,116 @@ class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_OriginalOrder
 class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_Shuffled(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_2stageSummary_stage2_shuffled"
+
+
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_OriginalOrder(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_41_stage2_originalOrder"
+
+
+class SummarizationTask_Wikinewssum_2Stage_Split_Input_Docs_Stage2_BasePrompt41_Shuffled(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_2stageSummary_41_stage2_shuffled"
+
+
+class MDS_WikinewsSum_SentenceChunk_1_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_1_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_1_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_1_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_3_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_3_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_3_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_3_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_5_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_5_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_5_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_5_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_10_00_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_10_MMR_0_0_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_SentenceChunk_10_05_512_sbert_comparison(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/ordered_chunks_sentences_10_MMR_0_5_512_sbert_comparison"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_1_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_1_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_3_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_3_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_5_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_5_max_512_order_cluster-size"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Random(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_random"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Original_Order(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_original-order"
+
+
+class MDS_WikinewsSum_ClusterChunk_10_Cluster_Size(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/chunk_clustering_sentences_10_max_512_order_cluster-size"
 
 
 class SummLtM_20Minuten(SummarizationTaskBase):
@@ -554,3 +688,169 @@ class SummLtMDe_20Minuten(SummLtM_20Minuten):
 class SummarizationTask_Klexikon(SummarizationTaskBase):
     VERSION = 0
     DATASET_PATH = "roysc/Klexikon_sample_250"
+
+
+
+
+class MDS_CHAIN_Wikinews_Stage2_SDS_Prep(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_S2_clust_total_2048_leave_512"
+
+
+class MDS_FCO_Wikinews_Cheat_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_cheat_orig_0shot_chunk_1024"
+
+class MDS_FCO_Wikinews_Cheat_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_cheat_orig_0shot_chunk_1536"
+
+class MDS_FCO_Wikinews_Lead_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_lead_orig_0shot_chunk_1024"
+
+class MDS_FCO_Wikinews_Lead_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_lead_orig_0shot_chunk_1536"
+
+class MDS_FCO_Wikinews_Lead_1shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_lead_orig_1shot_ex_20Min_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_Lead_1shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_lead_orig_1shot_ex_20Min_seed_42_chunk_1536"
+
+class MDS_FCO_Wikinews_Rand_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_0shot_chunk_1024"
+
+class MDS_FCO_Wikinews_Rand_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_0shot_chunk_1536"
+
+
+class MDS_FCO_Wikinews_Rand_1shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_1shot_ex_20Min_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_Rand_1shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_1shot_ex_20Min_seed_42_chunk_1536"
+
+
+class MDS_FCO_Wikinews_Rand_1shot_Wikinews_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_1shot_ex_Wikinews_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_Rand_1shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_rand_orig_1shot_ex_Wikinews_seed_42_chunk_1536"
+
+
+
+class MDS_FCO_Wikinews_Clust_0shot_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_0shot_chunk_1024"
+
+class MDS_FCO_Wikinews_Clust_0shot_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_0shot_chunk_1536"
+
+class MDS_FCO_Wikinews_Clust_0shot_2048(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_0shot_chunk_2048"
+
+
+
+class MDS_FCO_Wikinews_Clust_1shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_1shot_ex_20Min_chunk_1024"
+
+class MDS_FCO_Wikinews_Clust_1shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_1shot_ex_20Min_seed_42_chunk_1536"
+
+class MDS_FCO_Wikinews_Clust_1shot_20min_42_2048(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_1shot_ex_20Min_seed_42_chunk_2048"
+
+
+class MDS_FCO_Wikinews_Clust_2shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_2shot_ex_20Min_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_Clust_2shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_2shot_ex_20Min_seed_42_chunk_1536"
+
+class MDS_FCO_Wikinews_Clust_2shot_20min_42_2048(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_2shot_ex_20Min_seed_42_chunk_2048"
+
+
+
+class MDS_FCO_Wikinews_Clust_1shot_Wikinews_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_1shot_ex_Wikinews_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_Clust_1shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_1shot_ex_Wikinews_seed_42_chunk_1536"
+
+
+
+class MDS_FCO_Wikinews_Clust_2shot_Wikinews_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_2shot_ex_Wikinews_seed_42_chunk_1024"
+
+
+class MDS_FCO_Wikinews_Clust_2shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_clust_orig_2shot_ex_Wikinews_seed_42_chunk_1536"
+
+
+
+class MDS_FCO_Wikinews_DistMMR_0shot_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_0shot_chunk_1024"
+
+class MDS_FCO_Wikinews_DistMMR_0shot_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_0shot_chunk_1536"
+
+
+
+class MDS_FCO_Wikinews_DistMMR_1shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_1shot_ex_20Min_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_DistMMR_1shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_1shot_ex_20Min_seed_42_chunk_1536"
+
+
+
+
+class MDS_FCO_Wikinews_DistMMR_2shot_20min_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_2shot_ex_20Min_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_DistMMR_2shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_2shot_ex_20Min_seed_42_chunk_1536"
+
+
+
+class MDS_FCO_Wikinews_DistMMR_1shot_Wikinews_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_1shot_ex_Wikinews_seed_42_chunk_1024"
+
+class MDS_FCO_Wikinews_DistMMR_1shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_1shot_ex_Wikinews_seed_42_chunk_1536"
+
+class MDS_FCO_Wikinews_DistMMR_2shot_Wikinews_42_1024(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_FCO_distMMR_orig_2shot_ex_Wikinews_seed_42_chunk_1024"
+

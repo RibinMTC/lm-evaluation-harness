@@ -5,6 +5,8 @@ import os
 import time
 from google.oauth2 import service_account
 from google.cloud import aiplatform
+import google.generativeai as palm
+from google.generativeai.types import safety_types
 from vertexai.language_models import TextGenerationModel
 from lm_eval.base import LM
 from typing import List, Tuple
@@ -33,6 +35,15 @@ class Palm2CompletionsLM(LM):
         # get environment variables
         project = os.environ.get('GCLOUD_PROJECT')
         aiplatform.init(project=project, location='us-central1', credentials=credentials, experiment='llm-master-thesis')
+        palm.configure(credentials=credentials)
+
+        # API_URL = 'https://us-central1-aiplatform.googleapis.com'
+        # GET: https://us-central1-aiplatform.googleapis.com/v1/projects/llm-master-thesis/locations/us-central1/endpoints/text-bison@001
+        # POST: https://us-central1-aiplatform.googleapis.com/v1/projects/llm-master-thesis/locations/us-central1/endpoints/text-bison@001:predict
+
+        # make a http request to predict the text (prepare REST authentication, make the request, parse the response)
+
+        # TODO: List endpoints at the us-central1 location
 
         self.engine = engine
 
@@ -101,7 +112,6 @@ class Palm2CompletionsLM(LM):
                 }
             ]
         """
-
         model = TextGenerationModel.from_pretrained(self.engine)
 
         results = []
@@ -118,6 +128,43 @@ class Palm2CompletionsLM(LM):
 
             prediction = response.text
             results.append(prediction)
+
+            # result = palm.generate_text(
+            #     model=self.engine,
+            #     prompt=request[0],
+            #     temperature=0,
+            #     max_output_tokens=256,
+            #     safety_settings=[
+            #         {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_DEROGATORY,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_TOXICITY,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_VIOLENCE,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_SEXUAL,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_MEDICAL,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }, {
+            #             "category": safety_types.HarmCategory.HARM_CATEGORY_DANGEROUS,
+            #             "threshold": safety_types.HarmBlockThreshold.BLOCK_NONE
+            #         }
+            #     ],
+            #     top_k=40,
+            #     top_p=1.0,
+            # )
+            #
+            # prediction = result.result
+            # results.append(prediction)
+
         return results
 
     def _encode_pair(
