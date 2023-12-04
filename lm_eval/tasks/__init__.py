@@ -72,6 +72,7 @@ from . import xsum_faith_hallucination_classification
 from . import swisstext23_summarization
 from . import llm_summarization_mt
 from . import seahorse_classification
+from . import seahorse_classification_automatic
 
 ########################################
 # Translation tasks
@@ -332,6 +333,7 @@ TASK_REGISTRY = {
     "frank_hallucination_classification": frank_hallucination_classification.FrankHallucinationClassificationTask,
     "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
+    "SummarizationLocal": llm_summarization_mt.SummarizationTaskLocal,
     "SummSampleSmol_20Minuten_1": llm_summarization_mt.SummSampleSmol_20Minuten,
     "SummSampleSmol_20Minuten_2": llm_summarization_mt.SummSampleSmol_20Minuten,
     # "SummLtM1_20Minuten_21": llm_summarization_mt.SummarizationTask_20Minuten,
@@ -600,6 +602,7 @@ TASK_REGISTRY = {
     "SummarizationTask_20Minuten_T10_19": llm_summarization_mt.SummarizationTask_20Minuten,
     "SummarizationTask_20Minuten_T10_20": llm_summarization_mt.SummarizationTask_20Minuten,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
+    "seahorse_manual_test": seahorse_classification_automatic.AutomaticSeahorseClassificationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

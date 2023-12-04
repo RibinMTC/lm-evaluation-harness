@@ -1,0 +1,17 @@
+model: hf-causal-experimental #hf-seq2seq #hf-causal-experimental
+model_args: "pretrained=meta-llama/Llama-2-7b-hf,max_gen_toks=512,trust_remote_code=True,use_accelerate=True" #load_in_8bit=True,temperature=0.2,do_sample=True"
+tasks: "SummarizationLocal" #"germanquad_open_qa,x_stance_de,pawsx_de"
+prompt_version_per_task: "1"
+num_fewshot: 0
+batch_size: "1"
+device: null
+output_path: null
+limit: 1
+data_sampling: null
+no_cache: true
+decontamination_ngrams_path: null
+description_dict_path: null
+check_integrity: false
+write_out: true
+output_base_path: "results"
+wandb_on: false

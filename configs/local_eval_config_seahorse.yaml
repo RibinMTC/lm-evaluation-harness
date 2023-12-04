@@ -1,0 +1,22 @@
+model: hf-causal-experimental
+# Attibution
+#model_args: "pretrained=mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged,trust_remote_code=True,use_accelerate=True"
+# Main Ideas
+#model_args: "pretrained=mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged,trust_remote_code=True,use_accelerate=True"
+# Conciseness
+model_args: "pretrained=mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged,trust_remote_code=True,use_accelerate=True"
+tasks: "seahorse_manual_test" #"germanquad_open_qa,x_stance_de,pawsx_de"
+prompt_version_per_task: "1"
+num_fewshot: 0
+batch_size: "1"
+device: null
+output_path: null
+limit: null
+data_sampling: null
+no_cache: true
+decontamination_ngrams_path: null
+description_dict_path: null
+check_integrity: false
+write_out: true
+output_base_path: "results"
+wandb_on: false

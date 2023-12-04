@@ -5,6 +5,7 @@ The Task is based on the newsum2021 Dataset for summarization
 import evaluate
 import nltk
 import numpy as np
+import json
 
 from lm_eval.base import Task, rf
 from lm_eval.fragments import Fragments
@@ -267,6 +268,39 @@ class SummarizationTaskBase(Task):
 
         example = self.doc_to_text(doc)
         return description + labeled_examples + example
+
+
+
+class SummarizationTaskLocal(SummarizationTaskBase):
+    VERSION = 0
+    # LCL_DATASET_PATH = "./results_extended_input/df_large_prompts.json"
+    LCL_DATASET_PATH = "./results_extended_input/df_large_prompts_sample.json"
+
+    def has_training_docs(self):
+        return False
+
+    def has_validation_docs(self):
+        return False
+    def has_test_docs(self):
+        return True
+
+    def test_docs(self):
+        # read the json file and return as generator
+        data = []
+        with open(self.LCL_DATASET_PATH, encoding='utf-8') as f:
+            for line in f:
+                json_obj = json.loads(line)
+                data.append(json_obj)
+
+        # if list of lists, flatten
+        if isinstance(data[0], list):
+            data = [item for sublist in data for item in sublist]
+
+        return data
+
+    def doc_to_text(self, doc):
+        # prompts already applied
+        return doc["article"]
 
 
 class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
