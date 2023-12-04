@@ -551,7 +551,7 @@ class AutoCausalLM(HuggingFaceAutoLM):
             pad_token_id=self.eot_token_id
         )
         return utils.select_continuation_from_batch_left_padding(
-            generations, max_context_size=inputs["input_ids"].size(1)
+            generations, max_context_size=input_ids.size(1)
         )
 
 
