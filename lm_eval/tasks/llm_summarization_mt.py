@@ -303,6 +303,38 @@ class SummarizationTaskLocal(SummarizationTaskBase):
         return doc["article"]
 
 
+
+class RepeatExperiments_after_bugfix_0_Llama7b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_7b_0"
+
+class RepeatExperiments_after_bugfix_0_Llama70b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_70b_0"
+
+
+class RepeatExperiments_after_bugfix_1_Llama70b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_70b_1"
+
+
+class RepeatExperiments_after_bugfix_2_Llama70b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_70b_2"
+
+
+class RepeatExperiments_after_bugfix_3_Llama70b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_70b_3"
+
+
+class RepeatExperiments_after_bugfix_4_Llama70b(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/repeated_results_Llama_2_70b_4"
+
+
+
+
 class SummShard0_20Minuten_NonEmpty(SummarizationTaskBase):
     VERSION = 0
     # DATASET_PATH = "roysc/20minuten"

@@ -136,9 +136,11 @@
     "7": "Fasse den Artikel zusammen: {article}"
   },
   "few-shot-experiment-full": {
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n",
     "100": "Erstelle eine Zusammenfassung vom folgenden Artikel.\nArtikel: {article}\nZusammenfassung:"
   },
   "few-shot-experiment-clustering": {
+    "52": "Erstelle eine Zusammenfassung über die folgenden Artikel in 6 oder weniger Sätzen. \n\n{article}\nZusammenfassung:\n",
     "100": "Erstelle eine Zusammenfassung vom folgenden Artikel.\nArtikel: {article}\nZusammenfassung:"
   },
   "versions-experiment": {

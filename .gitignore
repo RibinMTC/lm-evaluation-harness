@@ -26,12 +26,15 @@ lm_cache
 /configs/prompt_templates/MDS2S_*.json
 /configs/prompt_templates/MDS2S*.json
 /configs/prompt_templates/MDSFCO_*.json
+/configs/prompt_templates/MDSChain_*.json
 /configs/prompt_templates/SummNonEmpty_*.json
 /configs/prompt_templates/SummEmpty_*.json
 /configs/eval_config_*.yaml
 report/.DS_Store
 .DS_Store
 euler_scripts/tmp_euler_config.json
+/report/repeat_results_bugfix/*
+/results_bag_extended_input/*
 /report/resources/*
 /euler_scripts/logs/
 euler_scripts/OPENAI_API_KEY

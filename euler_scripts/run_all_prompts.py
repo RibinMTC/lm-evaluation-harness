@@ -18,20 +18,63 @@ models = [
     "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
+    # "LeoLM/leo-hessianai-7b",
+    # "LeoLM/leo-hessianai-13b",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "llama2-70B-different-prompts-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "llama2-Chain-Stage2-experiments-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
-    "20Minuten"
+    "WikinewsS2",
+
+
+    # "20Minuten"
+    ## FCO Experiments
+    # Cheat
+    # "WikiCh1024", "WikiCh1536",
+    # Lead
+    # "WikiLe1024", "WikiLe1536",
+    # Lead - 1-shot (20Minuten examples)
+    # "WikiLe1S21024", "WikiLe1S21536",
+    # Lead - 1-shot (Wikinews examples)
+    # TODO-FUTURE: "WikiLe1SW1024", "WikiLe1SW1536",
+    # Random
+    # "WikiRa1024", "WikiRa1536",
+    # Random - 1-shot (20Minuten examples)
+    # "WikiRa1S21024", "WikiRa1S21536",
+    # Random - 1-shot (Wikinews examples)
+    # "WikiRa1SW1024", "WikiRa1SW1536",
+    # Clustering - 0-shot
+    # "WikiCl0N1024", "WikiCl0N1536", "WikiCl0N2048",
+    # Clustering - 1-shot (20Minuten examples)
+    # "WikiCl1N21024", "WikiCl1N21536", "WikiCl1N22048",
+    # Clustering - 2-shot (20Minuten examples)
+    # "WikiCl2S21024", "WikiCl2S21536", "WikiCl2S22048",
+    # Clustering - 1-shot (Wikinews examples)
+    # "WikiCl1SW1024", "WikiCl1SW1536", # TODO-FUTURE: "WikiCl1SW2048",
+    # Clustering - 2-shot (Wikinews examples)
+    # "WikiCl2SW1024", "WikiCl2SW1536",
+    # DistanceMMR - 0-shot
+    # "WikiDi0S1024", "WikiDi0S1536",
+    # DistanceMMR - 1-shot (20Minuten examples)
+    # "WikiDi1S21024", "WikiDi1S21536",
+    # DistanceMMR - 2-shot (20Minuten examples)
+    # "WikiDi2S21024", "WikiDi2S21536",
+    # DistanceMMR - 1-shot (Wikinews examples)
+    # "WikiDi1SW1024", "WikiDi1SW1536",
+    # DistanceMMR - 2-shot (Wikinews examples)
+    # "WikiDi2SW1024", # TODO-FUTURE:  "WikiDi2SW1536",
+
     # "WikinewsSplitS2OP41", "WikinewsSplitS2SP41"
     # "WikinewsClust1R", "WikinewsClust1O", "WikinewsClust1C", "WikinewsClust3R", "WikinewsClust3O", "WikinewsClust3C", "WikinewsClust5R", "WikinewsClust5O", "WikinewsClust5C", "WikinewsClust10R", "WikinewsClust10O", "WikinewsClust10C"
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [15, 43, 44, 45, 46, 47, 48, 49]  # [1, 2, 3, 4, 5]
+prompt_versions = [100]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
-task_base_names = ["SummSample_"]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
-
+task_base_names = [
+    "MDSChain_",
+    # "MDSFCO_",
+]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = ["8b"]  # ["", "8b"]
@@ -141,6 +184,8 @@ inferable_args = {
         "tiiuae/falcon-40b-instruct": "hf-causal-experimental",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "hf-causal-experimental",
         "garage-bAInd/Platypus2-70B-instruct": "hf-causal-experimental",
+        "LeoLM/leo-hessianai-7b": "hf-causal-experimental",
+        "LeoLM/leo-hessianai-13b": "hf-causal-experimental",
     },
     "task_temp_suffix": {
         "default": "",
@@ -155,9 +200,11 @@ inferable_args = {
         "palm2": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "12:00", # 24
+        "meta-llama/Llama-2-70b-chat-hf": "24:00",  # 24
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
         "garage-bAInd/Platypus2-70B-instruct": "30:00",
+        "LeoLM/leo-hessianai-7b": "8:00",
+        "LeoLM/leo-hessianai-13b": "12:00",
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
@@ -171,6 +218,8 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
+        "LeoLM/leo-hessianai-7b": "rtx_3090",
+        "LeoLM/leo-hessianai-13b": "a100_80gb",
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
@@ -184,6 +233,8 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": 3,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
         "garage-bAInd/Platypus2-70B-instruct": 3,
+        "LeoLM/leo-hessianai-7b": 1,
+        "LeoLM/leo-hessianai-13b": 1,
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 4,
@@ -209,7 +260,9 @@ model_args_schema_palm2 = "engine=text-bison@001"  # "engine=models/text-bison-0
     Build the configurations
 """
 # Create a list of all possible combinations of the parameters
-combinations = list(itertools.product(models, temperature_values, precision_values, dataset_names, prompt_versions, task_base_names, num_fewshot_list))
+combinations = list(
+    itertools.product(models, temperature_values, precision_values, dataset_names, prompt_versions, task_base_names,
+                      num_fewshot_list))
 config_list = []
 
 # Iterate over each combination and create a config dictionary
@@ -217,12 +270,14 @@ for combination in combinations:
     model, tempVal, precision, dataset, promptVersion, taskBaseName, num_fewshot = combination
 
     # prepare the values
-    task_temp_suffix = inferable_args["task_temp_suffix"][tempVal] if tempVal in inferable_args["task_temp_suffix"] else inferable_args["task_temp_suffix"]["default"]
+    task_temp_suffix = inferable_args["task_temp_suffix"][tempVal] if tempVal in inferable_args["task_temp_suffix"] else \
+        inferable_args["task_temp_suffix"]["default"]
     if tempVal == 0:
         temp_suffix_model_args = ""
     else:
         temp_suffix_model_args = f",do_sample=True,temperature={tempVal}"
-    precision_suffix = inferable_args["precision"][precision] if precision in inferable_args["precision"] else inferable_args["precision"]["default"]
+    precision_suffix = inferable_args["precision"][precision] if precision in inferable_args["precision"] else \
+        inferable_args["precision"]["default"]
     precision_task_suffix = "" if precision == "" else f"_{precision}"
 
     # insert num_fewshot into task string if necessary
@@ -230,20 +285,26 @@ for combination in combinations:
         taskBaseName = taskBaseName.format(num_fewshot=num_fewshot)
 
     # Build the arguments (eval_config)
-    model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"]["default"]
+    model_config = inferable_args["model"][model] if model in inferable_args["model"] else inferable_args["model"][
+        "default"]
     if inferable_args["model"][model] == "gpt4":
         model_args = model_args_schema_gpt4
     elif inferable_args["model"][model] == "palm2":
         model_args = model_args_schema_palm2
     elif inferable_args["model"][model] == "hf-causal-experimental":
-        model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args, precision_suffix=precision_suffix)
+        model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args,
+                                              precision_suffix=precision_suffix)
     else:
         raise NotImplementedError(f"Model {model} not implemented yet.")
-    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset, task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}", precision=f"{precision_task_suffix}")
+    task_name = task_name_schema.format(task_base_name=taskBaseName, dataset_name=dataset,
+                                        task_temp_suffix=task_temp_suffix, task_prompt_suffix=f"_{promptVersion}",
+                                        precision=f"{precision_task_suffix}")
     # Build the arguments (euler_config)
-    run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args["run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
+    run_duration_hours = inferable_args["run_duration_hours"][model] if model in inferable_args[
+        "run_duration_hours"] else inferable_args["run_duration_hours"]["default"]
     gpu = inferable_args["gpu"][model] if model in inferable_args["gpu"] else inferable_args["gpu"]["default"]
-    num_gpus = inferable_args["num_gpus"][model] if model in inferable_args["num_gpus"] else inferable_args["num_gpus"]["default"]
+    num_gpus = inferable_args["num_gpus"][model] if model in inferable_args["num_gpus"] else inferable_args["num_gpus"][
+        "default"]
 
     # Create the config dictionary for this combination
     config = {
