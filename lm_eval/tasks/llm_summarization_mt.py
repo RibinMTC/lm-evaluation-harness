@@ -270,6 +270,76 @@ class SummarizationTaskBase(Task):
         return description + labeled_examples + example
 
 
+class SummarizationTaskWithIdentifier(SummarizationTaskBase):
+    def process_results(self, doc, results):
+        """Take a single document and the LM results and evaluates, returning a
+        dict where keys are the names of submetrics and values are the values of
+        the metric for that one document
+
+        :param doc:
+            The document as returned from training_docs, validation_docs, or test_docs.
+        :param results:
+            The results of the requests created in construct_requests.
+        """
+        # TODO: Make this work for multiple results
+        assert len(results) == 1
+
+        prediction, reference = self.postprocess_text(results[0], doc["summary"])
+        article = doc["article"]
+        fragment = Fragments(article, prediction, language=self.LANGUAGE)
+
+        bertscore_result = _bertscore_metric(prediction, reference)
+
+        return {
+            "rouge1": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge1")),
+            "rouge2": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rouge2")),
+            "rougeL": self.round_to_3_decimals(_rouge_metric(prediction, reference, "rougeL")),
+            "identifier": doc["identifier"],
+            "bertscore_precision": self.round_to_3_decimals(np.mean(bertscore_result["precision"])),
+            "bertscore_recall": self.round_to_3_decimals(np.mean(bertscore_result["recall"])),
+            "bertscore_f1": self.round_to_3_decimals(np.mean(bertscore_result["f1"])),
+            'coverage': self.round_to_3_decimals(fragment.coverage()),
+            'density': self.round_to_3_decimals(fragment.density()),
+            'compression': self.round_to_3_decimals(fragment.compression())
+        }
+
+    def aggregation(self):
+        """
+        :returns: {str: [metric_score] -> float}
+            A dictionary where keys are the names of submetrics and values are
+            functions that aggregate a list of metric scores
+        """
+        return {
+            "rouge1": mean,
+            "rouge2": mean,
+            "rougeL": mean,
+            "identifier": lambda x: x,
+            "bertscore_precision": mean,
+            "bertscore_recall": mean,
+            "bertscore_f1": mean,
+            'coverage': mean,
+            'density': mean,
+            'compression': mean
+        }
+
+    def higher_is_better(self):
+        """
+                :returns: {str: bool}
+                    A dictionary where keys are the names of submetrics and values are
+                    whether a higher value of the submetric is better
+                """
+        return {
+            "rouge1": True,
+            "rouge2": True,
+            "rougeL": True,
+            "identifier": True,
+            "bertscore_precision": True,
+            "bertscore_recall": True,
+            "bertscore_f1": True,
+            "coverage": False,
+            "density": False,
+            "compression": True,
+        }
 
 class SummarizationTaskLocal(SummarizationTaskBase):
     VERSION = 0
@@ -304,31 +374,31 @@ class SummarizationTaskLocal(SummarizationTaskBase):
 
 
 
-class RepeatExperiments_after_bugfix_0_Llama7b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_0_Llama7b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_7b_0"
 
-class RepeatExperiments_after_bugfix_0_Llama70b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_0_Llama70b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_70b_0"
 
 
-class RepeatExperiments_after_bugfix_1_Llama70b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_1_Llama70b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_70b_1"
 
 
-class RepeatExperiments_after_bugfix_2_Llama70b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_2_Llama70b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_70b_2"
 
 
-class RepeatExperiments_after_bugfix_3_Llama70b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_3_Llama70b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_70b_3"
 
 
-class RepeatExperiments_after_bugfix_4_Llama70b(SummarizationTaskBase):
+class RepeatExperiments_after_bugfix_4_Llama70b(SummarizationTaskWithIdentifier):
     VERSION = 0
     DATASET_PATH = "roysc/repeated_results_Llama_2_70b_4"
 

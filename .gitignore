@@ -12,6 +12,7 @@ lm_cache
 /results_bag/
 /euler_outputs/
 /report/reports/
+/configs/prompt_templates/RepeatExperimentBugfix_*.json
 /configs/prompt_templates/SummarizationTask_*.json
 /configs/prompt_templates/SummLtM_*.json
 /configs/prompt_templates/SummLtM1_*.json
