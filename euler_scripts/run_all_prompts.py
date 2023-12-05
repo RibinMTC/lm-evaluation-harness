@@ -23,10 +23,18 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "llama2-Chain-Stage2-experiments-" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "repeat-experiments" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
-    "WikinewsS2",
+    ## Repeat experiments
+    "0_Llama7b",
+    "0_Llama70b",
+    "1_Llama70b",
+    "2_Llama70b",
+    "3_Llama70b",
+    "4_Llama70b",
 
+    ## summarization-chain
+    # "WikinewsS2",
 
     # "20Minuten"
     ## FCO Experiments
@@ -72,7 +80,9 @@ dataset_names = [
 prompt_versions = [100]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    "MDSChain_",
+    "RepeatExperimentBugfix_",
+
+    # "MDSChain_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
