@@ -39,7 +39,7 @@ exclude_experiments = [
     "SummSample_20Minuten_2_write_out_info.json",
 ]
 
-model_folder = model_folders[0]
+model_folder = model_folders[1]
 
 
 def upload_dataset_to_hf(dataset_name, dataset_dict):
@@ -111,7 +111,7 @@ def load_results_to_be_repeated():
         print(f"\t{filename.ljust(longest_filename_length)}:\t{filename_to_num_entries[filename]}")
 
     # save results and upload to huggingface
-    output_path = os.path.join(output_folder, "repeated_results.json")
+    output_path = os.path.join(output_folder, f"repeated_results_{model_folder_to_id[model_folder]}.json")
     # make the directory if it does not exist
     pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
@@ -122,7 +122,7 @@ def load_results_to_be_repeated():
     num_chunks = len(results) // chunk_size + 1
     for i in range(num_chunks):
         chunk = results[i * chunk_size: (i + 1) * chunk_size]
-        output_path = os.path.join(output_folder, f"repeated_results_{i}.json")
+        output_path = os.path.join(output_folder, f"repeated_results_{model_folder_to_id[model_folder]}_{i}.json")
         with open(output_path, "w") as f:
             json.dump(chunk, f)
 

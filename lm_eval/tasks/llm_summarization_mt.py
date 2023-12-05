@@ -313,7 +313,7 @@ class SummarizationTaskWithIdentifier(SummarizationTaskBase):
             "rouge1": mean,
             "rouge2": mean,
             "rougeL": mean,
-            "identifier": lambda x: x,
+            "identifier": lambda x: 0,
             "bertscore_precision": mean,
             "bertscore_recall": mean,
             "bertscore_f1": mean,
