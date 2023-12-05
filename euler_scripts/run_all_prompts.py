@@ -15,23 +15,29 @@ models = [
     # "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
     # "LeoLM/leo-hessianai-13b",
+    "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "repeat-experiments" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+experiment_name = "seahorse-experiments-base-datasets-" + ''.join(
+    random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     ## Repeat experiments
     # "0_Llama7b",
-    "0_Llama70b",
-    "1_Llama70b",
-    "2_Llama70b",
-    "3_Llama70b",
-    "4_Llama70b",
+    # "0_Llama70b",
+    # "1_Llama70b",
+    # "2_Llama70b",
+    # "3_Llama70b",
+    # "4_Llama70b",
+
+    "base_datasets",
 
     ## summarization-chain
     # "WikinewsS2",
@@ -80,14 +86,15 @@ dataset_names = [
 prompt_versions = [100]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    "RepeatExperimentBugfix_",
+    "seahorse_",
+    # "RepeatExperimentBugfix_",
 
     # "MDSChain_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
@@ -196,6 +203,9 @@ inferable_args = {
         "garage-bAInd/Platypus2-70B-instruct": "hf-causal-experimental",
         "LeoLM/leo-hessianai-7b": "hf-causal-experimental",
         "LeoLM/leo-hessianai-13b": "hf-causal-experimental",
+        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
+        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
+        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
     },
     "task_temp_suffix": {
         "default": "",
@@ -218,6 +228,9 @@ inferable_args = {
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
+        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "08:00",
+        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "08:00",
+        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "08:00",
     },
     "gpu": {
         "default": "rtx_3090",
@@ -233,6 +246,9 @@ inferable_args = {
         "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
         "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
+        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "rtx_3090",
+        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "rtx_3090",
+        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "rtx_3090",
     },
     "num_gpus": {
         "default": 1,
@@ -248,6 +264,9 @@ inferable_args = {
         "bigscience/bloomz-7b1-mt": 1,
         "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 4,
+        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": 1,
+        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": 1,
+        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": 1,
     },
     "precision": {
         "default": "",
@@ -265,6 +284,7 @@ task_name_schema = "{task_base_name}{dataset_name}{task_temp_suffix}{task_prompt
 model_args_schema = "pretrained={model},max_gen_toks=512,trust_remote_code=True,use_accelerate=True{temperature_suffix}{precision_suffix}"
 model_args_schema_gpt4 = "engine=gpt-4"
 model_args_schema_palm2 = "engine=text-bison@001"  # "engine=models/text-bison-001"
+model_args_schema_seahorse = "pretrained={model},trust_remote_code=True,use_accelerate=True"
 
 """
     Build the configurations
@@ -301,6 +321,8 @@ for combination in combinations:
         model_args = model_args_schema_gpt4
     elif inferable_args["model"][model] == "palm2":
         model_args = model_args_schema_palm2
+    elif inferable_args["model"][model] == "hf-causal-experimental" and "seahorse" in taskBaseName:
+        model_args = model_args_schema_seahorse.format(model=model)
     elif inferable_args["model"][model] == "hf-causal-experimental":
         model_args = model_args_schema.format(model=model, temperature_suffix=temp_suffix_model_args,
                                               precision_suffix=precision_suffix)
