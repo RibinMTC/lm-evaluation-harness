@@ -13,9 +13,9 @@ import random, string
 models = [
     # "gpt-4",
     # "palm2",
-    "meta-llama/Llama-2-7b-chat-hf",
+    # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
@@ -26,12 +26,12 @@ models = [
 experiment_name = "repeat-experiments" + ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     ## Repeat experiments
-    "0_Llama7b",
-    # "0_Llama70b",
-    # "1_Llama70b",
-    # "2_Llama70b",
-    # "3_Llama70b",
-    # "4_Llama70b",
+    # "0_Llama7b",
+    "0_Llama70b",
+    "1_Llama70b",
+    "2_Llama70b",
+    "3_Llama70b",
+    "4_Llama70b",
 
     ## summarization-chain
     # "WikinewsS2",

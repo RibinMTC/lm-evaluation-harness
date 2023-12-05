@@ -1,32 +1,43 @@
 from . import seahorse_classification
 import json
 import numpy as np
+from lm_eval.metrics import mean
 
 
 class AutomaticSeahorseClassificationTask(seahorse_classification.SeahorseClassificationTask):
     VERSION = 0
+    DATASET_PATH = "roysc/base_datasets"
+
+    load_lcl = False
     # LCL_DATASET_PATH = "./results_extended_input/example_input.json"
     LCL_DATASET_PATH = "./results_extended_input/base_datasets.json"
+
     # LCL_DATASET_PATH = "./results_extended_input/mds_fco_experiments.json"
 
     def has_test_docs(self):
         return True
 
     def test_docs(self):
-        # read the json file and return as generator
-        data = []
-        with open(self.LCL_DATASET_PATH, encoding='utf-8') as f:
-            for line in f:
-                json_obj = json.loads(line)
-                json_obj["worker_lang"] = 'de'
-                data.append(json_obj)
+        if self.load_lcl:
+            # read the json file and return as generator
+            data = []
+            with open(self.LCL_DATASET_PATH, encoding='utf-8') as f:
+                for line in f:
+                    json_obj = json.loads(line)
+                    json_obj["worker_lang"] = 'de'
+                    data.append(json_obj)
 
-            # data = json.load(f)
-            # # add worker_lang to each example
-            # for example in data:
-            #     example["worker_lang"] = 'de'
+                # data = json.load(f)
+                # # add worker_lang to each example
+                # for example in data:
+                #     example["worker_lang"] = 'de'
 
-        return data
+            return data
+        elif self.has_test_docs():
+            test_set = self.dataset["test"]
+            for idx, doc in enumerate(test_set):
+                test_set[idx]["worker_lang"] = 'de'
+            return test_set
 
     def doc_to_target(self, doc):
         # label = str(doc["question4"] == "Yes")
@@ -53,13 +64,26 @@ class AutomaticSeahorseClassificationTask(seahorse_classification.SeahorseClassi
     def aggregation(self):
         # don't aggregate at all
         return {
-            "prediction": lambda x: x,
-            "true_prediction_probability": lambda x: x,
-            "id": lambda x: x,
-            "article": lambda x: x,
-            "summary": lambda x: x,
-            "gt_summary": lambda x: x,
-            "experiment_id": lambda x: x,
-            "sub_id": lambda x: x,
+            "prediction": 0,
+            "true_prediction_probability": mean,
+            "id": 0,
+            "article": 0,
+            "summary": 0,
+            "gt_summary": 0,
+            "experiment_id": 0,
+            "sub_id": 0,
         }
 
+
+class AutomaticSeahorseClassificationTask_Local(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    # DATASET_PATH = "roysc/base_datasets"
+    load_lcl = True
+    LCL_DATASET_PATH = "./results_extended_input/base_datasets.json"
+
+
+class AutomaticSeahorseClassificationTask_BaseDatasets(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/base_datasets"
+    load_lcl = False
+    # LCL_DATASET_PATH = "./results_extended_input/base_datasets.json"

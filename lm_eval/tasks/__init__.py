@@ -712,7 +712,8 @@ TASK_REGISTRY = {
     "SummarizationTask_20Minuten_T10_19": llm_summarization_mt.SummarizationTask_20Minuten,
     "SummarizationTask_20Minuten_T10_20": llm_summarization_mt.SummarizationTask_20Minuten,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
-    "seahorse_manual_test": seahorse_classification_automatic.AutomaticSeahorseClassificationTask,
+    "seahorse_manual_test": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_Local,
+    "seahorse_base_datasets": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_BaseDatasets,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
