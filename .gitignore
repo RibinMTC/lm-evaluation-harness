@@ -37,6 +37,7 @@ report/.DS_Store
 euler_scripts/tmp_euler_config.json
 /report/repeat_results_bugfix/*
 /results_bag_extended_input/*
+/results_extended/*
 /report/resources/*
 /euler_scripts/logs/
 euler_scripts/OPENAI_API_KEY
