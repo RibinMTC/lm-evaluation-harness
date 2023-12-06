@@ -30,6 +30,7 @@ lm_cache
 /configs/prompt_templates/MDSChain_*.json
 /configs/prompt_templates/SummNonEmpty_*.json
 /configs/prompt_templates/SummEmpty_*.json
+/configs/prompt_templates/seahorse_*.json
 /configs/eval_config_*.yaml
 report/.DS_Store
 .DS_Store

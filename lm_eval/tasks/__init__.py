@@ -714,6 +714,7 @@ TASK_REGISTRY = {
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
     "seahorse_manual_test": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_Local,
     "seahorse_base_datasets_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_BaseDatasets,
+    "seahorse_fco_experiments_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_FCOExperiments,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

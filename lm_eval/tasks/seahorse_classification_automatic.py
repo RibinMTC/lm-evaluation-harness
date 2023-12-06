@@ -84,6 +84,10 @@ class AutomaticSeahorseClassificationTask_Local(AutomaticSeahorseClassificationT
 
 class AutomaticSeahorseClassificationTask_BaseDatasets(AutomaticSeahorseClassificationTask):
     VERSION = 0
-    DATASET_PATH = "roysc/base_datasets"
+    DATASET_PATH = "roysc/SEAHORSE_base_datasets"
     load_lcl = False
-    # LCL_DATASET_PATH = "./results_extended_input/base_datasets.json"
+
+class AutomaticSeahorseClassificationTask_FCOExperiments(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_mds_fco_experiments"
+    load_lcl = False

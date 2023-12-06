@@ -37,7 +37,9 @@ dataset_names = [
     # "3_Llama70b",
     # "4_Llama70b",
 
+    ## SEAHORSE evaluation
     "base_datasets",
+    "fco_experiments",
 
     ## summarization-chain
     # "WikinewsS2",
