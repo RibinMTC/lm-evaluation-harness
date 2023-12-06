@@ -58,7 +58,7 @@ def filename_from_identifier(identifier):
 
 
 def doc_id_from_identifier(identifier):
-    return identifier.split("/")[1]
+    return int(identifier.split("/")[1])
 
 
 def needs_repetition(prompt: str, response: str):
@@ -135,7 +135,70 @@ def load_results_to_be_repeated():
 
 
 def insert_repeated_experiments():
-    raise NotImplementedError("Not implemented yet")
+    process_repeat_files = [
+        # "RepeatExperimentBugfix_0_Llama7b_100_8b_write_out_info.json",
+    ]
+    dst_folder = "../results_extended"
+    base_folder = "../results"
+    # model_folder = "meta-llama-Llama-2-7b-chat-hf"
+    model_folder = "meta-llama-Llama-2-70b-chat-hf"
+
+    # make the model folder in the dst_folder if it does not exist
+    pathlib.Path(os.path.join(dst_folder, model_folder)).mkdir(parents=True, exist_ok=True)
+
+    # Load all repeated results at once and load them into a single list
+    all_repeated_results = []
+    for process_repeat_file in process_repeat_files:
+        print(f"Processing {process_repeat_file}")
+        with open(os.path.join(base_folder, model_folder, process_repeat_file), "r") as f:
+            repeat_results = json.load(f)
+            all_repeated_results.extend(repeat_results)
+
+    # sort all repeated results by their identifier
+    all_repeated_results = sorted(all_repeated_results, key=lambda x: x["identifier"])
+    # get all identifiers
+    affected_filenames = list(
+        set([filename_from_identifier(repeat_result["identifier"]) for repeat_result in all_repeated_results]))
+
+    update_columns = [
+        "prompt_0", "logit_0", "truth", "rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall",
+        "bertscore_f1", "coverage", "density", "compression"
+    ]
+
+    # load all original files
+    for filename in affected_filenames:
+        with open(os.path.join(base_folder, model_folder, filename), "r") as f:
+            original_file = json.load(f)
+
+            # only look at the repeated results that affect the current file
+            all_repeated_results_for_file = [repeat_result for repeat_result in all_repeated_results if
+                                             filename_from_identifier(repeat_result["identifier"]) == filename]
+
+            # sort the repeated results by their doc_id
+            all_repeated_results_for_file = sorted(all_repeated_results_for_file,
+                                                   key=lambda x: doc_id_from_identifier(x["identifier"]))
+
+            # update all entries in the original file
+            for update_entry in all_repeated_results_for_file:
+                update_doc_id = doc_id_from_identifier(update_entry["identifier"])
+                curr_orig_idx = 0
+                found = False
+                while original_file[curr_orig_idx]["doc_id"] <= update_doc_id:
+                    if original_file[curr_orig_idx]["doc_id"] == update_doc_id:
+                        # replace the prediction with the previous prediction
+                        for update_col in update_columns:
+                            original_file[curr_orig_idx][update_col] = update_entry[update_col]
+                        found = True
+                        break
+                    curr_orig_idx += 1
+                if not found:
+                    raise ValueError(f"Could not find doc_id {update_doc_id} in {filename}")
+
+        # save the file
+        with open(os.path.join(dst_folder, model_folder, filename), "w") as f:
+            json.dump(original_file, f)
+
+    return
 
 
 if __name__ == '__main__':

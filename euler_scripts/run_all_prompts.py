@@ -12,7 +12,7 @@ import random, string
 """
 models = [
     # "gpt-4",
-    # "palm2",
+    "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
     # "meta-llama/Llama-2-70b-chat-hf",
@@ -20,13 +20,13 @@ models = [
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
     # "LeoLM/leo-hessianai-13b",
-    "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
-    "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
-    "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "seahorse-experiments-base-datasets-" + ''.join(
+experiment_name = "palm-2-repeated-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     ## Repeat experiments
@@ -39,10 +39,12 @@ dataset_names = [
 
     ## SEAHORSE evaluation
     # "base_datasets",
-    "fco_experiments",
+    # "fco_experiments",
 
     ## summarization-chain
     # "WikinewsS2",
+    # "WikinewsClustS2",
+    # "WikinewsClustDistS2",
 
     # "20Minuten"
     ## FCO Experiments
@@ -84,13 +86,16 @@ dataset_names = [
     # "WikinewsSplitS2OP41", "WikinewsSplitS2SP41"
     # "WikinewsClust1R", "WikinewsClust1O", "WikinewsClust1C", "WikinewsClust3R", "WikinewsClust3O", "WikinewsClust3C", "WikinewsClust5R", "WikinewsClust5O", "WikinewsClust5C", "WikinewsClust10R", "WikinewsClust10O", "WikinewsClust10C"
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
+
+    "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [100]  # [1, 2, 3, 4, 5]
+prompt_versions = [1]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    "seahorse_",
+    # "seahorse_",
     # "RepeatExperimentBugfix_",
 
+    "SummSample_",
     # "MDSChain_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]

@@ -884,6 +884,12 @@ class SummarizationTask_Klexikon(SummarizationTaskBase):
 
 
 
+class MDS_CHAIN_Wikinews_Stage2_SDS_Prep(SummarizationTaskBase):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_S2_clust_total_2048_leave_512"
+
+
+
 class MDS_CHAIN_Wikinews_Clust_Stage2_SDS_Prep(SummarizationFCO_SummChainStage2):
     VERSION = 0
     DATASET_PATH = "roysc/mds_chain_S2_clust_total_2048_leave_512"
