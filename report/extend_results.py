@@ -54,7 +54,7 @@ base_dataset_paths = {
 }
 
 base_datasets_dst_file_name = "SEAHORSE_base_datasets"
-process_files_llama_2_7b = [
+process_files_llama_2_7b_1 = [
     "meta-llama-Llama-2-7b-chat-hf/SummEmpty_20minSmol_1_8b_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_15_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_T01_20_write_out_info.json",
@@ -79,6 +79,8 @@ process_files_llama_2_7b = [
     "meta-llama-Llama-2-7b-chat-hf/SummLtM_20Minuten_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_2_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_T05_3_write_out_info.json",
+]
+process_files_llama_2_7b_2 = [
     "meta-llama-Llama-2-7b-chat-hf/SummNonEmpty_20minSmol_1_8b_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_3_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_T05_5_write_out_info.json",
@@ -102,13 +104,7 @@ process_files_llama_2_7b = [
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_14_write_out_info.json",
     "meta-llama-Llama-2-7b-chat-hf/SummarizationTask_20Minuten_T01_1_write_out_info.json",
 ]
-process_files_MDS_Basic = [
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2OP41_52_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2O_52_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2SP41_52_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2S_52_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplit_2_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplit_41_8b_write_out_info.json",
+process_files_MDS_Basic_1 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsClean_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC128_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC256_52_8b_write_out_info.json",
@@ -129,6 +125,14 @@ process_files_MDS_Basic = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_50_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_51_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_52_8b_write_out_info.json",
+]
+process_files_MDS_Basic_2 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2OP41_52_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2O_52_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2SP41_52_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplitS2S_52_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplit_2_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS2S_WikinewsSplit_41_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10C_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10O_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10R_42_8b_write_out_info.json",
@@ -146,9 +150,11 @@ process_files_MDS_Basic = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent5L00_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent5L05_42_8b_write_out_info.json",
 ]
-process_files_MDS_FCO = [
+process_files_MDS_FCO_1 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCh1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCh1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N2048_100_8b_write_out_info.json",
@@ -162,6 +168,8 @@ process_files_MDS_FCO = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2S22048_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SW1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SW1536_100_8b_write_out_info.json",
+]
+process_files_MDS_FCO_2 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi0S1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi0S1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi1S21024_100_8b_write_out_info.json",
@@ -175,8 +183,6 @@ process_files_MDS_FCO = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1S21536_100_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1024_100_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1S21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1SW1024_100_8b_write_out_info.json",
@@ -185,7 +191,7 @@ process_files_MDS_FCO = [
 process_files_MDS_Chain = [
     "meta-llama-Llama-2-70b-chat-hf/MDSChain_WikinewsS2_100_8b_write_out_info.json",
 ]
-process_files_SDS = [
+process_files_SDS_1 = [
     "meta-llama-Llama-2-70b-chat-hf/SummFewshot0_20Minuten_1_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummFewshot0_20Minuten_4_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummFewshot0_20min0_2_8b_write_out_info.json",
@@ -206,17 +212,8 @@ process_files_SDS = [
     "meta-llama-Llama-2-70b-chat-hf/SummLtM1_20min0_31_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummLtM1_20min0_32_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummLtM1_20min0_33_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22E_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22E_37_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22S_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22S_37_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31E_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31E_37_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31S_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33E_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33E_37_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33S_35_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33S_37_8b_write_out_info.json",
+]
+process_files_SDS_2 = [
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_11_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_13_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_15_8b_write_out_info.json",
@@ -239,6 +236,19 @@ process_files_SDS = [
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_5_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_7_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummSample_20Minuten_9_8b_write_out_info.json",
+]
+process_files_SDS_3 = [
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22E_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22E_37_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22S_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p22S_37_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31E_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31E_37_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p31S_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33E_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33E_37_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33S_35_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/SummLtm2_20minLtm2p33S_37_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummarizationTask_20Minuten_3_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummarizationTask_20min0_1_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummarizationTask_20min0_2_8b_write_out_info.json",
@@ -252,8 +262,8 @@ Document 990, "Der zweite Silvester in Folge, der unter dem Einfluss der Corona-
 """
 
 worker_lang = "de"
-process_files = process_files_SDS
-dst_file_name = "SEAHORSE_mds_fco_experiments"
+process_files = process_files_MDS_FCO_1
+dst_file_name = "SEAHORSE_mds_fco_1_experiments"
 skip_processing_base_datasets = True
 """
 Old filenames:
