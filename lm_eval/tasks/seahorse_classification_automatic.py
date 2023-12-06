@@ -64,14 +64,14 @@ class AutomaticSeahorseClassificationTask(seahorse_classification.SeahorseClassi
     def aggregation(self):
         # don't aggregate at all
         return {
-            "prediction": 0,
+            "prediction": lambda x: 0,
             "true_prediction_probability": mean,
-            "id": 0,
-            "article": 0,
-            "summary": 0,
-            "gt_summary": 0,
-            "experiment_id": 0,
-            "sub_id": 0,
+            "id": lambda x: 0,
+            "article": lambda x: 0,
+            "summary": lambda x: 0,
+            "gt_summary": lambda x: 0,
+            "experiment_id": lambda x: 0,
+            "sub_id": lambda x: 0,
         }
 
 

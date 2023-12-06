@@ -38,7 +38,7 @@ dataset_names = [
     # "4_Llama70b",
 
     ## SEAHORSE evaluation
-    "base_datasets",
+    # "base_datasets",
     "fco_experiments",
 
     ## summarization-chain
@@ -230,9 +230,9 @@ inferable_args = {
         "bigscience/bloomz-7b1-mt": "08:00",
         "tiiuae/falcon-7b-instruct": "08:00",
         "tiiuae/falcon-40b-instruct": "24:00",
-        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "08:00",
-        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "08:00",
-        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "08:00",
+        "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "12:00",
+        "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "12:00",
+        "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "12:00",
     },
     "gpu": {
         "default": "rtx_3090",
