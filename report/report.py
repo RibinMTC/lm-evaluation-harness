@@ -2346,6 +2346,7 @@ datasetNameMap = {
     "20minLtm2p33S": "20Minuten",
     "20minLtm2p33E": "20Minuten",
     "WikinewsClean": "Wikinews",
+    "WikinewsSLR": "Wikinews",
     "WikinewsSimple": "Wikinews",
     "WikinewsSimpleS": "Wikinews",
     "WikinewsSimpleA": "Wikinews",

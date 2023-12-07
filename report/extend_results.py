@@ -260,10 +260,21 @@ process_files_SDS_3 = [
 Llama-2-7b Notes: 
 Document 990, "Der zweite Silvester in Folge, der unter dem Einfluss der Corona-Pand..." is too long
 """
+process_queue = [
+    ("SEAHORSE_llama_2_7b_1", process_files_llama_2_7b_1),
+    ("SEAHORSE_llama_2_7b_2", process_files_llama_2_7b_2),
+    ("SEAHORSE_mds_basic_1", process_files_MDS_Basic_1),
+    ("SEAHORSE_mds_basic_2", process_files_MDS_Basic_2),
+    ("SEAHORSE_mds_fco_1", process_files_MDS_FCO_1),
+    ("SEAHORSE_mds_fco_2", process_files_MDS_FCO_2),
+    ("SEAHORSE_mds_chain", process_files_MDS_Chain),
+    ("SEAHORSE_mds_sds_1", process_files_SDS_1),
+    ("SEAHORSE_mds_sds_2", process_files_SDS_2),
+    ("SEAHORSE_mds_sds_3", process_files_SDS_3),
+]
+
 
 worker_lang = "de"
-process_files = process_files_MDS_FCO_1
-dst_file_name = "SEAHORSE_mds_fco_1_experiments"
 skip_processing_base_datasets = True
 """
 Old filenames:
@@ -333,7 +344,8 @@ def truncate_article(article, max_article_length, sentence_splitter):
     return article
 
 
-def prepare_files(src_folder, files_list, dst_folder):
+def prepare_files(src_folder, files_list, dst_file_name, dst_folder):
+    print(f"Preparing files for {dst_file_name}")
     sentence_splitter_by_lang = {
         "de": lambda x: somajo_sentence_splitting(x, 1),
         "en": lambda x: sent_tokenize(x, language="english"),
@@ -513,5 +525,6 @@ def prepare_files(src_folder, files_list, dst_folder):
 
 
 if __name__ == "__main__":
-    prepare_files(SRC_FOLDER, process_files, INT_FOLDER)
+    for dst_file_name, process_files in process_queue:
+        prepare_files(SRC_FOLDER, process_files, dst_file_name, INT_FOLDER)
     # extend_basic_metrics(os.path.join(INT_FOLDER, "all_data.json"), os.path.join(DST_FOLDER, "all_data.json"))

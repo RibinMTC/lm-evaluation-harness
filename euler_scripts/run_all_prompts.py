@@ -89,7 +89,7 @@ dataset_names = [
 
     "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1]  # [1, 2, 3, 4, 5]
+prompt_versions = [2]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
     # "seahorse_",
