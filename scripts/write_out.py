@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument("--description_dict_path", default=None)
     parser.add_argument("--model_id", default=None)
     parser.add_argument("--prompt_version_per_task", default=None)
+    parser.add_argument("--fewshot_strategy", type=str, default="stratified")
     return parser.parse_args()
 
 
@@ -77,6 +78,7 @@ def main():
                     num_fewshot=args.num_fewshot,
                     rnd=rnd,
                     description=description,
+                    fewshot_sampling=args.fewshot_strategy
                 )
                 f.write(ctx + "\n")
 
