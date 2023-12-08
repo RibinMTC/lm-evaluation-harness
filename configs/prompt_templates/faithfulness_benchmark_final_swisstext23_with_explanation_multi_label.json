@@ -18,5 +18,11 @@
     },
    "mtc/ehartford-dolphin": {
     "all_labels_english": "<|im_start|>system\nYou are an expert German linguist<|im_end|>\n<|im_start|>user\nAnalyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'.\nArticle: {article}\nSentence: {sentence}<|im_end|>\n<|im_start|>assistant\n"
+  },
+  "ehartford/dolphin": {
+    "all_labels_english_with_explanation": "### Instruction:\nAnalyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label.\nArticle: {article}\nSentence: {sentence}\n\n### Explanation and Label:\n"
+  },
+  "microsoft/Orca": {
+    "all_labels_english_with_explanation": "### Instruction:\nAnalyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label.\nArticle: {article}\nSentence: {sentence}\n\n### Explanation and Label:\n"
   }
 }
