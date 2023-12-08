@@ -7,10 +7,19 @@ from lm_eval.tasks.faithfulness_multi_classification_base_task import Faithfulne
 
 
 class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationBaseTask):
+    DATASET_PATH = "mtc/final_german_faithfulness_benchmark_with_explanations"
+    explanation_key_name = "explanation"
+
     ANS_RE = re.compile(r"(?i)label:\s*(.*?)(?=\n|$)")
     INVALID_ANS = "Invalid"
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination", INVALID_ANS]
+
+    def format_prompt_target(self, doc):
+        explanation = doc[self.explanation_key_name]
+        label = doc[self.label_key_name]
+        explanation_with_label = f"Erklärung:{explanation}\nLabel:{label}"
+        return explanation_with_label
 
     def construct_requests(self, doc, ctx):
         completion = rf.greedy_until(ctx, {"until": []})
