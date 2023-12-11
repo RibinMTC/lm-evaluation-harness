@@ -12,8 +12,8 @@ import random, string
 """
 models = [
     # "gpt-4",
-    "palm2",
-    # "meta-llama/Llama-2-7b-chat-hf",
+    # "palm2",
+    "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
     # "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
@@ -26,9 +26,37 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "palm-2-repeated-" + ''.join(
+experiment_name = "mds-wikinews-fco-extended-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
+    # "WikinewsTrunc3584",
+    # "MultinewsTrunc3584",
+
+    "MultiCD040SSimDyn1024",
+    # "MultiCD040SSimDyn1536",
+
+    # "WikiCl0SSimDyn1536",
+    # "WikiCl1SSimDyn1536",
+    # "WikiCl2SSimDyn1536",
+
+    # "WikiCD040SSimDyn1024",
+    # "WikiCD040SSimDyn1536",
+    # "WikiCD041SSimDyn1024",
+    # "WikiCD042SSimDyn1024",
+    # "WikiCD043SSimDyn1024",
+    # "WikiCD041SSimDyn1536",
+    # "WikiCD042SSimDyn1536",
+    # "WikiCD043SSimDyn1536",
+    #
+    # "WikiCD050SSimDyn1536",
+    # "WikiCD060SSimDyn1536",
+    # "WikiCD051SSimDyn1536",
+    # "WikiCD061SSimDyn1536",
+    # "WikiCD052SSimDyn1536",
+    # "WikiCD062SSimDyn1536",
+    # "WikiCD053SSimDyn1536",
+    # "WikiCD063SSimDyn1536",
+
     ## Repeat experiments
     # "0_Llama7b",
     # "0_Llama70b",
@@ -87,21 +115,22 @@ dataset_names = [
     # "WikinewsClust1R", "WikinewsClust1O", "WikinewsClust1C", "WikinewsClust3R", "WikinewsClust3O", "WikinewsClust3C", "WikinewsClust5R", "WikinewsClust5O", "WikinewsClust5C", "WikinewsClust10R", "WikinewsClust10O", "WikinewsClust10C"
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
 
-    "20Minuten",
+    # "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [2]  # [1, 2, 3, 4, 5]
+prompt_versions = [100]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
     # "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    "SummSample_",
+    # "SummSample_",
     # "MDSChain_",
-    # "MDSFCO_",
+    # "MDS_",
+    "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", "8b"]
+precision_values = ["8b"]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
