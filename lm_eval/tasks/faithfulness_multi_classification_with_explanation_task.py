@@ -62,6 +62,50 @@ class FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask(
     DATASET_PATH = "mtc/final_german_faithfulness_benchmark_with_full_disagreements"
 
 
+class AbsinthWithExplanationEmptyArticleTask(
+    FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/absinth_correctly_predicted_samples_by_leo_mistral_cot_3epochs"
+
+    def format_prompt(self, doc):
+        if not self.prompt_template:
+            self.prompt_template = self.default_prompt_template
+        prompt = self.prompt_template.format(article="",
+                                             sentence=doc[self.sentence_key_name])
+        return prompt
+
+    def _process_doc(self, doc):
+        out_doc = {
+            "query": self.format_prompt(doc),
+            "choices": self.choices,
+            "gold": self.choices.index(self.convert_label("Extrinsic Hallucination")),
+            "original_doc": doc
+        }
+        return out_doc
+
+
+class AbsinthWithExplanationUnrelatedArticleTask(
+    FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/absinth_correctly_predicted_samples_by_leo_mistral_cot_3epochs"
+    UNRELATED_ARTICLE = """Das Hämoglobin im Blut ist nicht nur für die typisch rote Farbe verantwortlich. Es ist der wichtigste Bestandteil der roten Blutkörperchen (Erythrozyten). Diese haben die Aufgabe, alle Körperzellen mit lebenswichtigem Sauerstoff zu versorgen und auf dem Rückweg zur Lunge Kohlendioxid als Stoffwechselendprodukt zu entfernen. Sauerstoff und Kohlendioxid werden mit Hilfe des Hämoglobins transportiert. Im Hämoglobin ist Eisen enthalten, das den Sauerstoff bindet.
+Rote Blutkörperchen haben eine Lebensdauer 100 bis 140 Tagen, d. h. es werden ständig ältere Erythrozyten abgebaut und neue kommen hinzu. Im Monat werden insgesamt rund 1,2 Liter Blut neu gebildet. Das im roten Blutfarbstoff (Hämoglobin) enthaltene Eisen wird hierbei fast vollständig wieder zum Neubau von Hämoglobin verwendet. Jeder gesunde Mensch verfügt über eine natürliche Eisenreserve, mit der Verluste normalerweise rasch ausgeglichen werden können. Im Bedarfsfall steigt die Neubildung von roten Blutkörperchen bis auf das 15-Fache des Normalwertes an.
+Bei einer Blutspende oder bei größerem Blutverlust geht für den Neuaufbau von Hämoglobin wichtiges Eisen verloren. Besitzt ein Spender zu wenig roten Blutfarbstoff, d. h. ist sein Hämoglobinwert zu niedrig oder an der unteren Grenze, so hat er keine ausreichenden Eisenreserven für eine gesteigerte Neubildung von voll funktionsfähigen Erythrozyten. Eine Blutspende ist zu diesem Zeitpunkt dann nicht möglich."""
+
+    def format_prompt(self, doc):
+        if not self.prompt_template:
+            self.prompt_template = self.default_prompt_template
+        prompt = self.prompt_template.format(article=self.UNRELATED_ARTICLE,
+                                             sentence=doc[self.sentence_key_name])
+        return prompt
+
+    def _process_doc(self, doc):
+        out_doc = {
+            "query": self.format_prompt(doc),
+            "choices": self.choices,
+            "gold": self.choices.index(self.convert_label("Extrinsic Hallucination")),
+            "original_doc": doc
+        }
+        return out_doc
+
 class SeahorseFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/german_seahorse_dataset_with_articles"
     article_key_name = "article"
