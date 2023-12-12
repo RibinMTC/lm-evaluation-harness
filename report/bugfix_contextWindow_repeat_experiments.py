@@ -137,6 +137,11 @@ def load_results_to_be_repeated():
 def insert_repeated_experiments():
     process_repeat_files = [
         # "RepeatExperimentBugfix_0_Llama7b_100_8b_write_out_info.json",
+        "RepeatExperimentBugfix_0_Llama70b_100_8b_write_out_info.json",
+        "RepeatExperimentBugfix_1_Llama70b_100_8b_write_out_info.json",
+        "RepeatExperimentBugfix_2_Llama70b_100_8b_write_out_info.json",
+        "RepeatExperimentBugfix_3_Llama70b_100_8b_write_out_info.json",
+        "RepeatExperimentBugfix_4_Llama70b_100_8b_write_out_info.json",
     ]
     dst_folder = "../results_extended"
     base_folder = "../results"

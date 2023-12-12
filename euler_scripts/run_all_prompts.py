@@ -13,9 +13,9 @@ import random, string
 models = [
     # "gpt-4",
     # "palm2",
-    "meta-llama/Llama-2-7b-chat-hf",
+    # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
@@ -32,9 +32,9 @@ dataset_names = [
     # "WikinewsTrunc3584",
     # "MultinewsTrunc3584",
 
-    "MultiCD040SSimDyn1024",
+    # "MultiCD040SSimDyn1024",
     # "MultiCD040SSimDyn1536",
-
+    #
     # "WikiCl0SSimDyn1536",
     # "WikiCl1SSimDyn1536",
     # "WikiCl2SSimDyn1536",
@@ -73,6 +73,18 @@ dataset_names = [
     # "WikinewsS2",
     # "WikinewsClustS2",
     # "WikinewsClustDistS2",
+    # Actual summarization chain
+    "WikinewsCDS2i0",
+    # "WikinewsCDS2i1",
+    # "WikinewsCDS2i2",
+    # "WikinewsCDS2i3",
+    # "WikinewsCDS2i4",
+    # "WikinewsCDS2i5",
+    # "WikinewsCDS2i6",
+    # "WikinewsCDS2i7",
+    # "WikinewsCDS2i8",
+    # "WikinewsCDS2i9",
+    # "WikinewsCDS2i10",
 
     # "20Minuten"
     ## FCO Experiments
@@ -124,9 +136,9 @@ task_base_names = [
     # "RepeatExperimentBugfix_",
 
     # "SummSample_",
-    # "MDSChain_",
+    "MDSChain_",
     # "MDS_",
-    "MDSFCO_",
+    # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
@@ -274,7 +286,7 @@ inferable_args = {
         "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",
+        "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "LeoLM/leo-hessianai-7b": "rtx_3090",
@@ -292,7 +304,7 @@ inferable_args = {
         "palm2": 1,
         "meta-llama/Llama-2-7b-chat-hf": 2,
         "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 3,
+        "meta-llama/Llama-2-70b-chat-hf": 5,  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
         "garage-bAInd/Platypus2-70B-instruct": 3,
         "LeoLM/leo-hessianai-7b": 1,
