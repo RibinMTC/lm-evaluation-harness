@@ -123,6 +123,11 @@ Bei einer Blutspende oder bei größerem Blutverlust geht für den Neuaufbau von
         return prompt
 
 
+class AbsinthWithExplanationFaithfulDoubleNegationTask(
+    FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/absinth_double_negations_gpt4_test"
+
+
 class SeahorseFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/german_seahorse_dataset_with_articles"
     article_key_name = "article"
