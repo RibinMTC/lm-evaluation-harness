@@ -15,7 +15,8 @@ models = [
     # "palm2",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
+    "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
@@ -26,14 +27,14 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "mds-wikinews-fco-extended-" + ''.join(
+experiment_name = "versions-experiment-mixtral-moe-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
     # "MultinewsTrunc3584",
 
     # "MultiCD040SSimDyn1024",
-    # "MultiCD040SSimDyn1536",
+    # "MultiCD040SSimDyn1536", # TODO: Wait to see if finishes (39554644)
     #
     # "WikiCl0SSimDyn1536",
     # "WikiCl1SSimDyn1536",
@@ -74,8 +75,8 @@ dataset_names = [
     # "WikinewsClustS2",
     # "WikinewsClustDistS2",
     # Actual summarization chain
-    "WikinewsCDS2i0",
-    # "WikinewsCDS2i1",
+    # "WikinewsCDS2i0",
+    # "WikinewsCDS2i1", # TODO: CONTINUE HERE
     # "WikinewsCDS2i2",
     # "WikinewsCDS2i3",
     # "WikinewsCDS2i4",
@@ -127,22 +128,22 @@ dataset_names = [
     # "WikinewsClust1R", "WikinewsClust1O", "WikinewsClust1C", "WikinewsClust3R", "WikinewsClust3O", "WikinewsClust3C", "WikinewsClust5R", "WikinewsClust5O", "WikinewsClust5C", "WikinewsClust10R", "WikinewsClust10O", "WikinewsClust10C"
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
 
-    # "20Minuten",
+    "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [100]  # [1, 2, 3, 4, 5]
+prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
     # "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    # "SummSample_",
-    "MDSChain_",
+    "SummSample_",
+    # "MDSChain_",
     # "MDS_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
@@ -244,6 +245,7 @@ inferable_args = {
         "meta-llama/Llama-2-7b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-13b-chat-hf": "hf-causal-experimental",
         "meta-llama/Llama-2-70b-chat-hf": "hf-causal-experimental",
+        "mistralai/Mixtral-8x7B-Instruct-v0.1": "hf-causal-experimental",
         "bigscience/bloomz-7b1-mt": "hf-causal-experimental",
         "tiiuae/falcon-7b-instruct": "hf-causal-experimental",
         "tiiuae/falcon-40b-instruct": "hf-causal-experimental",
@@ -269,6 +271,7 @@ inferable_args = {
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
         "meta-llama/Llama-2-70b-chat-hf": "24:00",  # 24
+        "mistralai/Mixtral-8x7B-Instruct-v0.1": "12:00",  # 24
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
         "garage-bAInd/Platypus2-70B-instruct": "30:00",
         "LeoLM/leo-hessianai-7b": "8:00",
@@ -286,7 +289,8 @@ inferable_args = {
         "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "mistralai/Mixtral-8x7B-Instruct-v0.1": "rtx_3090",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "LeoLM/leo-hessianai-7b": "rtx_3090",
@@ -304,7 +308,8 @@ inferable_args = {
         "palm2": 1,
         "meta-llama/Llama-2-7b-chat-hf": 2,
         "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 5,  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": 3,  # 3x a100-pcie-40gb, 6x rtx_3090 or rtx_4090
+        "mistralai/Mixtral-8x7B-Instruct-v0.1": 4,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
         "garage-bAInd/Platypus2-70B-instruct": 3,
         "LeoLM/leo-hessianai-7b": 1,
