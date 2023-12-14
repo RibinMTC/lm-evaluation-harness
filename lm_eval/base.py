@@ -631,7 +631,7 @@ class Task(abc.ABC):
 
     @utils.positional_deprecated
     def fewshot_context(
-        self, doc, num_fewshot, provide_description=None, rnd=None, description=None
+        self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling=None
     ):
         """Returns a fewshot context string that is made up of a prepended description
         (if provided), the `num_fewshot` number of examples, and an appended prompt example.

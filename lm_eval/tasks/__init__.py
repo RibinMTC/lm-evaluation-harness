@@ -77,6 +77,7 @@ from . import faithfulness_classification_base_task
 from . import faithfulness_multi_classification_base_task
 from . import faithfulness_multi_classification_with_explanation_task
 from . import domain_adaptation_summarization
+from . import absinth_reasoning_generation
 from ..utils import TaskConfig
 
 ########################################
@@ -363,6 +364,7 @@ TASK_REGISTRY = {
     "govreport_domain_adaptation_summarization": domain_adaptation_summarization.GovReportDomainAdaptationSummarizationTask,
     "pubmed_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask,
     "pubmed_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Pubmed2ShotDomainAdaptationSummarizationTask,
+    "absinth_reasoning_generation": absinth_reasoning_generation.AbsinthReasoningGenerationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

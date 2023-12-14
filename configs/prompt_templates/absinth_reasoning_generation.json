@@ -1,0 +1,8 @@
+{
+   "mistralai": {
+     "reasoning_generation_english": "Reply ONLY in German. For the specified article, sentence, and label, explain in detail why the label was selected and the others label were not chosen. The label 'Faithful' indicates the sentence aligns with the article's content, 'Intrinsic Hallucination' means it contradicts or misrepresents the article by swapping entities, dates ,location etc. and 'Extrinsic hallucination' suggests it includes information not present in the article. Don't reply with: the label was chosen... but instead simply provide a concise explanation without mentioning the label. If the label is Intrinsic Hallucination, don't reply with: The information is not contained in the article. Think step by step before providing final explanation.\nArtikel: {article}\nSatz: {sentence}\nLabel: {label}\nErklärung:"
+  },
+  "LeoLM/leo": {
+     "reasoning_generation_english": "Reply ONLY in German. For the specified article, sentence, and label, explain in detail why the label was selected and the others label were not chosen. The label 'Faithful' indicates the sentence aligns with the article's content, 'Intrinsic Hallucination' means it contradicts or misrepresents the article by swapping entities, dates ,location etc. and 'Extrinsic hallucination' suggests it includes information not present in the article. Don't reply with: the label was chosen... but instead simply provide a concise explanation without mentioning the label. If the label is Intrinsic Hallucination, don't reply with: The information is not contained in the article. Think step by step before providing final explanation.\nArtikel: {article}\nSatz: {sentence}\nLabel: {label}\nErklärung:"
+  }
+}
