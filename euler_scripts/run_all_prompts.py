@@ -75,17 +75,17 @@ dataset_names = [
     # "WikinewsClustS2",
     # "WikinewsClustDistS2",
     # Actual summarization chain
-    # "WikinewsCDS2i0",
-    # "WikinewsCDS2i1", # TODO: CONTINUE HERE
-    # "WikinewsCDS2i2",
-    # "WikinewsCDS2i3",
-    # "WikinewsCDS2i4",
-    # "WikinewsCDS2i5",
-    # "WikinewsCDS2i6",
-    # "WikinewsCDS2i7",
-    # "WikinewsCDS2i8",
-    # "WikinewsCDS2i9",
-    # "WikinewsCDS2i10",
+    # "WikinewsCDS4i0",
+    "WikinewsCDS4i1", # TODO: CONTINUE HERE
+    # "WikinewsCDS4i2",
+    # "WikinewsCDS4i3",
+    # "WikinewsCDS4i4",
+    # "WikinewsCDS4i5",
+    # "WikinewsCDS4i6",
+    # "WikinewsCDS4i7",
+    # "WikinewsCDS4i8",
+    # "WikinewsCDS4i9",
+    # "WikinewsCDS4i10",
 
     # "20Minuten"
     ## FCO Experiments
