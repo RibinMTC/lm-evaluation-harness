@@ -29,7 +29,7 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "base-experiment-" + ''.join(
+experiment_name = "base-experiment-temperature-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
@@ -132,7 +132,11 @@ dataset_names = [
 
     # "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  # [1, 2, 3, 4, 5]
+prompt_versions = [2, 4, 5, 19, 23, 45, 49]  # [1, 2, 3, 4, 5]
+# 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+# 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+# 22,23,40,41,42,43,44,45,46,47,48,49,
+#
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
     # "seahorse_",
@@ -145,7 +149,7 @@ task_base_names = [
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
-temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
+temperature_values = [0.1, 0.5, 1.0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
@@ -277,10 +281,10 @@ inferable_args = {
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "12:00",  # 24
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
         "garage-bAInd/Platypus2-70B-instruct": "30:00",
-        "LeoLM/leo-hessianai-7b": "8:00",
+        "LeoLM/leo-hessianai-7b": "08:00",
         "LeoLM/leo-hessianai-13b": "12:00",
-        "bigscience/bloomz-7b1-mt": "08:00",
-        "tiiuae/falcon-7b-instruct": "08:00",
+        "bigscience/bloomz-7b1-mt": "04:00",
+        "tiiuae/falcon-7b-instruct": "04:00",
         "tiiuae/falcon-40b-instruct": "24:00",
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "24:00",
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "24:00",
@@ -298,8 +302,8 @@ inferable_args = {
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
         "LeoLM/leo-hessianai-7b": "rtx_3090",
         "LeoLM/leo-hessianai-13b": "a100_80gb",
-        "bigscience/bloomz-7b1-mt": "a100-pcie-40gb",
-        "tiiuae/falcon-7b-instruct": "a100-pcie-40gb",
+        "bigscience/bloomz-7b1-mt": "rtx_3090",
+        "tiiuae/falcon-7b-instruct": "rtx_3090",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "rtx_3090",
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "rtx_3090",
@@ -309,16 +313,16 @@ inferable_args = {
         "default": 1,
         "gpt-4": 1,
         "palm2": 1,
-        "meta-llama/Llama-2-7b-chat-hf": 2,
-        "meta-llama/Llama-2-13b-chat-hf": 1,
+        "meta-llama/Llama-2-7b-chat-hf": 1,
+        "meta-llama/Llama-2-13b-chat-hf": 2,
         "meta-llama/Llama-2-70b-chat-hf": 6,  # 3x a100-pcie-40gb, 6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": 4,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
         "garage-bAInd/Platypus2-70B-instruct": 3,
         "LeoLM/leo-hessianai-7b": 1,
         "LeoLM/leo-hessianai-13b": 1,
-        "bigscience/bloomz-7b1-mt": 1,
-        "tiiuae/falcon-7b-instruct": 1,
+        "bigscience/bloomz-7b1-mt": 2,
+        "tiiuae/falcon-7b-instruct": 2,
         "tiiuae/falcon-40b-instruct": 4,
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": 1,
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": 1,

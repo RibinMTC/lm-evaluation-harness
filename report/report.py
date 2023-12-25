@@ -148,7 +148,8 @@ def load_results(results_path_base, model_name, return_concat_df=True):
 
 
 # function receiving a list of model names calling load_results for each model and concatenating the results
-def load_all_results(results_path, model_names, shortNames, reload_preprocessed_dataset=False, no_cache_reload_all=False):
+def load_all_results(results_path, model_names, shortNames, reload_preprocessed_dataset=False,
+                     no_cache_reload_all=False):
     dfs = []
     model_names_list = []
     filenames_list = []
@@ -466,7 +467,7 @@ def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_
     if not skip_lang:
         # df_lang_stat, df_prompt_lang_effect = language_statistics(df, experiment_path, prompts, groupbyList=groupByList)
         # Filter out the non-german predictions
-        tgt_lang = datasetLanguage[df["Dataset"].iloc[0]] # should all be the same dataset
+        tgt_lang = datasetLanguage[df["Dataset"].iloc[0]]  # should all be the same dataset
         df_non_german = df[df["Language"] != tgt_lang]
         df = df[df["Language"] == tgt_lang]
 
@@ -591,13 +592,16 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prom
                                         f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}.csv"),
                            index=False)
     # reorganize the dataframe to have the different failure types as columns
-    df_failure_stat_pivot = df_failure_stat.pivot_table(index=groupbyList + [x_group], columns='failure', values='count',
+    df_failure_stat_pivot = df_failure_stat.pivot_table(index=groupbyList + [x_group], columns='failure',
+                                                        values='count',
                                                         fill_value=math.nan).reset_index()
     df_failure_stat_pivot.to_csv(os.path.join(experiment_path, subfolder_name,
-                                          f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.csv"), index=False)
+                                              f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.csv"),
+                                 index=False)
     # also save as latex table into a txt file
     df_failure_stat_pivot.to_latex(os.path.join(experiment_path, subfolder_name,
-                                            f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.txt"), index=False)
+                                                f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.txt"),
+                                   index=False)
 
 
 def get_lang_detector(nlp, name):
@@ -2249,7 +2253,15 @@ experiment_config = {
     },
     "base-experiment": {
         "groupByList": ["Prompt ID", "Model"],
-        "models": ["meta-llama/Llama-2-7b-chat-hf", "tiiuae/falcon-7b-instruct", "bigscience/bloomz-7b1-mt"],
+        "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-13b-chat-hf",
+            "tiiuae/falcon-7b-instruct",
+            "bigscience/bloomz-7b1-mt",
+        ],
+        "groupByListVariants": [
+            ["Prompt Desc. [ID]", "Model"],
+        ],
         "datasets": ["20Minuten"]
     },
     "base-experiment-temperature": {
@@ -2261,6 +2273,9 @@ experiment_config = {
             "tiiuae/falcon-7b-instruct",
             # "tiiuae/falcon-40b-instruct",
             "bigscience/bloomz-7b1-mt"
+        ],
+        "groupByListVariants": [
+            ["Prompt Desc. [ID]", "Model"],
         ],
         "datasets": ["20Minuten"]
     },
@@ -3197,7 +3212,8 @@ def main(reload_data=True, reload_preprocessed_dataset=False, no_cache_reload_al
 
     if reload_data:
         # Aggregate results and create DataFrame
-        df = load_all_results(RESULTS_PATH, models, shortNames, reload_preprocessed_dataset=reload_preprocessed_dataset, no_cache_reload_all=no_cache_reload_all)
+        df = load_all_results(RESULTS_PATH, models, shortNames, reload_preprocessed_dataset=reload_preprocessed_dataset,
+                              no_cache_reload_all=no_cache_reload_all)
         # Save DataFrame as CSV
         save_dataframe(df, experiment_name)
     else:
