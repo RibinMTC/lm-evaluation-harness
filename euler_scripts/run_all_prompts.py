@@ -13,12 +13,14 @@ import random, string
 models = [
     # "gpt-4",
     # "palm2",
-    # "meta-llama/Llama-2-7b-chat-hf",
-    # "meta-llama/Llama-2-13b-chat-hf",
+    "meta-llama/Llama-2-7b-chat-hf",
+    "meta-llama/Llama-2-13b-chat-hf",
     # "meta-llama/Llama-2-70b-chat-hf",
-    "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
+    "bigscience/bloomz-7b1-mt",
+    "tiiuae/falcon-7b-instruct",
     # "LeoLM/leo-hessianai-7b",
     # "LeoLM/leo-hessianai-13b",
     # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
@@ -27,7 +29,7 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "versions-experiment-mixtral-moe-" + ''.join(
+experiment_name = "base-experiment-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
@@ -76,18 +78,18 @@ dataset_names = [
     # "WikinewsClustDistS2",
     # Actual summarization chain
     # "WikinewsCDS4i0",
-    "WikinewsCDS4i1", # TODO: CONTINUE HERE
+    # "WikinewsCDS4i1",
     # "WikinewsCDS4i2",
     # "WikinewsCDS4i3",
     # "WikinewsCDS4i4",
     # "WikinewsCDS4i5",
     # "WikinewsCDS4i6",
     # "WikinewsCDS4i7",
-    # "WikinewsCDS4i8",
+    # "WikinewsCDS4i8", # TODO: CONTINUE HERE
     # "WikinewsCDS4i9",
     # "WikinewsCDS4i10",
 
-    # "20Minuten"
+    "20Minuten"
     ## FCO Experiments
     # Cheat
     # "WikiCh1024", "WikiCh1536",
@@ -128,15 +130,16 @@ dataset_names = [
     # "WikinewsClust1R", "WikinewsClust1O", "WikinewsClust1C", "WikinewsClust3R", "WikinewsClust3O", "WikinewsClust3C", "WikinewsClust5R", "WikinewsClust5O", "WikinewsClust5C", "WikinewsClust10R", "WikinewsClust10O", "WikinewsClust10C"
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
 
-    "20Minuten",
+    # "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1,2,3,4,5]  # [1, 2, 3, 4, 5]
+prompt_versions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  # [1, 2, 3, 4, 5]
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
     # "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    "SummSample_",
+    "SummarizationTask_",
+    # "SummSample_",
     # "MDSChain_",
     # "MDS_",
     # "MDSFCO_",
@@ -289,7 +292,7 @@ inferable_args = {
         "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "a100-pcie-40gb",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "rtx_3090",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
@@ -308,7 +311,7 @@ inferable_args = {
         "palm2": 1,
         "meta-llama/Llama-2-7b-chat-hf": 2,
         "meta-llama/Llama-2-13b-chat-hf": 1,
-        "meta-llama/Llama-2-70b-chat-hf": 3,  # 3x a100-pcie-40gb, 6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": 6,  # 3x a100-pcie-40gb, 6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": 4,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
         "garage-bAInd/Platypus2-70B-instruct": 3,

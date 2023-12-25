@@ -111,13 +111,15 @@ def extract_dataset_and_task_name(filename):
 
 
 # Function to load results from JSON files to a dataframe
-def load_results(results_path_base, model_name):
+def load_results(results_path_base, model_name, return_concat_df=True):
     model_name = rename_hf_model(model_name)
     results_path = f"../{results_path_base}/{model_name}"
     result_files = [f for f in os.listdir(results_path) if f.endswith(".json")]
 
     # Load the results from all JSON files and extend their fields as needed
     all_results = []
+    model_names = []
+    filenames = []
     for file in result_files:
         with open(os.path.join(results_path, file), "r") as f:
             result = json.load(f)
@@ -132,65 +134,41 @@ def load_results(results_path_base, model_name):
                 entry['Temperature'] = temperature
                 entry['Model Precision'] = precision
 
-            all_results.extend(result)
+            all_results.append(result)
+            model_names.append(model_name)
+            filenames.append(file)
 
-    out = pd.DataFrame(all_results)
-    return out
+    if return_concat_df:
+        # Concatenate the results from all JSON files
+        df = pd.concat([pd.DataFrame(result) for result in all_results])
+        return [df], [model_name], ["concat"]
+    else:
+        all_results_df = [pd.DataFrame(result) for result in all_results]
+        return all_results_df, model_names, filenames
 
 
 # function receiving a list of model names calling load_results for each model and concatenating the results
-def load_all_results(results_path, model_names, shortNames, reload_preprocessed_dataset=False):
+def load_all_results(results_path, model_names, shortNames, reload_preprocessed_dataset=False, no_cache_reload_all=False):
     dfs = []
+    model_names_list = []
+    filenames_list = []
     for model_name in model_names:
-        df = load_results(results_path, model_name)
-        dfs.append(df)
+        df_list, model_names, filenames = load_results(results_path, model_name, return_concat_df=False)
+        dfs.extend(df_list)
+        model_names_list.extend(model_names)
+        filenames_list.extend(filenames)
+    df = pd.concat(dfs)
 
     # prepare shotNames map -> replace / with -
     shortNames = {rename_hf_model(model_name): shortNames[model_name] for model_name in shortNames}
 
-    df = pd.concat(dfs)
-    df.rename(columns=column_rename_map, inplace=True)
-    df.rename(columns={"Model": "Model-Identifier"}, inplace=True)
-    df["Model"] = df["Model-Identifier"].map(shortNames)
-    df["Dataset Annotation"] = df["Dataset"].apply(
-        lambda x: datasetAnnotationMap[x] if x in datasetAnnotationMap else "")
-    df["Preprocessing Method"] = df["Dataset"].apply(
-        lambda x: preprocessing_method[x] if x in preprocessing_method else "")
-    df["Preprocessing Parameters"] = df["Dataset"].apply(
-        lambda x: preprocessing_parameters[x] if x in preprocessing_parameters else "")
-    df["Preprocessing Order"] = df["Dataset"].apply(
-        lambda x: preprocessing_order[x] if x in preprocessing_order else "")
-    df["N-Shot"] = df.apply(lambda row: dataset_n_fewshot_annotation_map[row["Dataset"]] if row[
-                                                                                                "Dataset"] in dataset_n_fewshot_annotation_map else
-    row["N-Shot"], axis=1)
-    df["Preprocessing + N-Shot"] = df.apply(lambda row: f"{row['Preprocessing Method']} ({row['N-Shot']}-shot)", axis=1)
-    df["Dataset"] = df["Dataset"].apply(lambda x: x if x not in datasetNameMap else datasetNameMap[x])
-    df["Prompt Description"] = df["Prompt ID"].apply(
-        lambda x: prompt_description[x] if x in prompt_description else "[ERROR]")
-    df["Prompt Variant"] = df["Prompt ID"].apply(lambda x: prompt_variant[x] if x in prompt_variant else "[ERROR]")
-    df["Has Prompt-Summary Separator"] = df["Prompt ID"].apply(
-        lambda x: prompt_annotation[x] if x in prompt_annotation else "[ERROR]")
-    df["Prompt Desc. [ID]"] = df.apply(lambda row: f"{row['Prompt Description']} [{row['Prompt ID']}]", axis=1)
+    in__dataset_path = os.path.join("resources", "Datasets")
+    out_dataset_path = os.path.join("resources", "Datasets-Prepared")
+    pathlib.Path(out_dataset_path).mkdir(parents=True, exist_ok=True)
 
     tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
     text_to_bpe = lambda x: tiktoken_encoder.encode(x)
     text_to_tokens = lambda x: list(itertools.chain.from_iterable(list(somajo_tokenizer.tokenize_text([x]))))
-
-    df["#Predicted Tokens"] = df["Prediction"].apply(lambda x: len(text_to_bpe(x)))
-    df["#Predicted Full Tokens"] = df["Prediction"].apply(lambda x: len(text_to_tokens(x)))
-    df["#Prompt Tokens"] = df["Prompt"].apply(lambda x: len(text_to_bpe(x)))
-    # df["#Prompt Full Tokens"] = df["Prompt"].apply(lambda x: len(text_to_tokens(x)))
-
-    # change the type of the following columns to string
-    str_cols = ["N-Shot", "Prompt ID"]
-    for col in str_cols:
-        df[col] = df[col].astype(str)
-    # change "Temperature" column to string (format 1 decimal point)
-    df["Temperature"] = df["Temperature"].apply(lambda x: f"{x:.1f}")
-
-    in__dataset_path = os.path.join("resources", "Datasets")
-    out_dataset_path = os.path.join("resources", "Datasets-Prepared")
-    pathlib.Path(out_dataset_path).mkdir(parents=True, exist_ok=True)
 
     # Load the datasets to calculate the number of input documents and number of input tokens
     datasets = {}
@@ -214,8 +192,11 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         # Calculate the number of input documents and number of input tokens
         # Pre-calculate for all relevant datasets, store in a map, use map to fill df
         dataset_names = df["Dataset"].unique()
-        assert dataset_names in ["20Minuten", "Wikinews",
-                                 "Klexikon"], "Dataset names must be supported in load_all_results"
+        dataset_names = [datasetNameMap[x] if x in datasetNameMap else x for x in dataset_names]
+        supported_names = ["20Minuten", "Wikinews", "Klexikon", "Multinews"]
+        supported_name = [True if dataset_name in supported_names else False for dataset_name in dataset_names]
+        assert all(supported_name), "All datasets must be supported in load_all_results"
+
         for dataset_name in datasets:
             dataset_df = datasets[dataset_name]
             isMDS = "article_list" in dataset_df.columns
@@ -299,6 +280,87 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         plt.savefig(violin_plot_path)
         plt.close()
         sns.set_theme(**DEFAULT_THEME)
+
+    preprocessed_cache_path = os.path.join("resources", "preprocessed_experiments_cache")
+    pathlib.Path(preprocessed_cache_path).mkdir(parents=True, exist_ok=True)
+
+    # Purge the cache of already preprocessed files if specified
+    if no_cache_reload_all:
+        # Check the cache for the number of files that are already in the cache but will be purged
+        purge_files = []
+        for _, model_name, filename in zip(dfs, model_names_list, filenames_list):
+            cache_file_path = os.path.join(preprocessed_cache_path, model_name, filename)
+            if os.path.exists(cache_file_path):
+                print(f"Warning: Cache file will be purged: {cache_file_path}")
+                purge_files.append(cache_file_path)
+
+        print(f"Purging preprocessing cache... purging {len(purge_files)} files")
+        for purge_file in purge_files:
+            os.remove(purge_file)
+
+    # Preprocess the result files 1-by-1 if not already present
+    all_processed_dfs = []
+    for df, model_name, filename in zip(dfs, model_names_list, filenames_list):
+        # ensure directory exstis
+        curr_dir_path = os.path.join(preprocessed_cache_path, model_name)
+        pathlib.Path(curr_dir_path).mkdir(parents=True, exist_ok=True)
+
+        # check if the file is already preprocessed -> if not, preprocess and save
+        cache_file_path = os.path.join(preprocessed_cache_path, model_name, filename)
+        if os.path.exists(cache_file_path):
+            print(f"Loading preprocessed file from cache: {cache_file_path}")
+            # load the json file into a dataframe
+            cached_df = pd.read_json(cache_file_path, orient="records", lines=True)
+            all_processed_dfs.append(cached_df)
+        else:
+            print(f"Preprocessing file: {cache_file_path}")
+            preprocessed_df = process_results_for_load(df, shortNames, datasets)
+            preprocessed_df.to_json(cache_file_path, orient="records", lines=True)
+            all_processed_dfs.append(preprocessed_df)
+
+    out_df = pd.concat(all_processed_dfs)
+    return out_df
+
+
+def process_results_for_load(df, shortNames, datasets):
+    df.rename(columns=column_rename_map, inplace=True)
+    df.rename(columns={"Model": "Model-Identifier"}, inplace=True)
+    df["Model"] = df["Model-Identifier"].map(shortNames)
+    df["Dataset Annotation"] = df["Dataset"].apply(
+        lambda x: datasetAnnotationMap[x] if x in datasetAnnotationMap else "")
+    df["Preprocessing Method"] = df["Dataset"].apply(
+        lambda x: preprocessing_method[x] if x in preprocessing_method else "")
+    df["Preprocessing Parameters"] = df["Dataset"].apply(
+        lambda x: preprocessing_parameters[x] if x in preprocessing_parameters else "")
+    df["Preprocessing Order"] = df["Dataset"].apply(
+        lambda x: preprocessing_order[x] if x in preprocessing_order else "")
+    df["N-Shot"] = df.apply(lambda row: dataset_n_fewshot_annotation_map[row["Dataset"]] if row[
+                                                                                                "Dataset"] in dataset_n_fewshot_annotation_map else
+    row["N-Shot"], axis=1)
+    df["Preprocessing + N-Shot"] = df.apply(lambda row: f"{row['Preprocessing Method']} ({row['N-Shot']}-shot)", axis=1)
+    df["Dataset"] = df["Dataset"].apply(lambda x: x if x not in datasetNameMap else datasetNameMap[x])
+    df["Prompt Description"] = df["Prompt ID"].apply(
+        lambda x: prompt_description[x] if x in prompt_description else "[ERROR]")
+    df["Prompt Variant"] = df["Prompt ID"].apply(lambda x: prompt_variant[x] if x in prompt_variant else "[ERROR]")
+    df["Has Prompt-Summary Separator"] = df["Prompt ID"].apply(
+        lambda x: prompt_annotation[x] if x in prompt_annotation else "[ERROR]")
+    df["Prompt Desc. [ID]"] = df.apply(lambda row: f"{row['Prompt Description']} [{row['Prompt ID']}]", axis=1)
+
+    tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
+    text_to_bpe = lambda x: tiktoken_encoder.encode(x)
+    text_to_tokens = lambda x: list(itertools.chain.from_iterable(list(somajo_tokenizer.tokenize_text([x]))))
+
+    df["#Predicted Tokens"] = df["Prediction"].apply(lambda x: len(text_to_bpe(x)))
+    df["#Predicted Full Tokens"] = df["Prediction"].apply(lambda x: len(text_to_tokens(x)))
+    df["#Prompt Tokens"] = df["Prompt"].apply(lambda x: len(text_to_bpe(x)))
+    # df["#Prompt Full Tokens"] = df["Prompt"].apply(lambda x: len(text_to_tokens(x)))
+
+    # change the type of the following columns to string
+    str_cols = ["N-Shot", "Prompt ID"]
+    for col in str_cols:
+        df[col] = df[col].astype(str)
+    # change "Temperature" column to string (format 1 decimal point)
+    df["Temperature"] = df["Temperature"].apply(lambda x: f"{x:.1f}")
 
     # Fill the df with the calculated values
     for idx, row in df.iterrows():
@@ -404,8 +466,9 @@ def create_preprocessed_report(df, experiment_name, metric_names, prompts, skip_
     if not skip_lang:
         # df_lang_stat, df_prompt_lang_effect = language_statistics(df, experiment_path, prompts, groupbyList=groupByList)
         # Filter out the non-german predictions
-        df_non_german = df[df["Language"] != "de"]
-        df = df[df["Language"] == "de"]
+        tgt_lang = datasetLanguage[df["Dataset"].iloc[0]] # should all be the same dataset
+        df_non_german = df[df["Language"] != tgt_lang]
+        df = df[df["Language"] == tgt_lang]
 
     # Save all stuff
     print("Saving results...")
@@ -527,6 +590,14 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prom
     df_failure_stat.to_csv(os.path.join(experiment_path, subfolder_name,
                                         f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}.csv"),
                            index=False)
+    # reorganize the dataframe to have the different failure types as columns
+    df_failure_stat_pivot = df_failure_stat.pivot_table(index=groupbyList + [x_group], columns='failure', values='count',
+                                                        fill_value=math.nan).reset_index()
+    df_failure_stat_pivot.to_csv(os.path.join(experiment_path, subfolder_name,
+                                          f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.csv"), index=False)
+    # also save as latex table into a txt file
+    df_failure_stat_pivot.to_latex(os.path.join(experiment_path, subfolder_name,
+                                            f"failure_statistics_overview__{groupbyList[0]}_{groupbyList[1]}_{x_group}_pivot.txt"), index=False)
 
 
 def get_lang_detector(nlp, name):
@@ -816,7 +887,7 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
         {'exceeds_4096': 'sum', 'below_4096': 'sum'}).reset_index()
     # save
     df_max_length_table.to_csv(os.path.join(save_base_path, "length-statistics", f"max_length_table{file_suffix}.csv"),
-                                 index=False)
+                               index=False)
 
     for gbl in gblExtension:
         for agg_func in ['mean', 'median', 'min', 'max']:
@@ -865,8 +936,9 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
                                                                   f"length_statistics_{tgt_label}_{plt_type}_{gbl[0]}_{gbl[1]}{lbl}.pdf")
                         plt.savefig(metrics_n_in_docs_plt_path)
                         plt.close()
-                    except :
-                        print("Unable to create catplot for lengths, creating catplot for individual dimensions instead...")
+                    except:
+                        print(
+                            "Unable to create catplot for lengths, creating catplot for individual dimensions instead...")
                         if len(row_order) > len(col_order):
                             larger_order = row_order
                             a_prime = b
@@ -882,10 +954,11 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
                             df_len_filtered = df_len[df_len[gbl[b_prime]] == larger_cat]
                             row_order_prime = get_sorted_labels(df_len_filtered, gbl[a_prime])
 
-                            len_plt = sns.catplot(df_len_filtered, row=gbl[a_prime], col=gbl[b_prime], row_order=row_order_prime, col_order=col_order_prime,
+                            len_plt = sns.catplot(df_len_filtered, row=gbl[a_prime], col=gbl[b_prime],
+                                                  row_order=row_order_prime, col_order=col_order_prime,
                                                   x=tgt_label, height=5, aspect=aspect_ratio, kind=plt_type)
                             len_plt_save_path = os.path.join(save_base_path, f"length-statistics",
-                                                                      f"length_statistics_{tgt_label}_{plt_type}_{gbl[a_prime]}_{gbl[b_prime]}__{larger_cat}.pdf")
+                                                             f"length_statistics_{tgt_label}_{plt_type}_{gbl[a_prime]}_{gbl[b_prime]}__{larger_cat}.pdf")
                             plt.savefig(len_plt_save_path)
                             print(f"saved {len_plt_save_path}")
                             # if plt is list_iterator object
@@ -893,7 +966,6 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
                                 print("WHY?")
                             else:
                                 plt.close()
-
 
         sns.set_theme(**DEFAULT_THEME)
         #
@@ -1274,6 +1346,7 @@ def save_df_to_html_simple(df, html_path, groupbyList, newline_columns=['Prompt'
     with open(html_path, "w") as f:
         f.write(html_page)
 
+
 def save_inspect_examples_to_html(df, html_path, extendedGroupByList, applySimilarityMatcher=True,
                                   newline_columns=['Prompt', 'Prediction', 'GT-Summary'],
                                   similarity_matcher=[
@@ -1331,6 +1404,7 @@ def df_row_replace(row, columns, replace, with_string):
             continue
         row[col] = row[col].replace(replace, with_string)
     return row
+
 
 def df_row_apply_func(row, columns, f):
     # Note: assumes columns are strings (values)
@@ -1453,7 +1527,8 @@ def save_inspect_examples_simple(df, experiment_path, inspect_name, extendedGrou
     for doc_id in doc_ids:
         df_doc = df[df['doc_id'] == doc_id]
         save_inspect_examples_to_html(df_doc, html_path, extendedGroupByList=extendedGroupByList,
-                                      newline_columns=['Prompt', 'Prediction', 'GT-Summary'], applySimilarityMatcher=False)
+                                      newline_columns=['Prompt', 'Prediction', 'GT-Summary'],
+                                      applySimilarityMatcher=False)
 
 
 def find_inspect_examples(df, experiment_path, metric_names, groupbyList=["Model", "Prompt ID"], extendedGroupByList=[],
@@ -1969,6 +2044,8 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     exclude += ['doc_id', 'N-Input Docs', '#Input Article Tokens', '#Input Article Full Tokens',
                 '#Predicted Tokens', '#Predicted Full Tokens', '#GT-Summary Tokens', '#GT-Summary Full Tokens',
                 'Preprocessing + N-Shot', '#Prompt Tokens']
+    exclude_metrics = ["Coverage (Prompt)", "Density (Prompt)", "Compression (Prompt)", "Compression (Full)"]
+    exclude.extend(exclude_metrics)
 
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -2009,13 +2086,45 @@ fewshot_experiment__experimental_setup = {
     "prompts_bag_alias": "few-shot-experiment-full",
 }
 
+fewshot_experiment__experimental_setup_MULTINEWS = {
+    "groupByList": ["Preprocessing + N-Shot", "Preprocessing Parameters"],
+    "groupByListVariants": [
+        ["Preprocessing Parameters", "Preprocessing + N-Shot"],
+        ["Preprocessing + N-Shot", "Dataset Annotation"],
+        ["Dataset Annotation", "Preprocessing + N-Shot"],
+    ],
+    "models": ["meta-llama/Llama-2-70b-chat-hf"],
+    "datasets": ["Multinews"],
+    "prompts_bag_alias": "few-shot-experiment-full",
+}
+
 """
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "few-shot-experiment-full-WikinewsExamples"
+experiment_name = "base-experiment"
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
+
+# DONE
+# base-experiment
+# base-experiment-temperature
+
+# TODO
+# least-to-most-prompting-stage2
+# experiment-sizes
+# versions-experiment
+# versions-experiment-llama2-gpt4-palm2
+# versions-experiment-llama2-gpt4-palm2-prompts-2-4
+# versions-experiment-gpt4-only
+# empty-experiment
+# prompt-experiment-large
+# prompt-experiment-large-basic
+# prompt-experiment-large-llama2-vs-leolm
+# prompt-experiment-large-NZZ
+# prompt-experiment-large-output-size
+# prompt-experiment-large-variants-only
+# prompt-experiment-large-vs-llama2-gpt4-palm2
 
 
 # TODO: IMPORTANT
@@ -2035,6 +2144,10 @@ experiment_config = {
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["20Minuten"]
     },
+    "few-shot-experiment-main": fewshot_experiment__experimental_setup,
+    "few-shot-experiment-multinews": fewshot_experiment__experimental_setup_MULTINEWS,
+    "few-shot-experiment-main-1024": fewshot_experiment__experimental_setup,
+    "few-shot-experiment-main-1536": fewshot_experiment__experimental_setup,
     "few-shot-experiment-full": fewshot_experiment__experimental_setup,
     "few-shot-experiment-full-20MinutesExamples": fewshot_experiment__experimental_setup,
     "few-shot-experiment-full-WikinewsExamples": fewshot_experiment__experimental_setup,
@@ -2047,26 +2160,6 @@ experiment_config = {
     "few-shot-experiment-distMMR": fewshot_experiment__experimental_setup,
     "few-shot-experiment-distMMR-20MinutesExamples": fewshot_experiment__experimental_setup,
     "few-shot-experiment-distMMR-WikinewsExamples": fewshot_experiment__experimental_setup,
-    "least-to-most-prompting-stage1": {
-        "groupByList": ["Prompt ID", "Model"],
-        "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["20Minuten"]
-    },
-    "least-to-most-prompting-stage1+2": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
-        "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "datasets": ["20Minuten"],
-        "additional_prompts": [21, 22, 30, 31, 32, 33]
-    },
-    "least-to-most-prompting-stage2": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
-        "models": ["meta-llama/Llama-2-70b-chat-hf"],
-        "groupByListVariants": [
-            ["Prompt Description", "Dataset Annotation"],
-        ],
-        "datasets": ["20Minuten"],
-        "additional_prompts": [21, 22, 30, 31, 32, 33]
-    },
     "mds-baseline": {
         "groupByList": ["Prompt ID", "Dataset Annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
@@ -2181,6 +2274,26 @@ experiment_config = {
             "garage-bAInd/Platypus2-70B-instruct",
         ],
         "datasets": ["20Minuten"]
+    },
+    "least-to-most-prompting-stage1": {
+        "groupByList": ["Prompt ID", "Model"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"]
+    },
+    "least-to-most-prompting-stage1+2": {
+        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "datasets": ["20Minuten"],
+        "additional_prompts": [21, 22, 30, 31, 32, 33]
+    },
+    "least-to-most-prompting-stage2": {
+        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Description", "Dataset Annotation"],
+        ],
+        "datasets": ["20Minuten"],
+        "additional_prompts": [21, 22, 30, 31, 32, 33]
     },
     "versions-experiment": {
         "groupByList": ["Prompt ID", "Model"],
@@ -2324,14 +2437,18 @@ shortNames = {
 datasetLanguage = {
     "Wikinews": "de",
     "20Minuten": "de",
-    "MultiNews": "en",
+    "Multinews": "en",
 }
 shortLangToLanguage = {
     "de": "german",
     "en": "english",
 }
 datasetNameMap = {
+    "MultinewsTrunc3584": "Multinews",
+    "MultiCD040SSimDyn1024": "Multinews",
+    "MultiCD040SSimDyn1536": "Multinews",
     "Wikinews": "Wikinews",
+    "WikinewsTrunc3584": "Wikinews",
     "20Minuten": "20Minuten",
     "20minSmol": "20Minuten",
     "20minTS250": "20Minuten",
@@ -2417,6 +2534,24 @@ datasetNameMap = {
     "WikiRa1S21536": "Wikinews",
     "WikiRa1SW1024": "Wikinews",
     "WikiRa1SW1536": "Wikinews",
+    "WikiCD040SSimDyn1024": "Wikinews",
+    "WikiCD040SSimDyn1536": "Wikinews",
+    "WikiCD041SSimDyn1024": "Wikinews",
+    "WikiCD042SSimDyn1024": "Wikinews",
+    "WikiCl0SSimDyn1536": "Wikinews",
+    "WikiCD041SSimDyn1536": "Wikinews",
+    "WikiCD042SSimDyn1536": "Wikinews",
+    "WikiCD043SSimDyn1536": "Wikinews",
+    "WikiCD050SSimDyn1536": "Wikinews",
+    "WikiCD051SSimDyn1536": "Wikinews",
+    "WikiCD052SSimDyn1536": "Wikinews",
+    "WikiCD053SSimDyn1536": "Wikinews",
+    "WikiCD060SSimDyn1536": "Wikinews",
+    "WikiCD061SSimDyn1536": "Wikinews",
+    "WikiCD062SSimDyn1536": "Wikinews",
+    "WikiCD063SSimDyn1536": "Wikinews",
+    "WikiCl1SSimDyn1536": "Wikinews",
+    "WikiCl2SSimDyn1536": "Wikinews",
 }
 datasetAnnotationMap = {
     "20minTS250": "20Minuten, 250 samples",
@@ -2430,7 +2565,11 @@ datasetAnnotationMap = {
     "20minLtm2p31E": "20Min, Questions+Instr.,\nArticle-Q&A",
     "20minLtm2p33S": "20Min, Instr.+Questions,\nQ&A-Article",
     "20minLtm2p33E": "20Min, Instr.+Questions,\nArticle-Q&A",
+    "MultinewsTrunc3584": "basic,\ntruncated to 3584 tokens",
+    "MultiCD040SSimDyn1024": "Ex.Src: Multinews",
+    "MultiCD040SSimDyn1536": "Ex.Src: Multinews",
     "Wikinews": "basic,\nfull articles,\noriginal order",
+    "WikinewsTrunc3584": "basic,\ntruncated to 3584 tokens",
     "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
     "WikinewsSimpleS": "no annotation,\nrandom order",
@@ -2502,9 +2641,31 @@ datasetAnnotationMap = {
     "WikiRa1S21536": "Ex.Src: 20Minuten",
     "WikiRa1SW1024": "Ex.Src: Wikinews",
     "WikiRa1SW1536": "Ex.Src: Wikinews",
+    "WikiCD040SSimDyn1024": "Ex.Src: Wikinews",
+    "WikiCD040SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD041SSimDyn1024": "Ex.Src: Wikinews",
+    "WikiCD042SSimDyn1024": "Ex.Src: Wikinews",
+    "WikiCl0SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD041SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD042SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD043SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD050SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD051SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD052SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD053SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD060SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD061SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD062SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCD063SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCl1SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiCl2SSimDyn1536": "Ex.Src: Wikinews",
 }
 preprocessing_method = {
+    "MultinewsTrunc3584": "-",
+    "MultiCD040SSimDyn1024": "-",
+    "MultiCD040SSimDyn1536": "-",
     "Wikinews": "-",
+    "WikinewsTrunc3584": "cleaning",
     "WikinewsClean": "cleaning",
     "WikinewsSimple": "-",
     "WikinewsSimpleS": "-",
@@ -2576,83 +2737,31 @@ preprocessing_method = {
     "WikiRa1S21536": "Random",
     "WikiRa1SW1024": "Random",
     "WikiRa1SW1536": "Random",
-}
-preprocessing_parameters = {
-    "Wikinews": "-",
-    "WikinewsClean": "-",
-    "WikinewsSimple": "-",
-    "WikinewsSimpleS": "-",
-    "WikinewsSimpleA": "-",
-    "WikinewsSimpleAS": "-",
-    "WikinewsSC32": " 32 tokens",
-    "WikinewsSC64": " 64 tokens",
-    "WikinewsSC128": "128 tokens",
-    "WikinewsSC256": "256 tokens",
-    "WikinewsSC512": "512 tokens",
-    "WikinewsSCS2": " 2 sentences",
-    "WikinewsSCS4": " 4 sentences",
-    "WikinewsSCS8": " 8 sentences",
-    "WikinewsSCS16": "16 sentences",
-    "WikinewsSCS32": "32 sentences",
-    "WikinewsSplit": "-",
-    "WikinewsSplitS2O": "-",
-    "WikinewsSplitS2S": "-",
-    "WikinewsSplitS2OP41": "-",
-    "WikinewsSplitS2SP41": "-",
-    "WikinewsClust1C": " 1 Sentence",
-    "WikinewsClust1O": " 1 Sentence",
-    "WikinewsClust1R": " 1 Sentence",
-    "WikinewsClust5C": " 5 Sentences",
-    "WikinewsClust5O": " 5 Sentences",
-    "WikinewsClust5R": " 5 Sentences",
-    "WikinewsClust10C": "10 Sentences",
-    "WikinewsClust10O": "10 Sentences",
-    "WikinewsClust10R": "10 Sentences",
-    "WikinewsSent1L00": " 1 Sentence",
-    "WikinewsSent1L05": " 1 Sentence",
-    "WikinewsSent3L00": " 3 Sentences",
-    "WikinewsSent3L05": " 3 Sentences",
-    "WikinewsSent5L00": " 5 Sentences",
-    "WikinewsSent5L05": " 5 Sentences",
-    "WikinewsSent10L00": "10 Sentences",
-    "WikinewsSent10L05": "10 Sentences",
-    "WikiCh1024": "#Input Tokens: 1024",
-    "WikiCh1536": "#Input Tokens: 1536",
-    "WikiLe1024": "#Input Tokens: 1024",
-    "WikiLe1536": "#Input Tokens: 1536",
-    "WikiRa1024": "#Input Tokens: 1024",
-    "WikiRa1536": "#Input Tokens: 1536",
-    "WikiCl0N1024": "#Input Tokens: 1024",
-    "WikiCl0N1536": "#Input Tokens: 1536",
-    "WikiCl0N2048": "#Input Tokens: 2048",
-    "WikiCl1N21024": "#Input Tokens: 1024",
-    "WikiCl1N21536": "#Input Tokens: 1536",
-    "WikiCl1N22048": "#Input Tokens: 2048",
-    "WikiCl2S21024": "#Input Tokens: 1024",
-    "WikiCl2S21536": "#Input Tokens: 1536",
-    "WikiCl2S22048": "#Input Tokens: 2048",
-    "WikiCl1SW1024": "#Input Tokens: 1024",
-    "WikiCl1SW1536": "#Input Tokens: 1536",
-    "WikiCl2SW1024": "#Input Tokens: 1024",
-    "WikiCl2SW1536": "#Input Tokens: 1536",
-    "WikiDi0S1024": "#Input Tokens: 1024",
-    "WikiDi0S1536": "#Input Tokens: 1536",
-    "WikiDi1S21024": "#Input Tokens: 1024",
-    "WikiDi1S21536": "#Input Tokens: 1536",
-    "WikiDi2S21024": "#Input Tokens: 1024",
-    "WikiDi2S21536": "#Input Tokens: 1536",
-    "WikiDi1SW1024": "#Input Tokens: 1024",
-    "WikiDi1SW1536": "#Input Tokens: 1536",
-    "WikiDi2SW1024": "#Input Tokens: 1024",
-    "WikiLe1S21024": "#Input Tokens: 1024",
-    "WikiLe1S21536": "#Input Tokens: 1536",
-    "WikiRa1S21024": "#Input Tokens: 1024",
-    "WikiRa1S21536": "#Input Tokens: 1536",
-    "WikiRa1SW1024": "#Input Tokens: 1024",
-    "WikiRa1SW1536": "#Input Tokens: 1536",
+    "WikiCD040SSimDyn1024": "ClustDist 0.4 (SimDyn)",
+    "WikiCD040SSimDyn1536": "ClustDist 0.4 (SimDyn)",
+    "WikiCD041SSimDyn1024": "ClustDist 0.4 (SimDyn)",
+    "WikiCD042SSimDyn1024": "ClustDist 0.4 (SimDyn)",
+    "WikiCl0SSimDyn1536": "Clustering (SimDyn)",
+    "WikiCD041SSimDyn1536": "ClustDist 0.4 (SimDyn)",
+    "WikiCD042SSimDyn1536": "ClustDist 0.4 (SimDyn)",
+    "WikiCD043SSimDyn1536": "ClustDist 0.4 (SimDyn)",
+    "WikiCD050SSimDyn1536": "ClustDist 0.5 (SimDyn)",
+    "WikiCD051SSimDyn1536": "ClustDist 0.5 (SimDyn)",
+    "WikiCD052SSimDyn1536": "ClustDist 0.5 (SimDyn)",
+    "WikiCD053SSimDyn1536": "ClustDist 0.5 (SimDyn)",
+    "WikiCD060SSimDyn1536": "ClustDist 0.6 (SimDyn)",
+    "WikiCD061SSimDyn1536": "ClustDist 0.6 (SimDyn)",
+    "WikiCD062SSimDyn1536": "ClustDist 0.6 (SimDyn)",
+    "WikiCD063SSimDyn1536": "ClustDist 0.6 (SimDyn)",
+    "WikiCl1SSimDyn1536": "Clustering (SimDyn)",
+    "WikiCl2SSimDyn1536": "Clustering (SimDyn)",
 }
 preprocessing_order = {
+    "MultinewsTrunc3584": "original",
+    "MultiCD040SSimDyn1024": "original",
+    "MultiCD040SSimDyn1536": "original",
     "Wikinews": "original",
+    "WikinewsTrunc3584": "original",
     "WikinewsClean": "original",
     "WikinewsSimple": "original",
     "WikinewsSimpleS": "random",
@@ -2724,8 +2833,29 @@ preprocessing_order = {
     "WikiRa1S21536": "original",
     "WikiRa1SW1024": "original",
     "WikiRa1SW1536": "original",
+    "WikiCD040SSimDyn1024": "original",
+    "WikiCD040SSimDyn1536": "original",
+    "WikiCD041SSimDyn1024": "original",
+    "WikiCD042SSimDyn1024": "original",
+    "WikiCl0SSimDyn1536": "original",
+    "WikiCD041SSimDyn1536": "original",
+    "WikiCD042SSimDyn1536": "original",
+    "WikiCD043SSimDyn1536": "original",
+    "WikiCD050SSimDyn1536": "original",
+    "WikiCD051SSimDyn1536": "original",
+    "WikiCD052SSimDyn1536": "original",
+    "WikiCD053SSimDyn1536": "original",
+    "WikiCD060SSimDyn1536": "original",
+    "WikiCD061SSimDyn1536": "original",
+    "WikiCD062SSimDyn1536": "original",
+    "WikiCD063SSimDyn1536": "original",
+    "WikiCl1SSimDyn1536": "original",
+    "WikiCl2SSimDyn1536": "original",
 }
 dataset_n_fewshot_annotation_map = {
+    "MultinewsTrunc3584": "0",
+    "MultiCD040SSimDyn1024": "0",
+    "MultiCD040SSimDyn1536": "0",
     "WikiCh1024": "0",
     "WikiCh1536": "0",
     "WikiLe1024": "0",
@@ -2760,6 +2890,120 @@ dataset_n_fewshot_annotation_map = {
     "WikiRa1S21536": "1",
     "WikiRa1SW1024": "1",
     "WikiRa1SW1536": "1",
+    "WikiCD040SSimDyn1024": "0",
+    "WikiCD040SSimDyn1536": "0",
+    "WikiCD041SSimDyn1024": "1",
+    "WikiCD042SSimDyn1024": "2",
+    "WikiCl0SSimDyn1536": "0",
+    "WikiCD041SSimDyn1536": "1",
+    "WikiCD042SSimDyn1536": "2",
+    "WikiCD043SSimDyn1536": "3",
+    "WikiCD050SSimDyn1536": "0",
+    "WikiCD051SSimDyn1536": "1",
+    "WikiCD052SSimDyn1536": "2",
+    "WikiCD053SSimDyn1536": "3",
+    "WikiCD060SSimDyn1536": "0",
+    "WikiCD061SSimDyn1536": "1",
+    "WikiCD062SSimDyn1536": "2",
+    "WikiCD063SSimDyn1536": "3",
+    "WikiCl1SSimDyn1536": "1",
+    "WikiCl2SSimDyn1536": "2",
+}
+preprocessing_parameters = {
+    "MultinewsTrunc3584": "-",
+    "MultiCD040SSimDyn1024": "#Input Tokens: 1024",
+    "MultiCD040SSimDyn1536": "#Input Tokens: 1536",
+    "Wikinews": "-",
+    "WikinewsTrunc3584": "-",
+    "WikinewsClean": "-",
+    "WikinewsSimple": "-",
+    "WikinewsSimpleS": "-",
+    "WikinewsSimpleA": "-",
+    "WikinewsSimpleAS": "-",
+    "WikinewsSC32": " 32 tokens",
+    "WikinewsSC64": " 64 tokens",
+    "WikinewsSC128": "128 tokens",
+    "WikinewsSC256": "256 tokens",
+    "WikinewsSC512": "512 tokens",
+    "WikinewsSCS2": " 2 sentences",
+    "WikinewsSCS4": " 4 sentences",
+    "WikinewsSCS8": " 8 sentences",
+    "WikinewsSCS16": "16 sentences",
+    "WikinewsSCS32": "32 sentences",
+    "WikinewsSplit": "-",
+    "WikinewsSplitS2O": "-",
+    "WikinewsSplitS2S": "-",
+    "WikinewsSplitS2OP41": "-",
+    "WikinewsSplitS2SP41": "-",
+    "WikinewsClust1C": " 1 Sentence",
+    "WikinewsClust1O": " 1 Sentence",
+    "WikinewsClust1R": " 1 Sentence",
+    "WikinewsClust5C": " 5 Sentences",
+    "WikinewsClust5O": " 5 Sentences",
+    "WikinewsClust5R": " 5 Sentences",
+    "WikinewsClust10C": "10 Sentences",
+    "WikinewsClust10O": "10 Sentences",
+    "WikinewsClust10R": "10 Sentences",
+    "WikinewsSent1L00": " 1 Sentence",
+    "WikinewsSent1L05": " 1 Sentence",
+    "WikinewsSent3L00": " 3 Sentences",
+    "WikinewsSent3L05": " 3 Sentences",
+    "WikinewsSent5L00": " 5 Sentences",
+    "WikinewsSent5L05": " 5 Sentences",
+    "WikinewsSent10L00": "10 Sentences",
+    "WikinewsSent10L05": "10 Sentences",
+    "WikiCh1024": "#Input Tokens: 1024",
+    "WikiCh1536": "#Input Tokens: 1536",
+    "WikiLe1024": "#Input Tokens: 1024",
+    "WikiLe1536": "#Input Tokens: 1536",
+    "WikiRa1024": "#Input Tokens: 1024",
+    "WikiRa1536": "#Input Tokens: 1536",
+    "WikiCl0N1024": "#Input Tokens: 1024",
+    "WikiCl0N1536": "#Input Tokens: 1536",
+    "WikiCl0N2048": "#Input Tokens: 2048",
+    "WikiCl1N21024": "#Input Tokens: 1024",
+    "WikiCl1N21536": "#Input Tokens: 1536",
+    "WikiCl1N22048": "#Input Tokens: 2048",
+    "WikiCl2S21024": "#Input Tokens: 1024",
+    "WikiCl2S21536": "#Input Tokens: 1536",
+    "WikiCl2S22048": "#Input Tokens: 2048",
+    "WikiCl1SW1024": "#Input Tokens: 1024",
+    "WikiCl1SW1536": "#Input Tokens: 1536",
+    "WikiCl2SW1024": "#Input Tokens: 1024",
+    "WikiCl2SW1536": "#Input Tokens: 1536",
+    "WikiDi0S1024": "#Input Tokens: 1024",
+    "WikiDi0S1536": "#Input Tokens: 1536",
+    "WikiDi1S21024": "#Input Tokens: 1024",
+    "WikiDi1S21536": "#Input Tokens: 1536",
+    "WikiDi2S21024": "#Input Tokens: 1024",
+    "WikiDi2S21536": "#Input Tokens: 1536",
+    "WikiDi1SW1024": "#Input Tokens: 1024",
+    "WikiDi1SW1536": "#Input Tokens: 1536",
+    "WikiDi2SW1024": "#Input Tokens: 1024",
+    "WikiLe1S21024": "#Input Tokens: 1024",
+    "WikiLe1S21536": "#Input Tokens: 1536",
+    "WikiRa1S21024": "#Input Tokens: 1024",
+    "WikiRa1S21536": "#Input Tokens: 1536",
+    "WikiRa1SW1024": "#Input Tokens: 1024",
+    "WikiRa1SW1536": "#Input Tokens: 1536",
+    "WikiCD040SSimDyn1024": "#Input Tokens: 1024",
+    "WikiCD040SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD041SSimDyn1024": "#Input Tokens: 1024",
+    "WikiCD042SSimDyn1024": "#Input Tokens: 1024",
+    "WikiCl0SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD041SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD042SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD043SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD050SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD051SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD052SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD053SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD060SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD061SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD062SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCD063SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCl1SSimDyn1536": "#Input Tokens: 1536",
+    "WikiCl2SSimDyn1536": "#Input Tokens: 1536",
 }
 prompt_description = {  # short description of the prompt to ID it instead of the prompt ID
     "1": "Basic",
@@ -2945,7 +3189,7 @@ metric_0_1_range = [column_rename_map[x] for x in
 
 
 # Main function
-def main(reload_data=True, reload_preprocessed_dataset=False):
+def main(reload_data=True, reload_preprocessed_dataset=False, no_cache_reload_all=False):
     sep_str = '=' * 100
     print(f"{sep_str}\n\tExperiment: {experiment_name}\n{sep_str}\n")
 
@@ -2953,7 +3197,7 @@ def main(reload_data=True, reload_preprocessed_dataset=False):
 
     if reload_data:
         # Aggregate results and create DataFrame
-        df = load_all_results(RESULTS_PATH, models, shortNames, reload_preprocessed_dataset=reload_preprocessed_dataset)
+        df = load_all_results(RESULTS_PATH, models, shortNames, reload_preprocessed_dataset=reload_preprocessed_dataset, no_cache_reload_all=no_cache_reload_all)
         # Save DataFrame as CSV
         save_dataframe(df, experiment_name)
     else:
@@ -2992,14 +3236,14 @@ def make_report_plots(prioritize_inspect_examples=False):
 
         # # SPECIAL CASE -> DELETE AGAIN
         # TODO: EXPLORE THIS
-        large_prompt_threshold = 3584 # 3259
+        large_prompt_threshold = 3584  # 3259
         df_large_prompt = df[df["#Prompt Tokens"] >= large_prompt_threshold]
         df_large_prompt['Preprocessing + N-Shot'] = df_large_prompt.apply(
             lambda row: f"{row['Preprocessing + N-Shot']} (LARGE)", axis=1)
         df_small_prompt = df[df["#Prompt Tokens"] < large_prompt_threshold]
         df_small_prompt['Preprocessing + N-Shot'] = df_small_prompt.apply(
             lambda row: f"{row['Preprocessing + N-Shot']}", axis=1)
-        df = df_small_prompt # pd.concat([df_large_prompt, df_small_prompt])
+        df = df_small_prompt  # pd.concat([df_large_prompt, df_small_prompt])
 
         # from the small prompt examples, find all examples that start the prediction with a lowercase character
         df_lowercase = df[df["Prediction"].str[0].str.islower()]
@@ -3022,7 +3266,6 @@ def make_report_plots(prioritize_inspect_examples=False):
         # df_large_prompt_save.rename(columns={'Prompt': 'article', 'GT-Summary': 'summary'}, inplace=True)
         # # save as json
         # df_large_prompt_save.to_json(os.path.join(experiment_path, "df_large_prompts.json"), orient='records')
-
 
         """
         MANUAL INSPECTION OF EXAMPLES
@@ -3090,7 +3333,8 @@ def make_report_plots(prioritize_inspect_examples=False):
             df_inspect_all = df.copy()
 
             # ... all entries that have low language scores
-            df_inspect = df_inspect_all.sort_values(by="Language Score", ascending=True).head(num_inspect_examples_specific)
+            df_inspect = df_inspect_all.sort_values(by="Language Score", ascending=True).head(
+                num_inspect_examples_specific)
             save_inspect_examples_simple(df_inspect, experiment_path, "low-lang-score", extendedGroupByList=inspectGBL)
 
             # ... all entries that use up a lot of tokens
@@ -3101,15 +3345,18 @@ def make_report_plots(prioritize_inspect_examples=False):
             # use lot's of tokens
             df_inspect = df_inspect_all[df_inspect_all["Used Tokens"] < 4096]
             df_inspect = df_inspect.sort_values(by="Used Tokens", ascending=False).head(num_inspect_examples_specific)
-            save_inspect_examples_simple(df_inspect, experiment_path, "high-used-tokens", extendedGroupByList=inspectGBL)
+            save_inspect_examples_simple(df_inspect, experiment_path, "high-used-tokens",
+                                         extendedGroupByList=inspectGBL)
             # long prompts
             long_prompt_threshold = 3259
             df_inspect = df_inspect_all[df_inspect_all["#Prompt Tokens"] >= long_prompt_threshold]
             save_inspect_examples_simple(df_inspect, experiment_path, "long-prompt", extendedGroupByList=inspectGBL)
 
             # ... all entries that have a low metric score
-            df_inspect = df_inspect_all.sort_values(by="BertScore F1", ascending=True).head(num_inspect_examples_specific)
-            save_inspect_examples_simple(df_inspect, experiment_path, "low-bertscore-f1", extendedGroupByList=inspectGBL)
+            df_inspect = df_inspect_all.sort_values(by="BertScore F1", ascending=True).head(
+                num_inspect_examples_specific)
+            save_inspect_examples_simple(df_inspect, experiment_path, "low-bertscore-f1",
+                                         extendedGroupByList=inspectGBL)
 
             df_inspect = df_inspect_all.sort_values(by="R-1", ascending=True).head(num_inspect_examples_specific)
             save_inspect_examples_simple(df_inspect, experiment_path, "low-rouge1", extendedGroupByList=inspectGBL)
@@ -3118,12 +3365,17 @@ def make_report_plots(prioritize_inspect_examples=False):
             save_inspect_examples_simple(df_inspect, experiment_path, "low-coverage", extendedGroupByList=inspectGBL)
 
             # ... all entries that have a much shorter summary than the gt-summary
-            df_inspect_all["Summary Length Ratio"] = df_inspect_all.apply(lambda row: row['#Predicted Tokens'] / row['#Input Article Tokens'] if row['#Input Article Tokens'] > 0 else -1, axis=1)
-            df_inspect = df_inspect_all.sort_values(by="Summary Length Ratio", ascending=True).head(num_inspect_examples_specific)
+            df_inspect_all["Summary Length Ratio"] = df_inspect_all.apply(
+                lambda row: row['#Predicted Tokens'] / row['#Input Article Tokens'] if row[
+                                                                                           '#Input Article Tokens'] > 0 else -1,
+                axis=1)
+            df_inspect = df_inspect_all.sort_values(by="Summary Length Ratio", ascending=True).head(
+                num_inspect_examples_specific)
             save_inspect_examples_simple(df_inspect, experiment_path, "short-summary", extendedGroupByList=inspectGBL)
 
             # ... all entries that have a much longer summary than the gt-summary
-            df_inspect = df_inspect_all.sort_values(by="Summary Length Ratio", ascending=False).head(num_inspect_examples_specific)
+            df_inspect = df_inspect_all.sort_values(by="Summary Length Ratio", ascending=False).head(
+                num_inspect_examples_specific)
             save_inspect_examples_simple(df_inspect, experiment_path, "long-summary", extendedGroupByList=inspectGBL)
 
             """
@@ -3144,7 +3396,10 @@ def make_report_plots(prioritize_inspect_examples=False):
         df_all[bucket_colname] = df_all["#Input Article Tokens"].apply(
             lambda x: f"{int(math.floor(x / bucket_size)) * bucket_size}".rjust(
                 5) + "-" + f"{int(math.ceil(x / bucket_size)) * bucket_size}".rjust(5))
-        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group="Temperature",
+        x_group = "Temperature"
+        if x_group in groupByList:
+            x_group = "Model"
+        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group=x_group,
                                 groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
                                                  "N-Input Docs"])
 

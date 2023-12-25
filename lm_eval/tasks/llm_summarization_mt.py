@@ -660,8 +660,8 @@ class SummSampleSmolSmol_20Minuten(SummarizationTaskBase):
 
 class SummarizationTask_20Minuten(SummarizationTaskBase):
     VERSION = 0
-    DATASET_PATH = "roysc/20minuten"
-    # DATASET_PATH = "roysc/20minuten_sample_250"
+    # DATASET_PATH = "roysc/20minuten"
+    DATASET_PATH = "roysc/20minuten_sample_250"
 
 
 class SummLtM2_20min_prompt22_start(SummarizationTaskBase):
