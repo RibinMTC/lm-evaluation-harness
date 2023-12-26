@@ -1069,10 +1069,12 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
         # subtract y from both yerr values to get the lower and upper error bars, making sure that the lower error bar is always positive
         overview_yerr[0] = overview_y - overview_yerr[0]
         overview_yerr[1] = overview_yerr[1] - overview_y
+        # plot the x-axis ordered (sort the x-axis labels)
+        x_order = sorted_labels_from_list(overview_x)
         # make the plot
-        plt.errorbar(overview_x, overview_y, yerr=overview_yerr, fmt='o')
-        plt.xticks(rotation=45)
-        plt.gcf().subplots_adjust(bottom=0.25)
+        plt.errorbar(overview_x, overview_y, yerr=overview_yerr, fmt='o', )
+        plt.xticks(rotation=90)
+        plt.gcf().subplots_adjust(bottom=0.4)
         save_path = os.path.join(experiment_path, "overview_plots",
                                  f"overview_{groupbyList[0]}_{groupbyList[1]}_median_plot_{metric_name}.pdf")
         plt.savefig(save_path)
@@ -1748,6 +1750,11 @@ def get_sorted_labels(data_df, column):
     sorted_axis_labels.sort(key=lambda x: label_sort_key_func(x))
     return sorted_axis_labels
 
+def sorted_labels_from_list(labels):
+    sorted_axis_labels = labels
+    sorted_axis_labels.sort(key=lambda x: label_sort_key_func(x))
+    return sorted_axis_labels
+
 
 def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["Model", "Prompt ID"],
                                      groupByListExtension=[], file_suffix="", facet_col_n_docs="N-Input Docs",
@@ -1946,6 +1953,17 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
 
+                box_plot = sns.boxplot(data=df_model, x="Prompt ID", hue=residualGroupBy[0], y=metric_name,
+                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, model_name,
+                                                f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
+                plt.close()
+
                 violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
                                              order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
@@ -1955,6 +1973,17 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                                                 f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
+                plt.close()
+
+                box_plot = sns.boxplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
+                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, model_name,
+                                                f"{model_name}_{metric_name}_R_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
                 plt.close()
             else:
                 sorted_x_axis_labels = get_sorted_labels(df, "Prompt ID")
@@ -1966,6 +1995,16 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                                                 f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
+                plt.close()
+
+                box_plot = sns.boxplot(data=df_model, x="Prompt ID", y=metric_name, order=sorted_x_axis_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, model_name,
+                                                f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
                 plt.close()
         model_plot_paths.append(out_paths)
 
@@ -1989,6 +2028,17 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(violin_plot_path)
                 plt.close()
 
+                box_plot = sns.boxplot(data=df_prompt, x="Model", hue=residualGroupBy[0], y=metric_name,
+                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
+                plt.close()
+
                 violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
                                              order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
@@ -1998,6 +2048,17 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                                                 f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
+                plt.close()
+
+                box_plot = sns.boxplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
+                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                f"Prompt_{promptVersion}_{metric_name}_R_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
                 plt.close()
             else:
                 sorted_x_axis_labels = get_sorted_labels(df, "Model")
@@ -2009,6 +2070,16 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                                                 f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
                 plt.savefig(violin_plot_path)
                 out_paths.append(violin_plot_path)
+                plt.close()
+
+                box_plot = sns.boxplot(data=df_prompt, x="Model", y=metric_name, order=sorted_x_axis_labels)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # save
+                box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
+                plt.savefig(box_plot_path)
+                out_paths.append(box_plot_path)
                 plt.close()
         prompt_plot_paths.append(out_paths)
 
@@ -2106,7 +2177,7 @@ fewshot_experiment__experimental_setup_MULTINEWS = {
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment"
+experiment_name = "base-experiment-separator-and-german-only"
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
 
@@ -2261,6 +2332,28 @@ experiment_config = {
         ],
         "groupByListVariants": [
             ["Prompt Desc. [ID]", "Model"],
+            ["Prompt Description", "Model"],
+            ["Prompt Variant", "Model"],
+            ["Prompt Description", "Has Prompt-Summary Separator"],
+            ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
+        ],
+        "datasets": ["20Minuten"]
+    },
+    "base-experiment-separator-and-german-only": {
+        "groupByList": ["Prompt ID", "Model"],
+        "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-13b-chat-hf",
+            "meta-llama/Llama-2-70b-chat-hf",
+            "tiiuae/falcon-7b-instruct",
+            "bigscience/bloomz-7b1-mt",
+        ],
+        "groupByListVariants": [
+            ["Prompt Desc. [ID]", "Model"],
+            ["Prompt Description", "Model"],
+            ["Prompt Variant", "Model"],
+            ["Prompt Description", "Has Prompt-Summary Separator"],
+            ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
         ],
         "datasets": ["20Minuten"]
     },
@@ -3464,10 +3557,18 @@ def make_report_plots(prioritize_inspect_examples=False):
                     table["df"].to_csv(
                         os.path.join(experiment_path, "overview_table", f"overview_table_{table['name']}.csv"),
                         index=False)
+                    # also export as latex table
+                    table["df"].to_latex(
+                        os.path.join(experiment_path, "overview_table", f"overview_table_{table['name']}.tex"),
+                        index=False)
             if tables_detail is not None:
                 for table in tables_detail:
                     table["df"].to_csv(
                         os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"), index=False)
+                    # also export as latex table
+                    table["df"].to_latex(
+                        os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.tex"),
+                        index=False)
 
         # create the statistics for the token lengths and number of sentences
         gblExtension = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])

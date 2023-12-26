@@ -12,15 +12,15 @@ import random, string
 """
 models = [
     # "gpt-4",
-    # "palm2",
-    "meta-llama/Llama-2-7b-chat-hf",
-    "meta-llama/Llama-2-13b-chat-hf",
+    "palm2",
+    # "bigscience/bloomz-7b1-mt",
+    # "tiiuae/falcon-7b-instruct",
+    # "meta-llama/Llama-2-7b-chat-hf",
+    # "meta-llama/Llama-2-13b-chat-hf",
     # "meta-llama/Llama-2-70b-chat-hf",
     # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
-    "bigscience/bloomz-7b1-mt",
-    "tiiuae/falcon-7b-instruct",
     # "LeoLM/leo-hessianai-7b",
     # "LeoLM/leo-hessianai-13b",
     # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
@@ -29,7 +29,7 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "base-experiment-temperature-" + ''.join(
+experiment_name = "palm-2-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
@@ -85,9 +85,9 @@ dataset_names = [
     # "WikinewsCDS4i5",
     # "WikinewsCDS4i6",
     # "WikinewsCDS4i7",
-    # "WikinewsCDS4i8", # TODO: CONTINUE HERE
+    # "WikinewsCDS4i8",
     # "WikinewsCDS4i9",
-    # "WikinewsCDS4i10",
+    # "WikinewsCDS4i10", # TODO: CONTINUE HERE
 
     "20Minuten"
     ## FCO Experiments
@@ -132,7 +132,7 @@ dataset_names = [
 
     # "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [2, 4, 5, 19, 23, 45, 49]  # [1, 2, 3, 4, 5]
+prompt_versions = [5]  # [1, 2, 3, 4, 5]
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 # 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 # 22,23,40,41,42,43,44,45,46,47,48,49,
@@ -142,14 +142,14 @@ task_base_names = [
     # "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    "SummarizationTask_",
-    # "SummSample_",
+    # "SummarizationTask_",
+    "SummSample_",
     # "MDSChain_",
     # "MDS_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
-temperature_values = [0.1, 0.5, 1.0]  # [0, 0.1, 0.5, 1.0]
+temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
 precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
