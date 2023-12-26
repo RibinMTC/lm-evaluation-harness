@@ -520,9 +520,9 @@ def empty_statistics(df, groupbyList=["Model", "Prompt ID"], text_col="Predictio
     return df_empty_stat, df_num_empty_docs, df_num_empty_prompts, worst_empty_docs, worst_empty_promptVersions
 
 
-def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prompt ID"], groupByIterator=[],
-                            x_group="Temperature", text_col="Prediction", langCol="Language", docCol="doc_id",
-                            promptCol="Prompt ID"):
+def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prompt ID"], groupByListExtension=[],
+                            groupByIterator=[], x_group="Temperature", text_col="Prediction", langCol="Language",
+                            docCol="doc_id", promptCol="Prompt ID"):
     if df_all.shape[0] == 0:
         return
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
@@ -584,6 +584,34 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prom
         # failure_plot.map(sns.countplot, 'failure')
         failure_plot_path = os.path.join(experiment_path, subfolder_name,
                                          f"failure_statistics_exploration__{a}_{b}_{c}.pdf")
+        plt.savefig(failure_plot_path)
+        plt.close()
+
+    # also do a similar plot for all passed combinations of groupbyList entries
+    for gbl in [groupByList] + groupByListExtension:
+        a = gbl[0]
+        b = gbl[1]
+        # make sure labels are strings
+        df_failures[a] = df_failures[a].astype(str)
+        df_failures[b] = df_failures[b].astype(str)
+
+        failure_plot = sns.catplot(df_failures, x='failure', order=x_order, col=a, row=b, kind="count",
+                                   height=3, aspect=1.5)
+
+        failure_plot_path = os.path.join(experiment_path, subfolder_name,
+                                         f"failure_statistics_group_by_exploration__{a}_{b}.pdf")
+        plt.savefig(failure_plot_path)
+
+        # annotate the values
+        for ax in failure_plot.axes.flat:
+            for p in ax.patches:
+                ax.annotate('{:.0f}'.format(p.get_height()), (p.get_x(), p.get_height() + 0.02),
+                            fontsize='xx-small',
+                            rotation='vertical')
+        # failure_plot = sns.FacetGrid(df_failures, col=groupbyList[0], row=groupbyList[1], height=3, aspect=1.5)
+        # failure_plot.map(sns.countplot, 'failure')
+        failure_plot_path = os.path.join(experiment_path, subfolder_name,
+                                         f"failure_statistics_group_by_exploration__{a}_{b}_annotated.pdf")
         plt.savefig(failure_plot_path)
         plt.close()
 
@@ -851,16 +879,21 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
 
     def calculate_lengths(text: str) -> Tuple[int, int, int]:
         text_bpe = tiktoken_encoder.encode(text)
-        sent_somajo = list(somajo_tokenizer.tokenize_text([text]))
+        newline_split_txt = text.split("\n")
+        sent_somajo = list(somajo_tokenizer.tokenize_text(newline_split_txt))
         text_somajo = list(itertools.chain.from_iterable(sent_somajo))
         return len(sent_somajo), len(text_somajo), len(text_bpe)
 
     num_sentences_colname = "# Sentences"
     num_full_tokens_colname = "# Full Tokens"
     num_bpe_tokens_colname = "# BPE Tokens"
+    avg_sentlen_colname = "Avg. Sentence Length"
 
     df_len[num_sentences_colname], df_len[num_full_tokens_colname], df_len[num_bpe_tokens_colname] = zip(
         *df_len["Prediction"].apply(lambda x: calculate_lengths(x)))
+    df_len[avg_sentlen_colname] = df_len.apply(
+        lambda row: row[num_full_tokens_colname] / row[num_sentences_colname] if row[num_sentences_colname] > 0 else 0,
+        axis=1)
     full_bckt_size = 25
     bpe__bckt_size = 50
     full_string_size = 4
@@ -879,7 +912,8 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
         print("Unable to create length statistics, ...")
         return
     df_prompt_length_impact = df_len.groupby(groupbyList).agg(
-        {num_sentences_colname: "mean", num_full_tokens_colname: "mean", num_bpe_tokens_colname: "mean"}).reset_index()
+        {num_sentences_colname: "mean", num_full_tokens_colname: "mean", num_bpe_tokens_colname: "mean",
+         avg_sentlen_colname: "mean"}).reset_index()
 
     # add a table with two counters indicating how many entries per group use up more than 4096 tokens in total
     #  and how many use up less than 4096 tokens in total
@@ -892,22 +926,46 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
     # save
     df_max_length_table.to_csv(os.path.join(save_base_path, "length-statistics", f"max_length_table{file_suffix}.csv"),
                                index=False)
+    # also save as latex table into a txt file
+    df_max_length_table.to_latex(os.path.join(save_base_path, "length-statistics",
+                                              f"max_length_table{file_suffix}.tex"), index=False)
 
     for gbl in gblExtension:
         for agg_func in ['mean', 'median', 'min', 'max']:
             df_prompt_length_impact_gbl = df_len.groupby(gbl).agg(
                 {num_sentences_colname: agg_func, num_full_tokens_colname: agg_func,
-                 num_bpe_tokens_colname: agg_func}).reset_index()
+                 num_bpe_tokens_colname: agg_func, avg_sentlen_colname: agg_func}).reset_index()
             length_impact_path = os.path.join(save_base_path, f"length-statistics",
                                               f"length_impact_{gbl[0]}_{gbl[1]}_{agg_func}.csv")
             df_prompt_length_impact_gbl.to_csv(length_impact_path, index=False)
+            # also save as latex table
+            df_prompt_length_impact_gbl.to_latex(os.path.join(save_base_path, "length-statistics",
+                                                              f"length_impact_{gbl[0]}_{gbl[1]}_{agg_func}.tex"),
+                                                 index=False)
+
+            # if median -> plot the median points
+            # make a plot showing the median of the number of tokens (per group by combination)
+            if agg_func in ['median', 'mean']:
+                for y_colname in [num_sentences_colname, num_full_tokens_colname, num_bpe_tokens_colname,
+                                  avg_sentlen_colname]:
+                    x_order = get_sorted_labels(df_prompt_length_impact_gbl, gbl[0])
+                    hue_order = get_sorted_labels(df_prompt_length_impact_gbl, gbl[1])
+                    sns.pointplot(data=df_prompt_length_impact_gbl, x=gbl[0], y=y_colname, hue=gbl[1], order=x_order,
+                                  hue_order=hue_order,
+                                  linestyles='')  # , err_kws={"markersize": 10, "capsize": 0.1, "errwidth": 1.5, "palette": "colorblind"}
+                    plt.xticks(rotation=90)
+                    plt.tight_layout()
+                    save_path = os.path.join(save_base_path, "length-statistics",
+                                             f"length_impact_{gbl[0]}_{gbl[1]}_{agg_func}_plot_{y_colname}.pdf")
+                    plt.savefig(save_path)
+                    plt.close()
 
     for lbl, (a, b) in zip(["", "_flipped"], [(0, 1), (1, 0)]):
         if lbl == "_flipped":
             aspect_ratio = 0.75
         else:
             aspect_ratio = 6
-        num_bins = 20
+        num_bins = 10
 
         # subplot grid: one-for each dimension in group-by-list
         # show num_full_tokens, num_bpe_tokens, num_sentences
@@ -941,35 +999,39 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
                         plt.savefig(metrics_n_in_docs_plt_path)
                         plt.close()
                     except:
+                        plt.close()
                         print(
                             "Unable to create catplot for lengths, creating catplot for individual dimensions instead...")
-                        if len(row_order) > len(col_order):
-                            larger_order = row_order
-                            a_prime = b
-                            b_prime = a
-                        else:
-                            larger_order = col_order
-                            a_prime = a
-                            b_prime = b
+                        continue
 
-                        for larger_cat in larger_order:
-                            col_order_prime = [larger_cat]
-                            # filter to only contain the current larger category
-                            df_len_filtered = df_len[df_len[gbl[b_prime]] == larger_cat]
-                            row_order_prime = get_sorted_labels(df_len_filtered, gbl[a_prime])
-
-                            len_plt = sns.catplot(df_len_filtered, row=gbl[a_prime], col=gbl[b_prime],
-                                                  row_order=row_order_prime, col_order=col_order_prime,
-                                                  x=tgt_label, height=5, aspect=aspect_ratio, kind=plt_type)
-                            len_plt_save_path = os.path.join(save_base_path, f"length-statistics",
-                                                             f"length_statistics_{tgt_label}_{plt_type}_{gbl[a_prime]}_{gbl[b_prime]}__{larger_cat}.pdf")
-                            plt.savefig(len_plt_save_path)
-                            print(f"saved {len_plt_save_path}")
-                            # if plt is list_iterator object
-                            if plt is None or isinstance(plt, list):
-                                print("WHY?")
-                            else:
-                                plt.close()
+                        # aspect_ratio = 1.5
+                        # if len(row_order) > len(col_order):
+                        #     larger_order = row_order
+                        #     a_prime = b
+                        #     b_prime = a
+                        # else:
+                        #     larger_order = col_order
+                        #     a_prime = a
+                        #     b_prime = b
+                        #
+                        # for larger_cat in larger_order:
+                        #     col_order_prime = [larger_cat]
+                        #     # filter to only contain the current larger category
+                        #     df_len_filtered = df_len[df_len[gbl[b_prime]] == larger_cat]
+                        #     row_order_prime = get_sorted_labels(df_len_filtered, gbl[a_prime])
+                        #
+                        #     len_plt = sns.catplot(df_len_filtered, row=gbl[a_prime], col=gbl[b_prime],
+                        #                           row_order=row_order_prime, col_order=col_order_prime,
+                        #                           x=tgt_label, height=5, aspect=aspect_ratio, kind=plt_type)
+                        #     len_plt_save_path = os.path.join(save_base_path, f"length-statistics",
+                        #                                      f"length_statistics_{tgt_label}_{plt_type}_{gbl[a_prime]}_{gbl[b_prime]}__{larger_cat}.pdf")
+                        #     plt.savefig(len_plt_save_path)
+                        #     print(f"saved {len_plt_save_path}")
+                        #     # if plt is list_iterator object
+                        #     if plt is None or isinstance(plt, list):
+                        #         print("WHY?")
+                        #     else:
+                        #         plt.close()
 
         sns.set_theme(**DEFAULT_THEME)
         #
@@ -1001,6 +1063,19 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
         # sent_distr_plot_path = os.path.join(save_base_path, "length-statistics", f"sent_distr_plot_violin{lbl}{file_suffix}.pdf")
         # plt.savefig(sent_distr_plot_path)
         # plt.close()
+
+    # make a boxplot showing the distribution of tokens (similar to the median plot above, but for the full distribution)
+    for y_colname in [num_sentences_colname, num_full_tokens_colname, num_bpe_tokens_colname, avg_sentlen_colname]:
+        for gbl in [groupByList] + gblExtension:
+            sorted_x_axis_labels = get_sorted_labels(df, gbl[0])
+            sorted_hue_labels = get_sorted_labels(df, gbl[1])
+
+            len_plt = sns.boxplot(df_len, x=gbl[0], y=y_colname, hue=gbl[1], order=sorted_x_axis_labels,
+                                  hue_order=sorted_hue_labels, flierprops={"marker": "x"}, notch=True, bootstrap=1000)
+            metrics_n_in_docs_plt_path = os.path.join(save_base_path, f"length-statistics",
+                                                      f"length_statistics_{y_colname}_box_{gbl[0]}_{gbl[1]}.pdf")
+            plt.savefig(metrics_n_in_docs_plt_path)
+            plt.close()
 
     return df_prompt_length_impact
 
@@ -1069,8 +1144,6 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
         # subtract y from both yerr values to get the lower and upper error bars, making sure that the lower error bar is always positive
         overview_yerr[0] = overview_y - overview_yerr[0]
         overview_yerr[1] = overview_yerr[1] - overview_y
-        # plot the x-axis ordered (sort the x-axis labels)
-        x_order = sorted_labels_from_list(overview_x)
         # make the plot
         plt.errorbar(overview_x, overview_y, yerr=overview_yerr, fmt='o', )
         plt.xticks(rotation=90)
@@ -1083,7 +1156,9 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
         # make a second plot where seaborn calculates the errorbars
         for (a, b) in [(0, 1), (1, 0)]:
             hue_order = get_sorted_labels(df, groupbyList[b])
+            x_order = get_sorted_labels(df, groupbyList[a])
             sns.pointplot(data=df, x=groupbyList[a], y=metric_name, hue=groupbyList[b], hue_order=hue_order,
+                          order=x_order,
                           estimator=np.median, errorbar=('ci', 95), n_boot=1000, dodge=True,
                           linestyles='')  # , err_kws={"markersize": 10, "capsize": 0.1, "errwidth": 1.5, "palette": "colorblind"}
             plt.xticks(rotation=45)
@@ -1738,6 +1813,8 @@ def label_sort_key_func(x):
     # if there is a number in the label, sort by that number first, then the string order
     if isinstance(x, int):
         return (x, "")
+    elif isinstance(x, float):
+        return (x, "")
     match = re.search(r'\d+', x)
     if match:
         return (int(match.group()), x)
@@ -1749,6 +1826,7 @@ def get_sorted_labels(data_df, column):
     sorted_axis_labels = data_df[column].unique().tolist()
     sorted_axis_labels.sort(key=lambda x: label_sort_key_func(x))
     return sorted_axis_labels
+
 
 def sorted_labels_from_list(labels):
     sorted_axis_labels = labels
@@ -1954,12 +2032,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
 
                 box_plot = sns.boxplot(data=df_model, x="Prompt ID", hue=residualGroupBy[0], y=metric_name,
-                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                                       order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
+                                             f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -1976,12 +2054,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
 
                 box_plot = sns.boxplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
-                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                                       order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_R_box_plot{file_suffix}.pdf")
+                                             f"{model_name}_{metric_name}_R_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -2002,7 +2080,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
+                                             f"{model_name}_{metric_name}_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -2029,12 +2107,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
 
                 box_plot = sns.boxplot(data=df_prompt, x="Model", hue=residualGroupBy[0], y=metric_name,
-                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                                       order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
+                                             f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -2051,12 +2129,12 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 plt.close()
 
                 box_plot = sns.boxplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
-                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                                       order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_R_box_plot{file_suffix}.pdf")
+                                             f"Prompt_{promptVersion}_{metric_name}_R_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -2077,7 +2155,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     box_plot.set_ylim(0, 1)
                 # save
                 box_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
+                                             f"Prompt_{promptVersion}_{metric_name}_box_plot{file_suffix}.pdf")
                 plt.savefig(box_plot_path)
                 out_paths.append(box_plot_path)
                 plt.close()
@@ -2177,12 +2255,13 @@ fewshot_experiment__experimental_setup_MULTINEWS = {
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment-separator-and-german-only"
+experiment_name = "base-experiment-temperature"
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
 
 # DONE
 # base-experiment
+# base-experiment-separator-and-german-only
 # base-experiment-temperature
 
 # TODO
@@ -2355,7 +2434,8 @@ experiment_config = {
             ["Prompt Description", "Has Prompt-Summary Separator"],
             ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
         ],
-        "datasets": ["20Minuten"]
+        "datasets": ["20Minuten"],
+        "prompts_bag_alias": "base-experiment",
     },
     "base-experiment-temperature": {
         "groupByList": ["Prompt ID", "Temperature"],
@@ -2369,8 +2449,11 @@ experiment_config = {
         ],
         "groupByListVariants": [
             ["Prompt Desc. [ID]", "Model"],
+            ["Prompt Desc. [ID]", "Temperature"],
+            ["Model", "Temperature"],
         ],
-        "datasets": ["20Minuten"]
+        "datasets": ["20Minuten"],
+        "prompts_bag_alias": "base-experiment",
     },
     "experiment-sizes": {
         "groupByList": ["Prompt ID", "Model"],
@@ -3160,6 +3243,53 @@ prompt_description = {  # short description of the prompt to ID it instead of th
     "52": "MDS",
     "100": "Basic",
 }
+prompt_name = {  # short description of the prompt to ID it instead of the prompt ID
+    "1": "Basic-1, EN,\n2-3 Sentences",
+    "2": "Basic-1, DE,\n2-3 Sentences",
+    "40": "Basic-1, DE,\n 8 Sentences",
+    "41": "Basic-1, DE,\n10 Sentences",
+    "42": "Basic-1, DE,\n 6 Sentences",
+    "3": "NZZ Prompt, EN",
+    "4": "NZZ Prompt, DE",
+    "23": "NZZ Prompt, DE,\nSeparator",
+    "5": "TL;DR",
+    "6": "Basic-2, EN",
+    "7": "Basic-2, DE",
+    "43": "Basic-2, DE,\nSeparator",
+    "8": "Basic-3, EN",
+    "9": "Basic-3, DE",
+    "44": "Basic-3, DE\nSeparator",
+    "10": "Simplification-1, EN",
+    "20": "Simplification-2, EN",
+    "11": "Simplification-1, DE",
+    "45": "Simplification-1, DE\nSeparator",
+    "12": "Personification-1, EN",
+    "13": "Personification-1, DE",
+    "46": "Personification-1, DE\nSeparator",
+    "14": "Personification-2, EN",
+    "15": "Personification-2, DE",
+    "47": "Personification-2, DE\nSeparator",
+    "16": "Non-expert-audience, EN",
+    "17": "Non-expert-audience, DE",
+    "48": "Non-expert-audience, DE\nSeparator",
+    "18": "Orig. Tone, EN",
+    "19": "Orig. Tone, DE",
+    "49": "Orig. Tone, DE\nSeparator",
+    "21": "Bullet-point, EN\nSeparator",
+    "22": "Bullet-point, DE\nSeparator",
+    "30": "Q&A-1, EN",
+    "31": "Q&A-1, DE",
+    "32": "Q&A-2, EN",
+    "33": "Q&A-2, DE",
+    "34": "Summarize all-1, EN",
+    "35": "Summarize all-1, DE",
+    "36": "Summarize all-2, EN",
+    "37": "Summarize all-2, DE",
+    "50": "MDS-1, EN",
+    "51": "MDS-1, DE",
+    "52": "MDS-2, DE",
+    "100": "Custom",
+}
 if experiment_name.startswith("mds"):
     prompt_description["42"] = "MDS"
 prompt_variant = {  # general variant of the prompt (not the langage)
@@ -3499,6 +3629,8 @@ def make_report_plots(prioritize_inspect_examples=False):
         if prioritize_inspect_examples:
             inspect_examples_report()
 
+        gblExtension = experiment_config[experiment_name].get("groupByListVariants", [])
+
         # Make plots showing the failure rate
         bucket_size = 1000
         bucket_colname = f"#Input Article Tokens Bucket"
@@ -3508,14 +3640,19 @@ def make_report_plots(prioritize_inspect_examples=False):
         x_group = "Temperature"
         if x_group in groupByList:
             x_group = "Model"
-        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, x_group=x_group,
+
+        # # TODO: DELETE
+        # df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList,
+        #                                             gblExtension=gblExtension, approximation=True)
+
+        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
+                                x_group=x_group,
                                 groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
                                                  "N-Input Docs"])
 
         # make violin (distribution) plot showing distribution of metric values per model and prompt
         # ... group by model (comparing prompts)
         # ... group by prompt (comparing models)
-        gblExtension = experiment_config[experiment_name].get("groupByListVariants", [])
         _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
                                              groupByListExtension=gblExtension, file_suffix="")
         # _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")

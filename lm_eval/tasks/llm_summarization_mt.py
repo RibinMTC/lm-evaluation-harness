@@ -1037,6 +1037,15 @@ class MDS_CHAIN_Wikinews_ClustDist_Stage4_it_10(SummarizationFCO_SummChainStage4
     VERSION = 0
     DATASET_PATH = "roysc/mds_chain_S4_clustDist_it_10_total_2048_leave_512"
 
+class MDS_CHAIN_Wikinews_ClustDist_Stage4_it_11(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_S4_clustDist_it_11_total_2048_leave_512"
+
+
+class MDS_CHAIN_Wikinews_ClustDist_Stage4_it_12(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_S4_clustDist_it_12_total_2048_leave_512"
+
 
 class MDS_FCO_Wikinews_Cheat_1024(SummarizationFCO_Fewshot_Base):
     VERSION = 0

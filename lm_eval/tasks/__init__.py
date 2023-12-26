@@ -398,6 +398,8 @@ TASK_REGISTRY = {
     "MDSChain_WikinewsCDS4i8_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_ClustDist_Stage4_it_8,
     "MDSChain_WikinewsCDS4i9_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_ClustDist_Stage4_it_9,
     "MDSChain_WikinewsCDS4i10_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_ClustDist_Stage4_it_10,
+    "MDSChain_WikinewsCDS4i11_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_ClustDist_Stage4_it_11,
+    "MDSChain_WikinewsCDS4i12_100_8b": llm_summarization_mt.MDS_CHAIN_Wikinews_ClustDist_Stage4_it_12,
     "MDS_WikinewsTrunc3584_52_8b": llm_summarization_mt.MDS_Baseline_truncated_3584_wikinewssum,
     "MDSFCO_WikiCD040SSimDyn1024_100_8b": llm_summarization_mt.MDS_FCO_wikinews_clustDist_04_0shot_simSize_dyn_chunk_1024,
     "MDSFCO_WikiCD040SSimDyn1536_100_8b": llm_summarization_mt.MDS_FCO_wikinews_clustDist_04_0shot_simSize_dyn_chunk_1536,
