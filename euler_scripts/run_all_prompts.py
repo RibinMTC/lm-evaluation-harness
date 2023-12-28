@@ -17,19 +17,21 @@ models = [
     # "tiiuae/falcon-7b-instruct",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
     # "LeoLM/leo-hessianai-7b",
     # "LeoLM/leo-hessianai-13b",
+    "LeoLM/leo-hessianai-7b-chat",
+    "LeoLM/leo-hessianai-13b-chat",
     # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
     # "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     # "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "added-prompt-base-experiment-" + ''.join(
+experiment_name = "redo-platypus-tldr-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
@@ -87,9 +89,12 @@ dataset_names = [
     # "WikinewsCDS4i7",
     # "WikinewsCDS4i8",
     # "WikinewsCDS4i9",
-    "WikinewsCDS4i10", # TODO: CONTINUE HERE
+    # "WikinewsCDS4i10",
+    # "WikinewsCDS4i11", # TODO: CONTINUE HERE
+    # "WikinewsCDS4i12",
 
-    # "20Minuten"
+    "20Minuten"
+    # "20min0"
     ## FCO Experiments
     # Cheat
     # "WikiCh1024", "WikiCh1536",
@@ -132,7 +137,7 @@ dataset_names = [
 
     # "20Minuten",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [100]  # TODO: 25?
+prompt_versions = [1, 2, 5, 22, 23, 25, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 # 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 # 22,23,40,41,42,43,44,45,46,47,48,49,
@@ -142,15 +147,15 @@ task_base_names = [
     # "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    # "SummarizationTask_",
+    "SummarizationTask_",
     # "SummSample_",
-    "MDSChain_",
+    # "MDSChain_",
     # "MDS_",
     # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
@@ -260,6 +265,8 @@ inferable_args = {
         "garage-bAInd/Platypus2-70B-instruct": "hf-causal-experimental",
         "LeoLM/leo-hessianai-7b": "hf-causal-experimental",
         "LeoLM/leo-hessianai-13b": "hf-causal-experimental",
+        "LeoLM/leo-hessianai-7b-chat": "hf-causal-experimental",
+        "LeoLM/leo-hessianai-13b-chat": "hf-causal-experimental",
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
         "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged": "hf-causal-experimental",
@@ -280,9 +287,11 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "24:00",  # 24
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "12:00",  # 24
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
-        "garage-bAInd/Platypus2-70B-instruct": "30:00",
+        "garage-bAInd/Platypus2-70B-instruct": "50:00",
         "LeoLM/leo-hessianai-7b": "08:00",
         "LeoLM/leo-hessianai-13b": "12:00",
+        "LeoLM/leo-hessianai-7b-chat": "08:00",
+        "LeoLM/leo-hessianai-13b-chat": "12:00",
         "bigscience/bloomz-7b1-mt": "04:00",
         "tiiuae/falcon-7b-instruct": "04:00",
         "tiiuae/falcon-40b-instruct": "24:00",
@@ -299,9 +308,11 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "rtx_3090",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
-        "garage-bAInd/Platypus2-70B-instruct": "a100-pcie-40gb",
+        "garage-bAInd/Platypus2-70B-instruct": "rtx_3090",
         "LeoLM/leo-hessianai-7b": "rtx_3090",
-        "LeoLM/leo-hessianai-13b": "a100_80gb",
+        "LeoLM/leo-hessianai-13b": "rtx_3090",
+        "LeoLM/leo-hessianai-7b-chat": "rtx_3090",
+        "LeoLM/leo-hessianai-13b-chat": "rtx_3090",
         "bigscience/bloomz-7b1-mt": "rtx_3090",
         "tiiuae/falcon-7b-instruct": "rtx_3090",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
@@ -318,9 +329,11 @@ inferable_args = {
         "meta-llama/Llama-2-70b-chat-hf": 6,  # 3x a100-pcie-40gb, 6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": 4,
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": 3,
-        "garage-bAInd/Platypus2-70B-instruct": 3,
+        "garage-bAInd/Platypus2-70B-instruct": 8,
         "LeoLM/leo-hessianai-7b": 1,
-        "LeoLM/leo-hessianai-13b": 1,
+        "LeoLM/leo-hessianai-13b": 3,
+        "LeoLM/leo-hessianai-7b-chat": 1,
+        "LeoLM/leo-hessianai-13b-chat": 3,
         "bigscience/bloomz-7b1-mt": 2,
         "tiiuae/falcon-7b-instruct": 2,
         "tiiuae/falcon-40b-instruct": 4,
