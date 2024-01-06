@@ -1,0 +1,8 @@
+{
+  "mtc/mistralai": {
+    "summarization_finetuned": "### Instruction:\nYou are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}\n\n### Assistant:\n{summary}"
+    },
+  "mtc/meta": {
+    "summarization_finetuned": "### Instruction:\nYou are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}\n\n### Assistant:\n{summary}"
+  }
+}
