@@ -41,7 +41,7 @@ class DomainAdaptationSummarizationBaseTask(Task):
     summary_key = ""
 
     system_message = "You are an expert at summarization. "
-    prompt_suffix = "\nSUMMARY:"
+    prompt_suffix = "\nSUMMARY: "
     zero_shot_prompt_template = "Proceed to summarize the following text. TEXT: {article}"
     few_shot_prompt_template = zero_shot_prompt_template + prompt_suffix + "{summary}\n"
 
@@ -133,8 +133,11 @@ class DomainAdaptationSummarizationBaseTask(Task):
 
         # Handle case with no few-shot examples
         if num_fewshot == 0:
-            self.prompt_template = self.zero_shot_prompt_template
-            full_prompt = self.system_message + self.doc_to_text(doc)
+            if not self.prompt_template:
+                self.prompt_template = self.zero_shot_prompt_template
+                full_prompt = self.system_message + self.doc_to_text(doc)
+            else:
+                full_prompt = self.doc_to_text(doc)
         else:
             full_prompt = self.get_fewshot_prompt(doc, num_fewshot, rnd)
 
