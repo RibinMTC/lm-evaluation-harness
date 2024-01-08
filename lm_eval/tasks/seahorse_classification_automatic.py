@@ -91,3 +91,207 @@ class AutomaticSeahorseClassificationTask_FCOExperiments(AutomaticSeahorseClassi
     VERSION = 0
     DATASET_PATH = "roysc/SEAHORSE_mds_fco_experiments"
     load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_falcon7b_1(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_falcon7b_1"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_falcon7b_2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_falcon7b_2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_bloomz7b_1(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_bloomz7b_1"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_bloomz7b_2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_bloomz7b_2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_palm2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_palm2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_gpt4(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_gpt4"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_platypus2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_platypus2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_orcallama2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_orcallama2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_leolm7b(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_leolm7b"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_leolm13b(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_leolm13b"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_7b_1(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_7b_1"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_7b_2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_7b_2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_7b_3(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_7b_3"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_13b_1(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_13b_1"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_13b_2(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_13b_2"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_1(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_1"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_2_a(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_2_a"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_2_b(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_2_b"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_3(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_3"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_4(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_4"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_5(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_5"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_6(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_6"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_7(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_7"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_8(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_8"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_9(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_9"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_10(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_10"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_11(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_11"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_12(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_12"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_13(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_13"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_14(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_14"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_15(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_15"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_16(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_16"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_17(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_17"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_18(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_llama2_70b_18"
+    load_lcl = False

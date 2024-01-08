@@ -1911,7 +1911,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     violin_plot.set_ylim(0, 1)
                     violin_plot.set_yticks(np.arange(0, 1.1, 0.1))
                 if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
-                    plt.xticks(rotation=45)
+                    plt.xticks(rotation=90)
                     plt.tight_layout()
                 # save
                 violin_plot_path = os.path.join(metric_plt_base_path,
@@ -1943,7 +1943,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 if metric_name in metric_0_1_range:
                     box_plot.set_yticks(np.arange(0, 1.1, 0.1))
                 if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
-                    plt.xticks(rotation=45)
+                    plt.xticks(rotation=90)
                     plt.tight_layout()
                 plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
                 plt.setp(box_plot.get_legend().get_title(), fontsize='16')
@@ -1970,7 +1970,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     if metric_name in metric_0_1_range:
                         catplt.set(yticks=np.arange(0, 1.1, 0.1))
                     # always rotate them
-                    plt.xticks(rotation=45)
+                    plt.xticks(rotation=90)
                     plt.tight_layout()
                     metrics_n_in_docs_plt_path = os.path.join(metric_plt_base_path,
                                                               f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
@@ -2000,7 +2000,7 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     if metric_name in metric_0_1_range:
                         catplt.set(yticks=np.arange(0, 1.1, 0.1))
                         # always rotate them
-                        plt.xticks(rotation=45)
+                        plt.xticks(rotation=90)
                         plt.tight_layout()
                     metrics_in_size_plt_path = os.path.join(metric_plt_base_path,
                                                             f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
@@ -2297,7 +2297,7 @@ base_experiment_groupByList_variants = [
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "prompt-experiment-large-all-llama-comparison-good-prompts"
+experiment_name = "prompt-experiment-large-llama2-vs-leolm"
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
 
@@ -2310,6 +2310,7 @@ experiment_name = "prompt-experiment-large-all-llama-comparison-good-prompts"
 # prompt-experiment-large-all-llama-comparison
 # prompt-experiment-large-all-llama-comparison-good-prompts
 
+# prompt-experiment-large-llama2-vs-leolm
 # base-experiment-shard2
 # base-experiment-shard1
 # TODO
@@ -2320,7 +2321,6 @@ experiment_name = "prompt-experiment-large-all-llama-comparison-good-prompts"
 # versions-experiment-gpt4-only
 # empty-experiment
 # prompt-experiment-large-basic
-# prompt-experiment-large-llama2-vs-leolm
 # prompt-experiment-large-NZZ
 # prompt-experiment-large-output-size
 # prompt-experiment-large-variants-only
@@ -2571,6 +2571,9 @@ experiment_config = {
             "fangloveskari/ORCA_LLaMA_70B_QLoRA",
             "garage-bAInd/Platypus2-70B-instruct",
         ],
+        "groupByListVariants": [
+            ["Prompt Name", "Model"],
+        ],
         "datasets": ["20Minuten"]
     },
     "versions-experiment-all": {
@@ -2584,6 +2587,9 @@ experiment_config = {
             "meta-llama/Llama-2-70b-chat-hf",
             "fangloveskari/ORCA_LLaMA_70B_QLoRA",
             "garage-bAInd/Platypus2-70B-instruct",
+        ],
+        "groupByListVariants": [
+            ["Prompt Name", "Model"],
         ],
         "datasets": ["20Minuten"]
     },
@@ -2658,6 +2664,7 @@ experiment_config = {
         ],
         "groupByListVariants": [
             ["Prompt Name", "Model"],
+            ["Model", "Prompt Name"],
             ["Prompt Desc. [ID]", "Model"],
         ],
         "datasets": ["20Minuten"],
@@ -2671,15 +2678,18 @@ experiment_config = {
     "prompt-experiment-large-llama2-vs-leolm": {
         "groupByList": ["Prompt ID", "Model"],
         "models": [
+            "meta-llama/Llama-2-7b-chat-hf",
+            "meta-llama/Llama-2-13b-chat-hf",
             "meta-llama/Llama-2-70b-chat-hf",
-            "LeoLM/leo-hessianai-7b",
-            "LeoLM/leo-hessianai-13b",
+            "LeoLM/leo-hessianai-7b-chat",
+            "LeoLM/leo-hessianai-13b-chat",
         ],
         "groupByListVariants": [
             ["Prompt Description", "Has Prompt-Summary Separator"],
             ["Prompt Desc. [ID]", "Has Prompt-Summary Separator"],
         ],
-        "datasets": ["20Minuten"]
+        "datasets": ["20Minuten"],
+        "prompts_bag_alias": "prompt-experiment-large",
     },
     "prompt-experiment-large-NZZ": {
         "groupByList": ["Prompt ID", "Model"],
@@ -2740,8 +2750,10 @@ shortNames = {
     "bigscience/bloomz-7b1-mt": "BloomZ  7b",
     "fangloveskari/ORCA_LLaMA_70B_QLoRA": "OrcaLlama2 70B",
     "garage-bAInd/Platypus2-70B-instruct": "Platypus2 70B",
-    "LeoLM/leo-hessianai-7b": "LeoLM  7B",
-    "LeoLM/leo-hessianai-13b": "LeoLM 13B",
+    "LeoLM/leo-hessianai-7b": "LeoLM  7B (Pretrained)",
+    "LeoLM/leo-hessianai-13b": "LeoLM 13B (Pretrained)",
+    "LeoLM/leo-hessianai-7b-chat": "LeoLM  7B",
+    "LeoLM/leo-hessianai-13b-chat": "LeoLM 13B",
 }
 datasetLanguage = {
     "Wikinews": "de",
@@ -2759,6 +2771,20 @@ datasetNameMap = {
     "Wikinews": "Wikinews",
     "WikinewsTrunc3584": "Wikinews",
     "WikinewsSummarizationChain": "Wikinews",
+    "WikinewsCDS2i0": "Wikinews",
+    "WikinewsCDS4i10": "Wikinews",
+    "WikinewsCDS4i11": "Wikinews",
+    "WikinewsCDS4i1": "Wikinews",
+    "WikinewsCDS4i2": "Wikinews",
+    "WikinewsCDS4i3": "Wikinews",
+    "WikinewsCDS4i4": "Wikinews",
+    "WikinewsCDS4i5": "Wikinews",
+    "WikinewsCDS4i6": "Wikinews",
+    "WikinewsCDS4i7": "Wikinews",
+    "WikinewsCDS4i8": "Wikinews",
+    "WikinewsCDS4i9": "Wikinews",
+    "WikinewsClustDistS2": "Wikinews",
+    "WikinewsS2": "Wikinews",
     "20Minuten": "20Minuten",
     "20minSmol": "20Minuten",
     "20minTS250": "20Minuten",
@@ -2774,6 +2800,7 @@ datasetNameMap = {
     "20minLtm2p33E": "20Minuten",
     "WikinewsClean": "Wikinews",
     "WikinewsSLR": "Wikinews",
+    "WikinewsSL": "Wikinews",
     "WikinewsSimple": "Wikinews",
     "WikinewsSimpleS": "Wikinews",
     "WikinewsSimpleA": "Wikinews",
