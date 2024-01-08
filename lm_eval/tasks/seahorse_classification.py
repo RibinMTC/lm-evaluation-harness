@@ -24,6 +24,8 @@ class SeahorseClassificationTask(Task):
     # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
 
+    tgt_question = 'question4'
+
     worker_lang_to_language_dict = {
         "en-US": "English",
         "es-ES": "Spanish",
@@ -68,7 +70,7 @@ Summary: {summary}
             test_set = self.dataset["test"]
             hq_test_set_german = test_set.filter(lambda example: example['question1'] == 'Yes')
             print(f"Num of samples: {hq_test_set_german.num_rows}")
-            test = hq_test_set_german.filter(lambda example: example["question4"] == "Yes")
+            test = hq_test_set_german.filter(lambda example: example[self.tgt_question] == "Yes")
             print(
                 f"Num of positive samples: {test.num_rows}. Num of negative samples: {hq_test_set_german.num_rows - test.num_rows}")
             return hq_test_set_german
@@ -82,7 +84,7 @@ Summary: {summary}
         return prompt
 
     def doc_to_target(self, doc):
-        label = str(doc["question4"] == "Yes")
+        label = str(doc[self.tgt_question] == "Yes")
         return " " + label
 
     def construct_requests(self, doc, ctx):
@@ -139,3 +141,32 @@ Summary: {summary}
                 "precision": True,
                 "recall": True,
                 "roc_auc": True}
+
+class SeahorseClassificationTask_comprehensible(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question1'
+
+class SeahorseClassificationTask_repetition(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question2'
+
+class SeahorseClassificationTask_grammar(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question3'
+class SeahorseClassificationTask_attribution(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question4'
+
+class SeahorseClassificationTask_main_ideas(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question5'
+
+class SeahorseClassificationTask_conciseness(SeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_TEST"
+    tgt_question = 'question6'

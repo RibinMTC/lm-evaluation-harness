@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 import random
 import os
+import datasets
 from datasets import DatasetDict, Dataset
+import tensorflow_datasets as tfds
 # import lm_eval.metrics
 # import lm_eval.models
 # import lm_eval.tasks
@@ -643,13 +645,13 @@ process_queue = [
     # ("SEAHORSE_llama2_70b_9", process_files_llama2_70b_9),
     # ("SEAHORSE_llama2_70b_10", process_files_llama2_70b_10),
     # ("SEAHORSE_llama2_70b_11", process_files_llama2_70b_11),
-    ("SEAHORSE_llama2_70b_12", process_files_llama2_70b_12),
-    ("SEAHORSE_llama2_70b_13", process_files_llama2_70b_13),
-    ("SEAHORSE_llama2_70b_14", process_files_llama2_70b_14),
-    ("SEAHORSE_llama2_70b_15", process_files_llama2_70b_15),
+    # ("SEAHORSE_llama2_70b_12", process_files_llama2_70b_12),
+    # ("SEAHORSE_llama2_70b_13", process_files_llama2_70b_13),
+    # ("SEAHORSE_llama2_70b_14", process_files_llama2_70b_14),
+    # ("SEAHORSE_llama2_70b_15", process_files_llama2_70b_15),
     # ("SEAHORSE_llama2_70b_16", process_files_llama2_70b_16),
-    ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
-    ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
+    # ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
+    # ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
 ]
 
 worker_lang = "de"
@@ -919,6 +921,138 @@ def prepare_files(src_folder, files_list, dst_file_name, dst_folder):
 #
 #     return
 
+def strip_MLSum_summary(summary):
+    # Removes the following characters as well as duplicate whitespaces
+    # `` '' , . : ( ) ? !
+
+    chars_to_remove = ['``', '\'\'', ',', '.', ':', '(', ')', '?', '!']
+    for char_to_remove in chars_to_remove:
+        summary = summary.replace(char_to_remove, '')
+
+    summary = summary.strip()
+
+    return summary
+
+def seahorse_gem_identifier(gem_id):
+    fields = gem_id.split("-")
+    assert len(fields) == 3
+
+    return fields[0], fields[1], fields[2]
+
+def prepare_seahorse_testset(dst_folder):
+    SEAHORSE_test_location = "./resources/seahorse_data/test.tsv"
+    SEAHORSE_MLSum_location_src = "./resources/seahorse_data/MLSum/test.txt.src"
+    SEAHORSE_MLSum_location_tgt = "./resources/seahorse_data/MLSum/test.txt.tgt"
+    SEAHORSE_Wikilingua_location = "./resources/seahorse_data/Wikilingua/german.pkl"
+
+    # Load all the data
+    SEAHORSE_test = pd.read_csv(SEAHORSE_test_location, sep='\t', header=0)
+
+    MLSum_entries = []
+    with open(SEAHORSE_MLSum_location_src) as srcF, open(SEAHORSE_MLSum_location_tgt) as tgtF:
+        for src, tgt in zip(srcF, tgtF):
+
+            MLSum_entries.append({
+                "article": src,
+                "summary": tgt,
+                "summary_stripped": strip_MLSum_summary(tgt),
+            })
+
+    # NOTE: according to seahorse github, need to be careful with Wikilingua dataset w.r.t. gem_ids?
+
+    Wikilingua = pd.read_pickle(SEAHORSE_Wikilingua_location)
+
+    Wikilingua_hf_dataset = datasets.load_dataset("gem", "wiki_lingua_german_de", split="test")
+    MLSum_hf_dataset = datasets.load_dataset("gem", "mlsum_de", split="test")
+    MLSum_hf_dataset2 = datasets.load_dataset("GEM/mlsum", "de", split="test")
+
+    Wikilingua_hf_df = pd.DataFrame(Wikilingua_hf_dataset)
+    MLSum_hf_df = pd.DataFrame(MLSum_hf_dataset)
+    MLSum_hf_df2 = pd.DataFrame(MLSum_hf_dataset2)
+
+    lang = 'german_de'
+    orig_split = 'test'
+    ds, info = tfds.load(f'huggingface:gem/wiki_lingua_{lang}', split=orig_split, with_info=True)
+    Wikilingua_tf_df = tfds.as_dataframe(ds, info)
+
+    # Filter the Seahorse data
+    # Filters: worker_lang="de", question1="Yes"
+    SEAHORSE_test = SEAHORSE_test[SEAHORSE_test['worker_lang'] == "de"]
+    SEAHORSE_test = SEAHORSE_test[SEAHORSE_test['question1'] == "Yes"]
+
+    # Extend the test data with the correct articles, at the same time, form the dataset for seahorse prediction
+    seahorse_gt_dataset_name = "SEAHORSE_TEST"
+    sentence_splitter_by_lang = {
+        "de": lambda x: somajo_sentence_splitting(x, 1),
+        "en": lambda x: sent_tokenize(x, language="english"),
+    }
+    sentence_splitter = sentence_splitter_by_lang['de']
+    base_dataset_entries = []
+    for index, row in SEAHORSE_test.iterrows():
+        gem_id = row['gem_id']
+        gem_dataset, gem_split, gem_idx = seahorse_gem_identifier(gem_id)
+        article = ""
+        if gem_dataset == "mlsum_de":
+            candidate_rows = MLSum_hf_df[MLSum_hf_df['gem_id'] == gem_id]
+            if len(candidate_rows) == 1:
+                article = candidate_rows['text'].values[0]
+            else:
+                # try the other MLSum dataset
+                candidate_rows = MLSum_hf_df2[MLSum_hf_df2['gem_id'] == gem_id]
+                if len(candidate_rows) == 1:
+                    article = candidate_rows['text'].values[0]
+                else:
+                    raise ValueError(f"Could not find the article for the gem_id: {gem_id}")
+        elif gem_dataset == "wiki_lingua_german_de":
+            candidate_rows = Wikilingua_tf_df[Wikilingua_tf_df['gem_id'] == gem_id.encode('UTF-8')]
+            if len(candidate_rows) == 1:
+                article = candidate_rows['source'].values[0].decode('UTF-8')
+            else:
+                raise ValueError(f"Could not find the article for the gem_id: {gem_id}")
+        else:
+            raise ValueError(f"Unknown gem dataset: {gem_dataset}")
+
+        q1 = row['question1']
+        q2 = row['question2']
+        q3 = row['question3']
+        q4 = row['question4']
+        q5 = row['question5']
+        q6 = row['question6']
+        summary = row['summary']
+        model = row['model']
+
+        article_len = len(report.text_to_llama_bpe(article))
+        summary_len = len(report.text_to_llama_bpe(summary))
+        full_len = seahorse_prompt_empty_len + article_len + summary_len
+        if full_len > size_threshold:
+            max_article_length = size_threshold - (seahorse_prompt_empty_len + summary_len)
+            article = truncate_article(article, max_article_length, sentence_splitter)
+
+        base_dataset_entries.append({
+            "gem_id": gem_id,
+            "model": model,
+            "article": article,
+            "summary": summary,
+            "worker_lang": "de",
+            "question1": q1,
+            "question2": q2,
+            "question3": q3,
+            "question4": q4,
+            "question5": q5,
+            "question6": q6
+        })
+
+    base_dataset_entries = pd.DataFrame(base_dataset_entries)
+    base_dataset_entries.to_json(os.path.join(dst_folder, f"{seahorse_gt_dataset_name}.json"), orient="records",
+                                 lines=True)
+
+    dataset_dict = DatasetDict({
+        "test": Dataset.from_pandas(base_dataset_entries),
+    })
+    upload_dataset_to_hf(seahorse_gt_dataset_name, dataset_dict)
+
+
+    return
 
 # TODO: Make function that reads in output from seahorse and extends the results
 #   Load the seahorse test set (load the tsv file)
@@ -948,3 +1082,6 @@ if __name__ == "__main__":
     for dst_file_name, process_files in process_queue:
         prepare_files(SRC_FOLDER, process_files, dst_file_name, INT_FOLDER)
     # extend_basic_metrics(os.path.join(INT_FOLDER, "all_data.json"), os.path.join(DST_FOLDER, "all_data.json"))
+
+    # prepare the test set
+    prepare_seahorse_testset(INT_FOLDER)

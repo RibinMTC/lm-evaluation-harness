@@ -43,7 +43,7 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "redo-platypus-tldr-" + ''.join(
+experiment_name = "seahorse-metric-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584",
@@ -105,7 +105,7 @@ dataset_names = [
     # "WikinewsCDS4i11", # TODO: CONTINUE HERE
     # "WikinewsCDS4i12",
 
-    "20Minuten"
+    # "20Minuten"
     # "20min0"
     ## FCO Experiments
     # Cheat
@@ -148,18 +148,54 @@ dataset_names = [
     # "WikinewsSent1L00", "WikinewsSent1L05", "WikinewsSent3L00", "WikinewsSent3L05", "WikinewsSent5L00", "WikinewsSent5L05", "WikinewsSent10L00", "WikinewsSent10L05"
 
     # "20Minuten",
+
+    # SEAHORSE TASK DATASETS
+    # "falcon7b1",
+    # "falcon7b2",
+    # "bloomz7b1",
+    # "bloomz7b2",
+    # "palm2",
+    # "gpt4",
+    # "platypus2",
+    # "orcallama2",
+    # "leolm7b",
+    # "leolm13b",
+    # "llama27b1",
+    # "llama27b2",
+    # "llama27b3",
+    "llama213b1",
+    "llama213b2",
+    "llama270b1",
+    "llama270b2a",
+    "llama270b2b",
+    "llama270b3",
+    "llama270b4",
+    "llama270b5",
+    "llama270b6",
+    "llama270b7",
+    "llama270b8",
+    "llama270b9",
+    "llama270b10",
+    "llama270b11",
+    "llama270b12",
+    "llama270b13",
+    "llama270b14",
+    "llama270b15",
+    "llama270b16",
+    "llama270b17",
+    "llama270b18",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [1, 2, 5, 22, 23, 25, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+prompt_versions = [100]
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 # 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 # 22,23,40,41,42,43,44,45,46,47,48,49,
 #
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    # "seahorse_",
+    "seahorse_",
     # "RepeatExperimentBugfix_",
 
-    "SummarizationTask_",
+    # "SummarizationTask_",
     # "SummSample_",
     # "MDSChain_",
     # "MDS_",
