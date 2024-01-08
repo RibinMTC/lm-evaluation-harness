@@ -5,7 +5,7 @@
     },
   "mtc/meta": {
     "summarization_finetuned": "### Instruction:\nYou are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}\n\n### Assistant:\n",
-    "prompt_v3_summarization_finetuned": "You are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}\nSUMMARY: "
+    "prompt_v3_summarization_finetuned": "You are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}"
   },
   "LeoLM/leo": {
     "summarization_finetuned": "### Instruction:\nYou are an expert at summarization. Proceed to summarize the following text.\nTEXT: {article}\n\n### Assistant:\n",
