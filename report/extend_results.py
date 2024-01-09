@@ -437,107 +437,127 @@ process_files_llama2_70b_4 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD040SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD041SSimDyn1024_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_5 = [
+process_files_llama2_70b_5_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD041SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD042SSimDyn1024_100_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD042SSimDyn1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD042SSimDyn1536_100_8b_write_out_info.json"
+]
+process_files_llama2_70b_5_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD043SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD050SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD051SSimDyn1536_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_6 = [
+process_files_llama2_70b_6_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD052SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD053SSimDyn1536_100_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD060SSimDyn1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD060SSimDyn1536_100_8b_write_out_info.json"
+]
+process_files_llama2_70b_6_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD061SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD062SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCD063SSimDyn1536_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_7 = [
+process_files_llama2_70b_7_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCh1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCh1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N1536_100_8b_write_out_info.json",
-    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N2048_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0N2048_100_8b_write_out_info.json"
+]
+process_files_llama2_70b_7_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl0SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1N21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1N21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1N22048_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1SSimDyn1536_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_8 = [
+process_files_llama2_70b_8_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1SW1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1SW1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2S21536_100_8b_write_out_info.json",
+]
+process_files_llama2_70b_8_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2S22048_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SSimDyn1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SW1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SW1536_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_9 = [
+process_files_llama2_70b_9_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi0S1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi0S1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi1S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi1S21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi1SW1024_100_8b_write_out_info.json",
+]
+process_files_llama2_70b_9_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi1SW1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi2S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi2S21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi2SW1024_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_10 = [
+process_files_llama2_70b_10_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1S21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1024_100_8b_write_out_info.json",
+]
+process_files_llama2_70b_10_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1S21024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1S21536_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1SW1024_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiRa1SW1536_100_8b_write_out_info.json"
 ]
-process_files_llama2_70b_11 = [
+process_files_llama2_70b_11_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsClean_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC128_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC256_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC32_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC512_52_8b_write_out_info.json",
+]
+process_files_llama2_70b_11_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSC64_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSCS16_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSCS2_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSCS32_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSCS4_52_8b_write_out_info.json"
 ]
-process_files_llama2_70b_12 = [
+process_files_llama2_70b_12_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSCS8_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSLR_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSL_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSimpleAS_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSimpleA_52_8b_write_out_info.json",
+]
+process_files_llama2_70b_12_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSimpleS_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_WikinewsSimple_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_50_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_51_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSSumm_Wikinews_52_8b_write_out_info.json"
 ]
-process_files_llama2_70b_13 = [
+process_files_llama2_70b_13_a = [
     # "meta-llama-Llama-2-70b-chat-hf/MDS_MultinewsTrunc3584_52_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10C_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10O_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust10R_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust1C_42_8b_write_out_info.json",
+]
+process_files_llama2_70b_13_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust1O_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust1R_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust5C_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsClust5O_42_8b_write_out_info.json",
 ]
-process_files_llama2_70b_14 = [
+process_files_llama2_70b_14_a = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent10L00_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent10L05_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent1L00_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent1L05_42_8b_write_out_info.json",
+]
+process_files_llama2_70b_14_b = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent3L00_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent3L05_42_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSent5L00_42_8b_write_out_info.json",
@@ -634,20 +654,30 @@ process_queue = [
     # ("SEAHORSE_llama2_13b_1", process_files_llama2_13b_1),
     # ("SEAHORSE_llama2_13b_2", process_files_llama2_13b_2),
     # ("SEAHORSE_llama2_70b_1", process_files_llama2_70b_1),
-    # ("SEAHORSE_llama2_70b_2_a", process_files_llama2_70b_2_a),
-    # ("SEAHORSE_llama2_70b_2_b", process_files_llama2_70b_2_b),
-    # ("SEAHORSE_llama2_70b_3", process_files_llama2_70b_3),
+    ("SEAHORSE_llama2_70b_2_a", process_files_llama2_70b_2_a),
+    ("SEAHORSE_llama2_70b_2_b", process_files_llama2_70b_2_b),
+    ("SEAHORSE_llama2_70b_3", process_files_llama2_70b_3),
     # ("SEAHORSE_llama2_70b_4", process_files_llama2_70b_4),
-    # ("SEAHORSE_llama2_70b_5", process_files_llama2_70b_5),
-    # ("SEAHORSE_llama2_70b_6", process_files_llama2_70b_6),
-    # ("SEAHORSE_llama2_70b_7", process_files_llama2_70b_7),
-    # ("SEAHORSE_llama2_70b_8", process_files_llama2_70b_8),
-    # ("SEAHORSE_llama2_70b_9", process_files_llama2_70b_9),
-    # ("SEAHORSE_llama2_70b_10", process_files_llama2_70b_10),
-    # ("SEAHORSE_llama2_70b_11", process_files_llama2_70b_11),
-    # ("SEAHORSE_llama2_70b_12", process_files_llama2_70b_12),
-    # ("SEAHORSE_llama2_70b_13", process_files_llama2_70b_13),
-    # ("SEAHORSE_llama2_70b_14", process_files_llama2_70b_14),
+    # ("SEAHORSE_llama2_70b_5_a", process_files_llama2_70b_5_a),
+    # ("SEAHORSE_llama2_70b_5_b", process_files_llama2_70b_5_b),
+    # ("SEAHORSE_llama2_70b_6_a", process_files_llama2_70b_6_a),
+    # ("SEAHORSE_llama2_70b_6_b", process_files_llama2_70b_6_b),
+    # ("SEAHORSE_llama2_70b_7_a", process_files_llama2_70b_7_a),
+    # ("SEAHORSE_llama2_70b_7_b", process_files_llama2_70b_7_b),
+    # ("SEAHORSE_llama2_70b_8_a", process_files_llama2_70b_8_a),
+    # ("SEAHORSE_llama2_70b_8_b", process_files_llama2_70b_8_b),
+    # ("SEAHORSE_llama2_70b_9_a", process_files_llama2_70b_9_a),
+    # ("SEAHORSE_llama2_70b_9_b", process_files_llama2_70b_9_b),
+    # ("SEAHORSE_llama2_70b_10_a", process_files_llama2_70b_10_a),
+    # ("SEAHORSE_llama2_70b_10_b", process_files_llama2_70b_10_b),
+    # ("SEAHORSE_llama2_70b_11_a", process_files_llama2_70b_11_a),
+    # ("SEAHORSE_llama2_70b_11_b", process_files_llama2_70b_11_b),
+    # ("SEAHORSE_llama2_70b_12_a", process_files_llama2_70b_12_a),
+    # ("SEAHORSE_llama2_70b_12_b", process_files_llama2_70b_12_b),
+    # ("SEAHORSE_llama2_70b_13_a", process_files_llama2_70b_13_a),
+    # ("SEAHORSE_llama2_70b_13_b", process_files_llama2_70b_13_b),
+    # ("SEAHORSE_llama2_70b_14_a", process_files_llama2_70b_14_a),
+    # ("SEAHORSE_llama2_70b_14_b", process_files_llama2_70b_14_b),
     # ("SEAHORSE_llama2_70b_15", process_files_llama2_70b_15),
     # ("SEAHORSE_llama2_70b_16", process_files_llama2_70b_16),
     # ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
@@ -812,8 +842,9 @@ def prepare_files(src_folder, files_list, dst_file_name, dst_folder):
                         raise ValueError(f"Could not find the ground truth entry for the summary: {gt_summary}")
                 article = gt_entry['article'].values[0]
                 article_list = [article]
-                if 'article_list' in entry:
-                    article_list = entry['article_list']
+                if 'article_list' in gt_entry:
+                    # article_list = entry['article_list']
+                    article_list = gt_entry['article_list'].values[0]
                     if isinstance(article_list, str):
                         used_apostrophe = article_list[1]
                         start_str = f"[{used_apostrophe}"
@@ -850,8 +881,10 @@ def prepare_files(src_folder, files_list, dst_file_name, dst_folder):
                 })
 
                 if len(article_list) > 1:
-                    for cmp_article_list_idx in range(len(article_list)):
+                    # only process articles that are not empty
+                    article_list = [x for x in article_list if len(x.strip()) > 2]
 
+                    for cmp_article_list_idx in range(len(article_list)):
                         article = article_list[cmp_article_list_idx]
 
                         article_len = len(report.text_to_llama_bpe(article))
@@ -866,6 +899,7 @@ def prepare_files(src_folder, files_list, dst_file_name, dst_folder):
                             "article": article,
                             "summary": pred_summary,
                             "gt_summary": gt_summary,
+                            "worker_lang": worker_lang,
                             "id": orig_doc_id,
                             "experiment_id": file,
                             "sub_id": sub_identifier(cmp_gt_summary=False, cmp_article_list=True,
@@ -1051,26 +1085,38 @@ def prepare_seahorse_testset(dst_folder):
     })
     upload_dataset_to_hf(seahorse_gt_dataset_name, dataset_dict)
 
+    # OLD NOTES: Make function that reads in output from seahorse and extends the results
+    #   Load the seahorse test set (load the tsv file)
+    #   Filter by worker_lang="de"
+    #   Filter by qestion1="Yes"
+    #   Load the original articles from the datasets: Wikilingua and MLSum
+    #   - Wikilingua:
+    #       import tensorflow_datasets as tfds
+    #       lang = 'english_en'
+    #       orig_split = 'validation'
+    #       ds, info = tfds.load(f'huggingface:gem/wiki_lingua_{lang}', split=orig_split, with_info=True)
+    #       hfdf = tfds.as_dataframe(ds,info)
+    #   - MLSum -> retreive through GEM on huggingface, or directly through the original test file (with lines as indices?)
+    #       import datasets
+    #       data = datasets.load_dataset('GEM/mlsum')
+    #   ALTERNATIVE: Load the datasets, and try to match the reference summaries to the original summaries to get the appropriate articles
+    #     MLSum -> make sure to remove `` '' , . : ( ) ? ! from both summaries, because the MLSum dataset has weird whitespaces next to them
+    #
+
 
     return
 
-# TODO: Make function that reads in output from seahorse and extends the results
-#   Load the seahorse test set (load the tsv file)
-#   Filter by worker_lang="de"
-#   Filter by qestion1="Yes"
-#   Load the original articles from the datasets: Wikilingua and MLSum
-#   - Wikilingua:
-#       import tensorflow_datasets as tfds
-#       lang = 'english_en'
-#       orig_split = 'validation'
-#       ds, info = tfds.load(f'huggingface:gem/wiki_lingua_{lang}', split=orig_split, with_info=True)
-#       hfdf = tfds.as_dataframe(ds,info)
-#   - MLSum -> retreive through GEM on huggingface, or directly through the original test file (with lines as indices?)
-#       import datasets
-#       data = datasets.load_dataset('GEM/mlsum')
-#   ALTERNATIVE: Load the datasets, and try to match the reference summaries to the original summaries to get the appropriate articles
-#     MLSum -> make sure to remove `` '' , . : ( ) ? ! from both summaries, because the MLSum dataset has weird whitespaces next to them
-#
+def postprocess_seahorse_results():
+    seahorse_paths = {
+        "attribution": "../results/mtc-NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+        "conciceness": "../results/mtc-NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
+        "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    }
+
+    # TODO
+
+    return
+
 
 
 if __name__ == "__main__":
@@ -1079,9 +1125,12 @@ if __name__ == "__main__":
     # if "--google" in sys.argv:
     #     beluga_prompt = False
 
-    for dst_file_name, process_files in process_queue:
-        prepare_files(SRC_FOLDER, process_files, dst_file_name, INT_FOLDER)
-    # extend_basic_metrics(os.path.join(INT_FOLDER, "all_data.json"), os.path.join(DST_FOLDER, "all_data.json"))
+    if "--postprocess" in sys.argv:
+        postprocess_seahorse_results()
+    else:
+        for dst_file_name, process_files in process_queue:
+            prepare_files(SRC_FOLDER, process_files, dst_file_name, INT_FOLDER)
+        # extend_basic_metrics(os.path.join(INT_FOLDER, "all_data.json"), os.path.join(DST_FOLDER, "all_data.json"))
 
-    # prepare the test set
-    prepare_seahorse_testset(INT_FOLDER)
+        # prepare the test set
+        prepare_seahorse_testset(INT_FOLDER)
