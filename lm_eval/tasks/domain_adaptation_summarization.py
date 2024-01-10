@@ -205,6 +205,14 @@ class ArxivDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseTa
     max_generation_length = 256
 
 
+class ArxivDomainAdaptationSummarizationTask2kWindow(DomainAdaptationSummarizationBaseTask):
+    DATASET_PATH = "anumafzal94/arxiv-test-2048"
+    DATASET_NAME = None
+    article_key = "text"
+    summary_key = "summary"
+    max_generation_length = 256
+
+
 class Arxiv2ShotDomainAdaptationSummarizationTask(ArxivDomainAdaptationSummarizationTask):
     DATASET_PATH = "anumafzal94/arxiv-2shot-4096"
     DATASET_NAME = None
@@ -218,6 +226,14 @@ class PubmedDomainAdaptationSummarizationTask(DomainAdaptationSummarizationBaseT
 
     article_key = "article"
     summary_key = "abstract"
+    max_generation_length = 256
+
+
+class PubmedDomainAdaptationSummarizationTask2kWindow(DomainAdaptationSummarizationBaseTask):
+    DATASET_PATH = "anumafzal94/pubmed-test-2048"
+    DATASET_NAME = None
+    article_key = "text"
+    summary_key = "summary"
     max_generation_length = 256
 
 

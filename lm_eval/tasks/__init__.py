@@ -360,9 +360,11 @@ TASK_REGISTRY = {
     "xnli_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.XnliFaithfulnessMultiClassificationWithExplanationTask,
     "seahorse_attribution_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.SeahorseFaithfulnessMultiClassificationWithExplanationTask,
     "arxiv_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask,
+    "arxiv_2k_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask2kWindow,
     "arxiv_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Arxiv2ShotDomainAdaptationSummarizationTask,
     "govreport_domain_adaptation_summarization": domain_adaptation_summarization.GovReportDomainAdaptationSummarizationTask,
     "pubmed_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask,
+    "pubmed_2k_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask2kWindow,
     "pubmed_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Pubmed2ShotDomainAdaptationSummarizationTask,
     "absinth_reasoning_generation": absinth_reasoning_generation.AbsinthReasoningGenerationTask,
     # Requires manual download of data.
