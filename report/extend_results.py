@@ -967,11 +967,13 @@ def strip_MLSum_summary(summary):
 
     return summary
 
+
 def seahorse_gem_identifier(gem_id):
     fields = gem_id.split("-")
     assert len(fields) == 3
 
     return fields[0], fields[1], fields[2]
+
 
 def prepare_seahorse_testset(dst_folder):
     SEAHORSE_test_location = "./resources/seahorse_data/test.tsv"
@@ -985,7 +987,6 @@ def prepare_seahorse_testset(dst_folder):
     MLSum_entries = []
     with open(SEAHORSE_MLSum_location_src) as srcF, open(SEAHORSE_MLSum_location_tgt) as tgtF:
         for src, tgt in zip(srcF, tgtF):
-
             MLSum_entries.append({
                 "article": src,
                 "summary": tgt,
@@ -1103,20 +1104,175 @@ def prepare_seahorse_testset(dst_folder):
     #     MLSum -> make sure to remove `` '' , . : ( ) ? ! from both summaries, because the MLSum dataset has weird whitespaces next to them
     #
 
-
     return
 
+
 def postprocess_seahorse_results():
+    # NOTE: The code assumes that all seahorse results are performed for all the keys, so each file must be present
+    # for each key below.
     seahorse_paths = {
         "attribution": "../results/mtc-NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
         "conciceness": "../results/mtc-NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
+    exclude_filenames = [
+        "seahorse_testq1_100_write_out_info.json",
+        "seahorse_testq2_100_write_out_info.json",
+        "seahorse_testq3_100_write_out_info.json",
+        "seahorse_testq4_100_write_out_info.json",
+        "seahorse_testq5_100_write_out_info.json",
+        "seahorse_testq6_100_write_out_info.json",
+    ]
+    DST_FOLDER = "./results_seahorse"  # folder to put all results in from experiments
 
-    # TODO
+    if len(seahorse_paths) == 0:
+        raise ValueError("No seahorse paths specified!")
+
+    # read in all the filenames, and process them grouped, such that only the content of files with the same name is processed at once
+    filenames = {}
+    for key, path in seahorse_paths.items():
+        filenames[key] = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        filenames[key] = [f for f in filenames[key] if f.endswith(".json")]
+        filenames[key] = sorted(filenames[key])
+
+        # remove the files that should be excluded
+        filenames[key] = [f for f in filenames[key] if f not in exclude_filenames]
+
+
+    # process the files
+    seahorse_keys = list(seahorse_paths.keys())
+    generic_seahorse_key = list(seahorse_keys)[0]
+    for filename in filenames[generic_seahorse_key]:
+        print(f"Processing file {filename}")
+
+        # load the data into a map, only load the relevant fields, and already group the data by the experiment_id,
+        # because all the data with the same experiment_id will be put into the same file in the end
+        seahorse_data = {}
+        experiment_ids = []
+        for key, path in seahorse_paths.items():
+            if key not in seahorse_data:
+                seahorse_data[key] = {}
+            with open(os.path.join(path, filename), 'r') as f:
+                result = json.load(f)
+                entries = {}
+                for entry in result:
+                    experiment_id = entry["experiment_id"]
+                    if experiment_id not in experiment_ids:
+                        experiment_ids.append(experiment_id)
+                    if experiment_id not in entries:
+                        entries[experiment_id] = []
+                    truth_value = True if entry["prediction"] == "1" else False
+                    entries[experiment_id].append({
+                        "doc_id": entry["id"],
+                        "score": entry["true_prediction_probability"],
+                        "truth_value": truth_value,
+                        "experiment_id": experiment_id,
+                        "sub_id": entry["sub_id"],
+                        "article": entry["article"],
+                        "summary": entry["summary"],
+                        "gt_summary": entry["gt_summary"],
+                    })
+                # need to aggregate entries that have the same doc_id, these are MDS predictions and need to be further processed
+                agg_entries = {}
+                for experiment_id, experiment_entries in entries.items():
+                    processed_doc_ids = []
+                    for entry in experiment_entries:
+                        doc_id = entry["doc_id"]
+                        if doc_id in processed_doc_ids:
+                            continue
+
+                        # find all entries with the same doc_id
+                        base_entries = [e for e in experiment_entries if
+                                        e["doc_id"] == doc_id and ",full_article" in e["sub_id"]]
+                        if len(base_entries) != 1:
+                            raise ValueError(f"Expected exactly 1 base entry, but found {len(base_entries)}")
+                        base_entry = base_entries[0]
+                        # get the mds_entries and sort them by sub_id (since it contains the index of the article)
+                        mds_entries = [e for e in experiment_entries if
+                                       e["doc_id"] == doc_id and ",full_article" not in e["sub_id"]]
+                        mds_entries = sorted(mds_entries, key=lambda x: int(x["sub_id"].split("_")[-1]))
+
+                        # aggregate the entries (if necessary)
+                        if len(mds_entries) > 0:
+                            if experiment_id not in agg_entries:
+                                agg_entries[experiment_id] = []
+
+                            # calculate basic aggregations and add them to the base_entry
+                            mds_scores = [e["score"] for e in mds_entries]
+                            mds_truth_values = [e["truth_value"] for e in mds_entries]
+                            avg_score = np.mean(mds_scores)
+                            avg_truth_value = np.mean([1.0 if x else 0.0 for x in mds_truth_values])
+
+                            base_entry["mds_scores"] = mds_scores
+                            base_entry["mds_truth_values"] = mds_truth_values
+                            base_entry["mds_avg_score"] = avg_score
+                            base_entry["mds_avg_truth_value"] = avg_truth_value
+
+                            agg_entries[experiment_id].append(base_entry)
+                        else:
+                            if experiment_id not in agg_entries:
+                                agg_entries[experiment_id] = []
+                            agg_entries[experiment_id].append(base_entry)
+
+                        processed_doc_ids.append(doc_id)
+
+                # sort the agg_entries by doc_id and save them in the seahorse_data
+                for experiment_id, experiment_entries in agg_entries.items():
+                    experiment_entries = sorted(experiment_entries, key=lambda x: int(x["doc_id"]))
+                    seahorse_data[key][experiment_id] = experiment_entries
+                seahorse_data[key] = agg_entries
+        # Now, all the data is loaded into seahorse_data, and grouped by experiment_id
+        # Next: put all the data of the same experiment_id into a single file, and save it for the report code to use
+        for experiment_id in experiment_ids:
+            # create the output folder if it does not exist yet
+            if experiment_id.endswith(".json"):
+                save_folder = os.path.join(DST_FOLDER, os.path.dirname(experiment_id))
+                save_filename = os.path.basename(experiment_id)
+            else:
+                save_folder = os.path.join(DST_FOLDER, experiment_id)
+                save_filename = f"{experiment_id}.json"
+            if not os.path.exists(save_folder):
+                os.makedirs(save_folder)
+
+            # Aggregate the data that has the same doc_id but different seahorse-key into a single file
+            all_doc_ids = [entry["doc_id"] for key in seahorse_keys for entry in seahorse_data[key][experiment_id]]
+            all_doc_ids = [int(x) for x in all_doc_ids]
+            all_doc_ids = list(set(all_doc_ids))
+            all_doc_ids.sort()
+
+            experiment_entries = []
+            for doc_id in all_doc_ids:
+                doc_id_entries = {}
+                # find the relevant entries (i know that its not very efficient)
+                for key in seahorse_keys:
+                    for entry in seahorse_data[key][experiment_id]:
+                        if entry["doc_id"] == doc_id or entry["doc_id"] == str(doc_id):
+                            doc_id_entries[key] = entry
+                # aggregate the entries
+                agg_entry = {
+                    "doc_id": doc_id,
+                    "experiment_id": doc_id_entries[generic_seahorse_key]["experiment_id"],
+                    "article": doc_id_entries[generic_seahorse_key]["article"],
+                    "summary": doc_id_entries[generic_seahorse_key]["summary"],
+                    "gt_summary": doc_id_entries[generic_seahorse_key]["gt_summary"],
+                }
+                for key in seahorse_keys:
+                    agg_entry[f"{key}_score"] = doc_id_entries[key]["score"]
+                    agg_entry[f"{key}_truth_value"] = doc_id_entries[key]["truth_value"]
+                    if "mds_scores" in doc_id_entries[key]:
+                        agg_entry[f"{key}_mds_scores"] = doc_id_entries[key]["mds_scores"]
+                        agg_entry[f"{key}_mds_truth_values"] = doc_id_entries[key]["mds_truth_values"]
+                        agg_entry[f"{key}_mds_avg_score"] = doc_id_entries[key]["mds_avg_score"]
+                        agg_entry[f"{key}_mds_avg_truth_value"] = doc_id_entries[key]["mds_avg_truth_value"]
+
+                experiment_entries.append(agg_entry)
+
+            # save the data to the file
+            with open(os.path.join(save_folder, save_filename), 'w') as f:
+                # write the data to the file
+                json.dump(experiment_entries, f, indent=4)
 
     return
-
 
 
 if __name__ == "__main__":

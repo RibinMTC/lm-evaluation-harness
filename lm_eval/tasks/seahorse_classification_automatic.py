@@ -1,6 +1,7 @@
 from . import seahorse_classification
 import json
 import numpy as np
+from lm_eval.base import rf
 from lm_eval.metrics import mean
 
 
@@ -13,6 +14,25 @@ class AutomaticSeahorseClassificationTask(seahorse_classification.SeahorseClassi
     LCL_DATASET_PATH = "./results_extended_input/base_datasets.json"
 
     # LCL_DATASET_PATH = "./results_extended_input/mds_fco_experiments.json"
+
+    worker_lang_to_language_dict = {
+        "en-US": "English",
+        "es-ES": "Spanish",
+        "ru": "Russian",
+        "vi": "Vietnamese",
+        "tr": "Turkish",
+        "de": "German"
+    }
+
+    default_prompt_template = """### System:
+You are StableBeluga, an AI that follows instructions extremely well. Help as much as you can.
+
+### User: Given an article and its corresponding summary in {lang}, reply with True if all information in the summary originates from the article and reply False otherwise. 
+Article: {article}
+Summary: {summary}
+
+### Assistant:"
+"""
 
     def has_test_docs(self):
         return True
@@ -39,9 +59,31 @@ class AutomaticSeahorseClassificationTask(seahorse_classification.SeahorseClassi
                 test_set[idx]["worker_lang"] = 'de'
             return test_set
 
+    def doc_to_text(self, doc):
+        self.prompt_template = self.default_prompt_template # override the prompt template in any case
+        prompt = self.prompt_template.format(article=doc['article'],
+                                             summary=doc['summary'], label="",
+                                             lang=self.worker_lang_to_language_dict['de']) # and use german as language
+        return prompt
+
     def doc_to_target(self, doc):
         # label = str(doc["question4"] == "Yes")
         return " " + str(True)
+
+    def construct_requests(self, doc, ctx):
+        ll_false, _ = rf.loglikelihood(ctx, " False")
+        ll_true, _ = rf.loglikelihood(ctx, " True")
+        return ll_false, ll_true
+
+    @staticmethod
+    def convert_label(label):
+        label = label.strip()
+        if label.lower() == 'false':
+            return 0
+        elif label.lower() == 'true':
+            return 1
+        else:
+            raise ValueError("Invalid label!")
 
     def process_results(self, doc, results):
         prediction = np.argmax(results)
