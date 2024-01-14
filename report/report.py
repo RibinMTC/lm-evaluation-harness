@@ -10,6 +10,10 @@ from scipy.stats import bootstrap
 import scipy.stats as stats
 import pandas as pd
 import numpy as np
+import matplotlib
+# import matplotlib.patches as mpatches
+
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pathlib
@@ -114,6 +118,7 @@ def extract_dataset_and_task_name(filename):
 def load_results(results_path_base, model_name, return_concat_df=True):
     model_name = rename_hf_model(model_name)
     results_path = f"../{results_path_base}/{model_name}"
+    seahorse_path = f"./results_seahorse/{model_name}"
     result_files = [f for f in os.listdir(results_path) if f.endswith(".json")]
 
     # Load the results from all JSON files and extend their fields as needed
@@ -133,6 +138,28 @@ def load_results(results_path_base, model_name, return_concat_df=True):
                 entry["Model"] = model_name
                 entry['Temperature'] = temperature
                 entry['Model Precision'] = precision
+
+            # join with seahorse results based on doc_id
+            include_seahorse_columns = ["attribution_score", "attribution_truth_value", "conciceness_score",
+                                        "conciceness_truth_value", "main-ideas_score", "main-ideas_truth_value"]
+            if os.path.exists(os.path.join(seahorse_path, file)):
+                with open(os.path.join(seahorse_path, file), "r") as f:
+                    seahorse_result = json.load(f)
+                    seahorse_result_df = pd.DataFrame(seahorse_result)
+                    for entry in result:
+                        doc_id = entry["doc_id"]
+                        seahorse_row = seahorse_result_df[seahorse_result_df["doc_id"] == doc_id]
+                        if len(seahorse_row) == 0:
+                            print(f"Warning: No Seahorse row found for model/doc_id {model_name}/{doc_id}")
+                            continue
+                        seahorse_row = seahorse_row.iloc[0]
+                        for column in include_seahorse_columns:
+                            entry[column] = seahorse_row[column]
+            else:
+                print(f"Warning: No Seahorse file found for file {model_name}/{file}, initializing to 0")
+                for entry in result:
+                    for column in include_seahorse_columns:
+                        entry[column] = 0.0
 
             all_results.append(result)
             model_names.append(model_name)
@@ -195,6 +222,7 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         dataset_names = df["Dataset"].unique()
         dataset_names = [datasetNameMap[x] if x in datasetNameMap else x for x in dataset_names]
         supported_names = ["20Minuten", "Wikinews", "Klexikon", "Multinews"]
+        mds_names = ["Wikinews", "Multinews"]
         supported_name = [True if dataset_name in supported_names else False for dataset_name in dataset_names]
         assert all(supported_name), "All datasets must be supported in load_all_results"
 
@@ -282,6 +310,50 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         plt.close()
         sns.set_theme(**DEFAULT_THEME)
 
+        # make a histogram plot for the size of the input documents
+        keys_to_histogram_binwidth = {
+            'num_article_bpe': 500,
+            'num_summary_bpe': 100,
+            'num_input_docs': 1,
+        }
+        keys_to_xlabels = {
+            'num_article_bpe': 'Article Length (BPE)',
+            'num_summary_bpe': 'Summary Length (BPE)',
+            'num_input_docs': 'Number of Input Documents',
+        }
+        metric_plt_theme = {
+            "style": "darkgrid", "rc": {"figure.figsize": (15, 10), "font.size": 24, },
+        }
+        sns.set_theme(**metric_plt_theme)
+        for key in keys_to_xlabels.keys():
+            hist_binwidth = keys_to_histogram_binwidth[key]
+            hist_xlabel = keys_to_xlabels[key]
+            max_val = max(datasets[dataset_name][key])
+            max_val_rounded = math.ceil(max_val / hist_binwidth) * hist_binwidth
+            binrange = (0, max_val_rounded)
+            histplot = sns.histplot(data=datasets[dataset_name], x=key, binwidth=hist_binwidth, binrange=binrange)
+            histplot.set_xlabel(hist_xlabel, fontsize=18)
+            histplot.set_ylabel("Count", fontsize=18)
+            histplot.tick_params(labelsize=16)
+            # save
+            hist_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_{key}_count_histogram.pdf")
+            plt.savefig(hist_plot_path)
+            plt.close()
+
+            # also save the histogram as a table (latex)
+            hist_table_path = os.path.join(dataset_insights_path, f"{dataset_name}_{key}_count_histogram.tex")
+            hist_bins = np.arange(binrange[0], binrange[1] + hist_binwidth, hist_binwidth)
+            hist_table = pd.cut(datasets[dataset_name][key], bins=hist_bins, include_lowest=True).value_counts(
+                sort=False).reset_index(name='Count')
+            # save as latex table
+            hist_table.to_latex(hist_table_path, index=False)
+
+        sns.set_theme(**DEFAULT_THEME)
+
+        # for MDS datasets, make an additional plot for the number of input documents within the dataset
+        # ... also save this as a table (latex)
+        #     mds_names
+
     preprocessed_cache_path = os.path.join("resources", "preprocessed_experiments_cache")
     pathlib.Path(preprocessed_cache_path).mkdir(parents=True, exist_ok=True)
 
@@ -327,6 +399,11 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
     out_df["Prompt Name"] = out_df.apply(
         lambda row: row["Preprocessing + N-Shot"] if row["Prompt ID"] == "100" else row["Prompt Name"], axis=1)
 
+    # make sure seahorse scores are floats
+    seahorse_float_cols = ["Attribution", "Conciseness", "Main Ideas"]
+    for seahorse_float_col in seahorse_float_cols:
+        out_df[seahorse_float_col] = out_df[seahorse_float_col].astype(float, copy=True)
+
     return out_df
 
 
@@ -353,6 +430,41 @@ def process_results_for_load(df, shortNames, datasets):
     df["Has Prompt-Summary Separator"] = df["Prompt ID"].apply(
         lambda x: prompt_annotation[x] if x in prompt_annotation else "[ERROR]")
     df["Prompt Desc. [ID]"] = df.apply(lambda row: f"{row['Prompt Description']} [{row['Prompt ID']}]", axis=1)
+
+    # Process the Seahorse scores
+    seahorse_metrics = ["attribution", "conciceness", "main-ideas"]
+    seahorse_metric_to_name = {
+        "attribution": "Attribution",
+        "conciceness": "Conciseness",
+        "main-ideas": "Main Ideas"
+    }
+    seahorse_base_column_subname = " (MDS Scores)"
+    seahorse_aggregate_funcs = {
+        " (St. Dev.)": np.std,
+        " (Mean)": np.mean,
+        " (Median)": np.median,
+        " (Min)": np.min,
+        " (Max)": np.max,
+        " (90th Percentile)": lambda x: np.percentile(x, 90),
+        " (75th Percentile)": lambda x: np.percentile(x, 75),
+        " (25th Percentile)": lambda x: np.percentile(x, 25),
+        " (10th Percentile)": lambda x: np.percentile(x, 10),
+        " (First)": lambda x: x[0],
+        " (Last)": lambda x: x[-1],
+        # averaging all but the first and the last
+        " (Middle)": lambda x: np.mean(x[1:-1]) if len(x) > 2 else np.mean(x),
+    }
+    # For MDS Data -> calculate some more aggregates based on the scores themselves
+    for seahorse_metric in seahorse_metrics:
+        seahorse_base_data_col = f"{seahorse_metric_to_name[seahorse_metric]}{seahorse_base_column_subname}"
+        if seahorse_base_data_col not in df.columns:
+            continue
+        # First make sure the base-column contains a list of floats
+        df[seahorse_base_data_col] = df[seahorse_base_data_col].apply(lambda x: [float(y) for y in x])
+
+        for name, agg_func in seahorse_aggregate_funcs.items():
+            seahorse_dst_col = f"{seahorse_metric_to_name[seahorse_metric]}{name}"
+            df[seahorse_dst_col] = df[seahorse_base_data_col].apply(lambda x: agg_func(x))
 
     tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
     text_to_bpe = lambda x: tiktoken_encoder.encode(x)
@@ -2196,6 +2308,248 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
     return prompt_plot_paths, model_plot_paths
 
 
+def make_seahorse_distribution_figures(df, save_base_path, standard_evaluation_metric_names,
+                                       groupbyList=["Model", "Prompt ID"], groupByListExtension=[],
+                                       file_suffix="", facet_col_n_docs="N-Input Docs",
+                                       facet_col_size="#Input Article Tokens"):
+    print("Making SEAHORSE distribution figures...")
+
+    save_base_path = os.path.join(save_base_path, "SEAHORSE")
+
+    fullGroupByList = [[groupbyList[0], groupbyList[1]], [groupbyList[1], groupbyList[0]]] + groupByListExtension
+
+    metric_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in SEAHORSE_Plot_Metric_Names if
+                    extension not in SEAHORSE_Binary_Names]
+    binary_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in SEAHORSE_Plot_Metric_Names if
+                    extension in SEAHORSE_Binary_Names]
+
+    # make all subfolders
+    for metric_name in metric_names:
+        if metric_name in df.columns:
+            pathlib.Path(os.path.join(save_base_path, f"seahorse-{metric_name}")).mkdir(parents=True, exist_ok=True)
+    for binary_name in binary_names:
+        if binary_name in df.columns:
+            pathlib.Path(os.path.join(save_base_path, f"seahorse-{binary_name}")).mkdir(parents=True, exist_ok=True)
+
+    # TODO: make scatter plots showing the basic seahorse scores against each other, and also against basic metrics
+    #  ... to visually inspect whether there is a correlation between the values
+
+    figsizes = [(24, 10)]  # [None, (20, 10), (18, 10)]
+    save_suffixes = [("pdf", {})]  # [("pdf", {}), ("png", {"dpi": 300}), ("png", {"dpi": 250})]
+    for fig_size, (suffix, suffix_kwargs) in zip(figsizes, save_suffixes):
+        for gbl in fullGroupByList:
+            sorted_x_axis_labels = get_sorted_labels(df, gbl[0], prioritize_string_order=True)
+            sorted_hue_labels = get_sorted_labels(df, gbl[1], prioritize_string_order=True)
+            # make all the plots for the metric names
+            for metric_name in metric_names:
+                # if the metric name is not a column -> skip
+                if metric_name not in df.columns:
+                    print(f"Skipping {metric_name} because it is not a column in the dataframe")
+                    continue
+
+                # Make the actual plots
+                metric_plt_base_path = os.path.join(save_base_path, f"seahorse-{metric_name}")
+                if suffix == "png":
+                    metric_plt_base_path = os.path.join(save_base_path, f"seahorse-{metric_name}", "PNG")
+
+                # Set temporary theme
+                fig_size_name = "default"
+                if fig_size is not None:
+                    metric_plt_theme = {
+                        "style": "darkgrid", "rc": {"figure.figsize": fig_size, "font.size": 24, },
+                    }
+                    sns.set_theme(**metric_plt_theme)
+                    fig_size_name = f"{fig_size[0]}x{fig_size[1]}"
+
+                # Show distribution via a boxplot
+                box_plot = sns.boxplot(data=df, x=gbl[0], hue=gbl[1], y=metric_name, flierprops={"marker": "x"},
+                                       notch=True, bootstrap=1000,
+                                       order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                if metric_name in metric_0_1_range:
+                    box_plot.set_ylim(0, 1)
+                # box_plot.axes.set_title("Title", fontsize=50)
+                box_plot.set_xlabel(gbl[0], fontsize=18)
+                box_plot.set_ylabel(metric_name, fontsize=18)
+                box_plot.tick_params(labelsize=16)
+                # Set y-ticks to be 0.1 steps
+                if metric_name in metric_0_1_range:
+                    box_plot.set_yticks(np.arange(0, 1.1, 0.1))
+                if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
+                    plt.xticks(rotation=90)
+                    plt.tight_layout()
+                plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
+                plt.setp(box_plot.get_legend().get_title(), fontsize='16')
+                # save
+                box_plot_path = os.path.join(metric_plt_base_path,
+                                             f"{metric_name}_{gbl[0]}_{gbl[1]}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                plt.savefig(box_plot_path, bbox_inches='tight', **suffix_kwargs)
+                plt.close()
+
+                df[facet_col_n_docs] = df[facet_col_n_docs].astype(int)
+
+                # Make a facet-plot with the number of input documents as the facet column
+                for fct_row, fct_hue in [(facet_col_n_docs, gbl[1]), (gbl[1], facet_col_n_docs)]:
+                    fct_hue_order = get_sorted_labels(df, fct_hue)
+                    fct_row_order = get_sorted_labels(df, fct_row)
+                    fct_x___order = get_sorted_labels(df, gbl[0])
+                    catplt = sns.catplot(df, row=fct_row, row_order=fct_row_order, height=10, aspect=1.5, x=gbl[0],
+                                         order=fct_x___order, hue=fct_hue, hue_order=fct_hue_order, y=metric_name,
+                                         kind='box',
+                                         flierprops={"marker": "x"}, notch=True,
+                                         bootstrap=1000)
+                    # Set y-ticks to be 0.1 steps
+                    if metric_name in metric_0_1_range:
+                        catplt.set(yticks=np.arange(0, 1.1, 0.1))
+                    # always rotate them
+                    plt.xticks(rotation=90)
+                    plt.tight_layout()
+                    metrics_n_in_docs_plt_path = os.path.join(metric_plt_base_path,
+                                                              f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                    plt.savefig(metrics_n_in_docs_plt_path)
+                    plt.close()
+
+            # ... and also for the binary columns
+            for binary_name in binary_names:
+                if binary_name not in df.columns:
+                    print(f"Skipping {binary_name} because it is not a column in the dataframe")
+                    continue
+
+                binary_plt_base_path = os.path.join(save_base_path, f"seahorse-{binary_name}")
+                if suffix == "png":
+                    binary_plt_base_path = os.path.join(save_base_path, f"seahorse-{binary_name}", "PNG")
+
+                # Set temporary theme
+                fig_size_name = "default"
+                if fig_size is not None:
+                    binary_plt_theme = {
+                        "style": "darkgrid", "rc": {"figure.figsize": fig_size, "font.size": 24, },
+                    }
+                    sns.set_theme(**binary_plt_theme)
+                    fig_size_name = f"{fig_size[0]}x{fig_size[1]}"
+
+
+                # make a stacked 100% bar plot (with both group-by-dimensions)
+                df_binary_grouped = df.groupby(gbl)[binary_name].value_counts(normalize=True).unstack(binary_name)
+                df_binary_grouped = df_binary_grouped.reset_index()
+                if False not in df_binary_grouped.columns:
+                    df_binary_grouped[False] = 0.0
+                if True not in df_binary_grouped.columns:
+                    df_binary_grouped[True] = 0.0
+                df_binary_grouped["False real"] = df_binary_grouped[False]
+                df_binary_grouped[False] = 1.0
+                # sns.barplot(data=df_binary_grouped, x=gbl[0], y=False, hue=gbl[1], order=sorted_x_axis_labels,
+                #             color="tab:blue")
+                sorted_x_axis_labels_str = [str(x) for x in sorted_x_axis_labels]
+                sorted_hue_labels_str = [str(x) for x in sorted_hue_labels]
+                df_binary_grouped[gbl[0]] = df_binary_grouped[gbl[0]].astype(str)
+                df_binary_grouped[gbl[1]] = df_binary_grouped[gbl[1]].astype(str)
+                sns.barplot(data=df_binary_grouped, x=gbl[0], y=True, hue=gbl[1], order=sorted_x_axis_labels_str, hue_order=sorted_hue_labels_str)
+                plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                plt.tight_layout()
+                binary_plt_path = os.path.join(binary_plt_base_path,
+                                               f"{binary_name}__{gbl[0]}_{gbl[1]}_stacked_plot{file_suffix}__{fig_size_name}.{suffix}")
+                plt.savefig(binary_plt_path, bbox_inches='tight', **suffix_kwargs)
+                plt.close()
+
+                # save as tex table
+                df_binary_grouped_to_tex = df_binary_grouped.copy()
+                df_binary_grouped_to_tex[False] = df_binary_grouped_to_tex["False real"]
+                df_binary_grouped_to_tex = df_binary_grouped_to_tex.drop(columns=["False real"])
+                df_binary_grouped_to_tex = df_binary_grouped_to_tex.rename(columns={True: "True", False: "False"})
+                binary_plt_path = os.path.join(binary_plt_base_path, f"{binary_name}__{gbl[0]}_{gbl[1]}_stacked_plot{file_suffix}__{fig_size_name}.tex")
+                df_binary_grouped_to_tex.to_latex(binary_plt_path, index=False, escape=False, float_format="%.3f")
+
+
+                # only with 1 group-by-dimension
+                for gbl_subval in [gbl[0], gbl[1]]:
+                    # make a stacked 100% bar plot (with both group-by-dimensions)
+                    df_binary_grouped = df.groupby([gbl_subval])[binary_name].value_counts(normalize=True).unstack(
+                        binary_name)
+                    df_binary_grouped = df_binary_grouped.reset_index()
+                    if False not in df_binary_grouped.columns:
+                        df_binary_grouped[False] = 0.0
+                    if True not in df_binary_grouped.columns:
+                        df_binary_grouped[True] = 0.0
+                    df_binary_grouped["False real"] = df_binary_grouped[False]
+                    df_binary_grouped[False] = 1.0
+                    # sns.barplot(data=df_binary_grouped, x=gbl[0], y=False, hue=gbl[1], order=sorted_x_axis_labels,
+                    #             color="tab:blue")
+                    sorted_gbl_subval_labels = get_sorted_labels(df, gbl_subval, prioritize_string_order=True)
+                    sns.barplot(data=df_binary_grouped, x=gbl_subval, y=True, order=sorted_gbl_subval_labels, )
+                    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                    plt.tight_layout()
+                    binary_plt_path = os.path.join(binary_plt_base_path,
+                                                   f"{binary_name}__{gbl[0]}__stacked_plot{file_suffix}__{fig_size_name}.{suffix}")
+                    plt.savefig(binary_plt_path, bbox_inches='tight', **suffix_kwargs)
+                    plt.close()
+
+                    # save as tex table
+                    df_binary_grouped_to_tex = df_binary_grouped.copy()
+                    df_binary_grouped_to_tex[False] = df_binary_grouped_to_tex["False real"]
+                    df_binary_grouped_to_tex = df_binary_grouped_to_tex.drop(columns=["False real"])
+                    df_binary_grouped_to_tex = df_binary_grouped_to_tex.rename(columns={True: "True", False: "False"})
+                    binary_plt_path = os.path.join(binary_plt_base_path,
+                                                   f"{binary_name}__{gbl[0]}_{gbl[1]}_stacked_plot{file_suffix}__{fig_size_name}.tex")
+                    df_binary_grouped_to_tex.to_latex(binary_plt_path, index=False, escape=False, float_format="%.3f")
+
+                # e.g. sns.catplot(x='car',hue='TARGET_happiness',data=df,kind="count")
+                # e.g. pd.crosstab(df['car'],df['TARGET_happiness']).plot.bar(stacked=True) -> stacked, make sure to make at least 1 stacked bar plot
+
+                # create metric plots with the binary column as the hue
+                for std_eval_metric_name in standard_evaluation_metric_names:
+                    for hue_val in sorted_hue_labels:
+                        df_hue_group = df[df[gbl[1]] == hue_val]
+                        subgroup_hue_labels = get_sorted_labels(df, binary_name, prioritize_string_order=True)
+
+                        box_plot = sns.boxplot(data=df_hue_group, x=gbl[0], hue=binary_name, y=std_eval_metric_name,
+                                               flierprops={"marker": "x"},
+                                               notch=True, bootstrap=1000,
+                                               order=sorted_x_axis_labels, hue_order=subgroup_hue_labels)
+                        plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                        if std_eval_metric_name in metric_0_1_range:
+                            box_plot.set_ylim(0, 1)
+                        # box_plot.axes.set_title("Title", fontsize=50)
+                        box_plot.set_xlabel(gbl[0], fontsize=18)
+                        box_plot.set_ylabel(std_eval_metric_name, fontsize=18)
+                        box_plot.tick_params(labelsize=16)
+                        # Set y-ticks to be 0.1 steps
+                        if std_eval_metric_name in metric_0_1_range:
+                            box_plot.set_yticks(np.arange(0, 1.1, 0.1))
+                        if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
+                            plt.xticks(rotation=90)
+                            plt.tight_layout()
+                        plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
+                        plt.setp(box_plot.get_legend().get_title(), fontsize='16')
+                        # save
+                        box_plot_path = os.path.join(binary_plt_base_path,
+                                                     f"{std_eval_metric_name}__{gbl[1]}_{hue_val}_{gbl[0]}_{binary_name}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                        plt.savefig(box_plot_path, bbox_inches='tight', **suffix_kwargs)
+                        plt.close()
+
+    # make a pairplot for all metrics to look at the correlations
+    pairplot_seahorse_metric_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
+                                      SEAHORSE_Pairplot_Metric_Names]
+    pairplot_seahorse_metric_names = [x for x in pairplot_seahorse_metric_names if x in df.columns]
+    pairplot_metrics = StandardEval_Pairplot_Metric_Names + pairplot_seahorse_metric_names  # + binary_names
+    for gbl in [groupbyList]:  # fullGroupByList:
+        sorted_groups = get_sorted_labels(df, gbl[0], prioritize_string_order=True)
+        # sorted_hue_labels = get_sorted_labels(df, gbl[1], prioritize_string_order=True)
+
+        if len(sorted_groups) > 1: # only initial sample, do more if it is interesting
+            sorted_groups = sorted_groups[:1]
+
+        for group in sorted_groups:
+            df_group = df[df[gbl[0]] == group]
+            sns.pairplot(df_group, hue=gbl[1], vars=pairplot_metrics, kind="kde", diag_kind="kde")
+            plt.tight_layout()
+            pairplot_path = os.path.join(save_base_path, f"Pairplot_metrics_{gbl[0]}_{group}_by_{gbl[1]}.pdf")
+            plt.savefig(pairplot_path)
+            plt.close()
+
+    return
+
+
 def get_prompts_by_experiment_name(experiment_name):
     # Get the prompts from the prompts_bag.json file for the given experiment
     prompts_bag_path = f"prompts_bag.json"
@@ -2230,7 +2584,10 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
                 '#Predicted Tokens', '#Predicted Full Tokens', '#GT-Summary Tokens', '#GT-Summary Full Tokens',
                 'Preprocessing + N-Shot', '#Prompt Tokens', 'Prompt Name']
     exclude_metrics = ["Coverage (Prompt)", "Density (Prompt)", "Compression (Prompt)", "Compression (Full)"]
+    exclude_seahorse = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
+                        SEAHORSE_Plot_Metric_Names]
     exclude.extend(exclude_metrics)
+    exclude.extend(exclude_seahorse)
 
     metric_names = [col for col in list(df.columns) if col not in exclude]
     metric_ordering_all = {
@@ -2297,7 +2654,8 @@ base_experiment_groupByList_variants = [
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "prompt-experiment-large-llama2-vs-leolm"
+experiment_name = "mds-summarization-chain"
+# prompt-experiment-large-llama2-vs-leolm
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
 
@@ -2310,10 +2668,47 @@ experiment_name = "prompt-experiment-large-llama2-vs-leolm"
 # prompt-experiment-large-all-llama-comparison
 # prompt-experiment-large-all-llama-comparison-good-prompts
 
+# TODO SDS
+# versions-experiment
+# few-shot-initial
+# base-experiment-temperature
+# base-experiment-separator-and-german-only
+# prompt-experiment-large-variants-only-20Minuten
+# prompt-experiment-large-llama2-vs-leolm
+# prompt-experiment-large-all-llama-comparison-good-prompts
+# least-to-most-prompting-stage2
+# TODO MDS
+# mds-summarization-chain
+# mds-2stage-experiment
+# mds-baseline
+# mds-cluster-chunks-experiment
+# mds-cluster-chunks-vs-2stage-experiment
+# mds-ordered-chunks-initial-1sentence
+# mds-ordered-chunks-initial-overview
+# mds-prefix-experiment
+# mds-shuffling-and-annotation-experiment
+# mds-summarization-chain
+# few-shot-experiment-main-1536
+# few-shot-experiment-clustering
+# few-shot-experiment-clustering-WikinewsExamples
+# few-shot-experiment-full-20MinutesExamples
+# few-shot-experiment-full-1024
+# few-shot-experiment-full-1536
+# few-shot-experiment-full-2048
+# few-shot-experiment-full
+# few-shot-experiment-full-WikinewsExamples
+#
+# TODO MAYBE
+# base-experiment
+# prompt-experiment-large
+# prompt-experiment-large-all-llama-comparison
+#
+#
+
+# TODO (OLD)
 # prompt-experiment-large-llama2-vs-leolm
 # base-experiment-shard2
 # base-experiment-shard1
-# TODO
 # experiment-sizes
 # versions-experiment
 # versions-experiment-llama2-gpt4-palm2
@@ -2339,6 +2734,24 @@ experiment_name = "prompt-experiment-large-llama2-vs-leolm"
 """
 # read the json file into a dictionary
 experiment_config = {
+    "all-data-full-preprocessing": {
+        "groupByList": ["Model", "Prompt ID"],
+        "models": [
+            # "meta-llama/Llama-2-7b-chat-hf",
+            # "meta-llama/Llama-2-13b-chat-hf",
+            # "meta-llama/Llama-2-70b-chat-hf",
+            "tiiuae/falcon-7b-instruct",
+            "bigscience/bloomz-7b1-mt",
+            "fangloveskari/ORCA_LLaMA_70B_QLoRA",
+            "garage-bAInd/Platypus2-70B-instruct",
+            # "gpt-4",
+            # "palm2",
+            "LeoLM/leo-hessianai-7b-chat",
+            "LeoLM/leo-hessianai-13b-chat",
+        ],
+        "groupByListVariants": [],
+        "datasets": ["20Minuten", "Wikinews"]
+    },
     "few-shot-initial": {
         "groupByList": ["N-Shot", "Prompt ID"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
@@ -3578,7 +3991,39 @@ column_rename_map = {
     "task_name": "Task Name",
     "lang": "Language",
     "lang_score": "Language Score",
+    "attribution_score": "Attribution",
+    "attribution_truth_value": "Attribution (Truth Value)",
+    "attribution_mds_scores": "Attribution (MDS Scores)",
+    "attribution_mds_truth_values": "Attribution (Truth Values)",
+    "attribution_mds_avg_score": "Attribution (Avg. Score)",
+    "attribution_mds_avg_truth_value": "Attribution (Agreement)",
+    "conciceness_score": "Conciseness",
+    "conciceness_truth_value": "Conciseness (Truth Value)",
+    "conciceness_mds_scores": "Conciseness (MDS Scores)",
+    "conciceness_mds_truth_values": "Conciseness (Truth Values)",
+    "conciceness_mds_avg_score": "Conciseness (Avg. Score)",
+    "conciceness_mds_avg_truth_value": "Conciseness (Agreement)",
+    "main-ideas_score": "Main Ideas",
+    "main-ideas_truth_value": "Main Ideas (Truth Value)",
+    "main-ideas_mds_scores": "Main Ideas (MDS Scores)",
+    "main-ideas_mds_truth_values": "Main Ideas (Truth Values)",
+    "main-ideas_mds_avg_score": "Main Ideas (Avg. Score)",
+    "main-ideas_mds_avg_truth_value": "Main Ideas (Agreement)",
 }
+SEAHORSE_Base_Names = ["Attribution", "Conciseness", "Main Ideas"]
+SEAHORSE_Binary_Names = [" (Truth Value)"]
+SEAHORSE_Plot_Metric_Names = [
+    "", " (Truth Value)", " (Avg. Score)", " (Agreement)",
+    " (St. Dev.)", " (Mean)", " (Median)", " (Min)", " (Max)",
+    " (90th Percentile)", " (75th Percentile)", " (25th Percentile)", " (10th Percentile)",
+    " (First)", " (Last)", " (Middle)",
+]
+SEAHORSE_Pairplot_Metric_Names = ["", " (Avg. Score)", " (Agreement)", " (Mean)", " (Median)"]
+StandardEval_Pairplot_Metric_Names = [
+    "R-1",  # "R-2", "R-L",
+    "BertScore F1",  # "BertScore Precision", "BertScore Recall",
+    "Coverage",  # "Density", "Compression",
+]
 
 metric_0_1_range = [column_rename_map[x] for x in
                     ["rouge1", "rouge2", "rougeL", "bertscore_precision", "bertscore_recall", "bertscore_f1",
@@ -3811,16 +4256,18 @@ def make_report_plots(prioritize_inspect_examples=False):
         # df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList,
         #                                             gblExtension=gblExtension, approximation=True)
 
-        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
-                                x_group=x_group,
-                                groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
-                                                 "N-Input Docs"])
-
-        # make violin (distribution) plot showing distribution of metric values per model and prompt
-        # ... group by model (comparing prompts)
-        # ... group by prompt (comparing models)
-        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
-                                             groupByListExtension=gblExtension, file_suffix="")
+        # failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
+        #                         x_group=x_group,
+        #                         groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
+        #                                          "N-Input Docs"])
+        #
+        # # make violin (distribution) plot showing distribution of metric values per model and prompt
+        # # ... group by model (comparing prompts)
+        # # ... group by prompt (comparing models)
+        # _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
+        #                                      groupByListExtension=gblExtension, file_suffix="")
+        _ = make_seahorse_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
+                                               groupByListExtension=gblExtension, file_suffix="")
         # _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
         # _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
 
@@ -3892,8 +4339,66 @@ def make_report_plots(prioritize_inspect_examples=False):
         # with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
         #     json.dump(inspect_examples_mp, f, indent=4)
 
+def make_only_metrics_report_plots():
+    for dataset in datasets:
+        experiment_path = os.path.join("reports", f"{experiment_name}-{dataset}")
+
+        # Load all prepared data
+        df = pd.read_csv(os.path.join(experiment_path, "df_filtered.csv"))
+        df_all = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
+        df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
+        df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
+
+        metric_names, _ = get_metrics_info(df)
+
+        gblExtension = experiment_config[experiment_name].get("groupByListVariants", [])
+
+        # Make plots showing the failure rate
+        bucket_size = 1000
+        bucket_colname = f"#Input Article Tokens Bucket"
+        df_all[bucket_colname] = df_all["#Input Article Tokens"].apply(
+            lambda x: f"{int(math.floor(x / bucket_size)) * bucket_size}".rjust(
+                5) + "-" + f"{int(math.ceil(x / bucket_size)) * bucket_size}".rjust(5))
+        x_group = "Temperature"
+        if x_group in groupByList:
+            x_group = "Model"
+
+        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
+                                x_group=x_group,
+                                groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
+                                                 "N-Input Docs"])
+
+        # make violin (distribution) plot showing distribution of metric values per model and prompt
+        # ... group by model (comparing prompts)
+        # ... group by prompt (comparing models)
+        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
+                                             groupByListExtension=gblExtension, file_suffix="")
+    return
+
 
 if __name__ == "__main__":
+
+    # if --name is passed, read the experiment name from the command line and overwrite the default
+    if "--name" in sys.argv:
+        experiment_name_arg = sys.argv[sys.argv.index("--name") + 1]
+        if experiment_name_arg in experiment_config:
+            experiment_name = experiment_name_arg
+            print(f"Overwriting experiment name with {experiment_name}")
+
+            groupByList = experiment_config[experiment_name]["groupByList"]
+            models = experiment_config[experiment_name]["models"]
+            datasets = experiment_config[experiment_name]["datasets"]
+            additional_prompts = experiment_config[experiment_name].get("additional_prompts", [])
+            if experiment_name.startswith("mds"):
+                prompt_description["42"] = "MDS"
+        else:
+            print(f"Experiment name {experiment_name_arg} not found in experiment_config")
+            exit(-1)
+
+    if "--only-metrics" in sys.argv:
+        make_only_metrics_report_plots()
+        exit(0)
+
     # if passing argument --full, run the main function
     if "--full" in sys.argv:
         reload_data = "--reload" in sys.argv

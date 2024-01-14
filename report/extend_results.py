@@ -632,6 +632,9 @@ process_files_llama2_70b_18 = [
     "meta-llama-Llama-2-70b-chat-hf/SummarizationTask_20min0_4_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/SummarizationTask_20min0_5_8b_write_out_info.json",
 ]
+process_files_missing = [
+    "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSummarizationChain_100_8b_write_out_info.json"
+]
 
 """
 Llama-2-7b Notes: 
@@ -654,9 +657,9 @@ process_queue = [
     # ("SEAHORSE_llama2_13b_1", process_files_llama2_13b_1),
     # ("SEAHORSE_llama2_13b_2", process_files_llama2_13b_2),
     # ("SEAHORSE_llama2_70b_1", process_files_llama2_70b_1),
-    ("SEAHORSE_llama2_70b_2_a", process_files_llama2_70b_2_a),
-    ("SEAHORSE_llama2_70b_2_b", process_files_llama2_70b_2_b),
-    ("SEAHORSE_llama2_70b_3", process_files_llama2_70b_3),
+    # ("SEAHORSE_llama2_70b_2_a", process_files_llama2_70b_2_a),
+    # ("SEAHORSE_llama2_70b_2_b", process_files_llama2_70b_2_b),
+    # ("SEAHORSE_llama2_70b_3", process_files_llama2_70b_3),
     # ("SEAHORSE_llama2_70b_4", process_files_llama2_70b_4),
     # ("SEAHORSE_llama2_70b_5_a", process_files_llama2_70b_5_a),
     # ("SEAHORSE_llama2_70b_5_b", process_files_llama2_70b_5_b),
@@ -682,6 +685,7 @@ process_queue = [
     # ("SEAHORSE_llama2_70b_16", process_files_llama2_70b_16),
     # ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
     # ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
+    ("SEAHORSE_missing", process_files_missing),
 ]
 
 worker_lang = "de"
@@ -1116,12 +1120,29 @@ def postprocess_seahorse_results():
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
     exclude_filenames = [
+        "seahorse_base_datasets_100_write_out_info.json",
         "seahorse_testq1_100_write_out_info.json",
         "seahorse_testq2_100_write_out_info.json",
         "seahorse_testq3_100_write_out_info.json",
         "seahorse_testq4_100_write_out_info.json",
         "seahorse_testq5_100_write_out_info.json",
         "seahorse_testq6_100_write_out_info.json",
+        # DEBUGGING
+        # "seahorse_bloomz7b1_100_write_out_info.json",
+        # "seahorse_bloomz7b2_100_write_out_info.json",
+        # "seahorse_falcon7b1_100_write_out_info.json",
+        # "seahorse_falcon7b2_100_write_out_info.json",
+        # "seahorse_gpt4_100_write_out_info.json",
+        # "seahorse_leolm13b_100_write_out_info.json",
+        # "seahorse_leolm7b_100_write_out_info.json",
+        # "seahorse_llama213b1_100_write_out_info.json",
+        # "seahorse_llama213b2_100_write_out_info.json",
+        # "seahorse_llama27b1_100_write_out_info.json",
+        # "seahorse_llama27b2_100_write_out_info.json",
+        # "seahorse_llama27b3_100_write_out_info.json",
+        # "seahorse_orcallama2_100_write_out_info.json",
+        # "seahorse_palm2_100_write_out_info.json",
+        # "seahorse_platypus2_100_write_out_info.json",
     ]
     DST_FOLDER = "./results_seahorse"  # folder to put all results in from experiments
 
@@ -1198,7 +1219,7 @@ def postprocess_seahorse_results():
                                 agg_entries[experiment_id] = []
 
                             # calculate basic aggregations and add them to the base_entry
-                            mds_scores = [e["score"] for e in mds_entries]
+                            mds_scores = [float(e["score"]) for e in mds_entries]
                             mds_truth_values = [e["truth_value"] for e in mds_entries]
                             avg_score = np.mean(mds_scores)
                             avg_truth_value = np.mean([1.0 if x else 0.0 for x in mds_truth_values])

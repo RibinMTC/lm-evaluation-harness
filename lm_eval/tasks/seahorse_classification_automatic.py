@@ -397,3 +397,8 @@ class AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_18(AutomaticSeahor
     VERSION = 0
     DATASET_PATH = "roysc/SEAHORSE_llama2_70b_18"
     load_lcl = False
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing"
+    load_lcl = False
