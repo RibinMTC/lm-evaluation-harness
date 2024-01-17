@@ -78,3 +78,284 @@ Starting few-shot-experiment-full-WikinewsExamples
 [SUCCESS] few-shot-experiment-full-WikinewsExamples
 
 -----
+Sun Jan 14 12:03:53 CET 2024
+Starting versions-experiment
+Sun Jan 14 12:57:51 CET 2024
+Starting versions-experiment
+Sun Jan 14 13:08:29 CET 2024
+Starting versions-experiment
+[SUCCESS] versions-experiment
+Sun Jan 14 13:20:10 CET 2024
+Starting few-shot-initial
+[SUCCESS] few-shot-initial
+Sun Jan 14 13:23:26 CET 2024
+Starting base-experiment-temperature
+[SUCCESS] base-experiment-temperature
+Sun Jan 14 13:44:17 CET 2024
+Starting base-experiment-separator-and-german-only
+[SUCCESS] base-experiment-separator-and-german-only
+Sun Jan 14 14:12:38 CET 2024
+Starting prompt-experiment-large-variants-only
+[SUCCESS] prompt-experiment-large-variants-only
+Sun Jan 14 14:18:31 CET 2024
+Starting prompt-experiment-large-llama2-vs-leolm
+[SUCCESS] prompt-experiment-large-llama2-vs-leolm
+Sun Jan 14 14:37:16 CET 2024
+Starting prompt-experiment-large-all-llama-comparison-good-prompts
+[SUCCESS] prompt-experiment-large-all-llama-comparison-good-prompts
+Sun Jan 14 14:53:23 CET 2024
+Starting least-to-most-prompting-stage2
+[SUCCESS] least-to-most-prompting-stage2
+Sun Jan 14 15:02:29 CET 2024
+Starting mds-summarization-chain
+[ERROR] mds-summarization-chain
+Sun Jan 14 15:02:51 CET 2024
+Starting mds-2stage-experiment
+[ERROR] mds-2stage-experiment
+Sun Jan 14 15:06:16 CET 2024
+Starting mds-baseline
+[ERROR] mds-baseline
+Sun Jan 14 15:06:34 CET 2024
+Starting mds-cluster-chunks-experiment
+[ERROR] mds-cluster-chunks-experiment
+Sun Jan 14 15:15:20 CET 2024
+Starting mds-cluster-chunks-vs-2stage-experiment
+[ERROR] mds-cluster-chunks-vs-2stage-experiment
+Sun Jan 14 15:15:38 CET 2024
+Starting mds-ordered-chunks-initial-1sentence
+[ERROR] mds-ordered-chunks-initial-1sentence
+Sun Jan 14 15:18:05 CET 2024
+Starting mds-ordered-chunks-initial-overview
+[ERROR] mds-ordered-chunks-initial-overview
+Sun Jan 14 15:21:41 CET 2024
+Starting mds-prefix-experiment
+[ERROR] mds-prefix-experiment
+Sun Jan 14 15:32:37 CET 2024
+Starting mds-shuffling-and-annotation-experiment
+[ERROR] mds-shuffling-and-annotation-experiment
+Sun Jan 14 15:37:20 CET 2024
+Starting few-shot-experiment-main-1536
+[ERROR] few-shot-experiment-main-1536
+Sun Jan 14 15:58:31 CET 2024
+Starting few-shot-experiment-clustering
+[ERROR] few-shot-experiment-clustering
+Sun Jan 14 16:09:37 CET 2024
+Starting few-shot-experiment-clustering-WikinewsExamples
+[ERROR] few-shot-experiment-clustering-WikinewsExamples
+Sun Jan 14 16:09:59 CET 2024
+Starting few-shot-experiment-full-20MinutesExamples
+[ERROR] few-shot-experiment-full-20MinutesExamples
+Sun Jan 14 16:25:35 CET 2024
+Starting few-shot-experiment-full-1024
+[ERROR] few-shot-experiment-full-1024
+Sun Jan 14 16:27:09 CET 2024
+Starting few-shot-experiment-full-1536
+[ERROR] few-shot-experiment-full-1536
+Sun Jan 14 16:28:43 CET 2024
+Starting few-shot-experiment-full-2048
+[ERROR] few-shot-experiment-full-2048
+Sun Jan 14 16:29:01 CET 2024
+Starting few-shot-experiment-full
+[ERROR] few-shot-experiment-full
+Sun Jan 14 16:29:36 CET 2024
+Starting few-shot-experiment-full-WikinewsExamples
+[ERROR] few-shot-experiment-full-WikinewsExamples
+
+
+Sun Jan 14 18:17:48 CET 2024
+Starting mds-summarization-chain
+Sun Jan 14 18:50:09 CET 2024
+Starting mds-summarization-chain
+[SUCCESS] mds-summarization-chain
+Sun Jan 14 19:14:07 CET 2024
+Starting mds-2stage-experiment
+[SUCCESS] mds-2stage-experiment
+Sun Jan 14 19:24:24 CET 2024
+Starting mds-baseline
+[SUCCESS] mds-baseline
+Sun Jan 14 19:28:58 CET 2024
+Starting mds-cluster-chunks-experiment
+[ERROR] mds-cluster-chunks-experiment
+Sun Jan 14 19:45:10 CET 2024
+Starting mds-cluster-chunks-vs-2stage-experiment
+[ERROR] mds-cluster-chunks-vs-2stage-experiment
+Sun Jan 14 20:00:27 CET 2024
+Starting mds-ordered-chunks-initial-1sentence
+[SUCCESS] mds-ordered-chunks-initial-1sentence
+Sun Jan 14 20:23:19 CET 2024
+Starting mds-ordered-chunks-initial-overview
+[SUCCESS] mds-ordered-chunks-initial-overview
+Sun Jan 14 20:54:05 CET 2024
+Starting mds-prefix-experiment
+[SUCCESS] mds-prefix-experiment
+Sun Jan 14 21:09:20 CET 2024
+Starting mds-shuffling-and-annotation-experiment
+[SUCCESS] mds-shuffling-and-annotation-experiment
+Sun Jan 14 21:15:51 CET 2024
+Starting few-shot-experiment-main-1536
+[SUCCESS] few-shot-experiment-main-1536
+Sun Jan 14 22:05:17 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Sun Jan 14 22:29:14 CET 2024
+Starting few-shot-experiment-clustering-WikinewsExamples
+[SUCCESS] few-shot-experiment-clustering-WikinewsExamples
+Sun Jan 14 22:48:09 CET 2024
+Starting few-shot-experiment-full-20MinutesExamples
+[SUCCESS] few-shot-experiment-full-20MinutesExamples
+Sun Jan 14 23:30:55 CET 2024
+Starting few-shot-experiment-full-1024
+[SUCCESS] few-shot-experiment-full-1024
+Mon Jan 15 00:03:35 CET 2024
+Starting few-shot-experiment-full-1536
+[SUCCESS] few-shot-experiment-full-1536
+Mon Jan 15 00:34:40 CET 2024
+Starting few-shot-experiment-full-2048
+[SUCCESS] few-shot-experiment-full-2048
+Mon Jan 15 00:49:15 CET 2024
+Starting few-shot-experiment-full
+[SUCCESS] few-shot-experiment-full
+Mon Jan 15 01:34:40 CET 2024
+Starting few-shot-experiment-full-WikinewsExamples
+[SUCCESS] few-shot-experiment-full-WikinewsExamples
+
+---
+
+
+Mon Jan 15 23:35:35 CET 2024
+Starting versions-experiment
+[ERROR] versions-experiment
+Mon Jan 15 23:40:54 CET 2024
+Starting few-shot-initial
+[ERROR] few-shot-initial
+Mon Jan 15 23:41:45 CET 2024
+Starting base-experiment-temperature
+[ERROR] base-experiment-temperature
+Mon Jan 15 23:50:08 CET 2024
+Starting base-experiment-separator-and-german-only
+[ERROR] base-experiment-separator-and-german-only
+Mon Jan 15 23:56:23 CET 2024
+Starting prompt-experiment-large-variants-only
+[SUCCESS] few-shot-experiment-full
+Mon Jan 15 23:58:10 CET 2024
+Starting few-shot-experiment-full-WikinewsExamples
+[ERROR] prompt-experiment-large-variants-only
+Mon Jan 15 23:58:16 CET 2024
+Starting prompt-experiment-large-llama2-vs-leolm
+[ERROR] prompt-experiment-large-llama2-vs-leolm
+Tue Jan 16 00:06:05 CET 2024
+Starting prompt-experiment-large-all-llama-comparison-good-prompts
+[ERROR] prompt-experiment-large-all-llama-comparison-good-prompts
+Tue Jan 16 00:10:39 CET 2024
+Starting least-to-most-prompting-stage2
+[ERROR] least-to-most-prompting-stage2
+Tue Jan 16 00:15:12 CET 2024
+Starting mds-summarization-chain
+[SUCCESS] few-shot-experiment-full-WikinewsExamples
+[SUCCESS] mds-summarization-chain
+Tue Jan 16 00:31:08 CET 2024
+Starting mds-2stage-experiment
+Tue Jan 16 00:32:48 CET 2024
+Starting versions-experiment
+[SUCCESS] versions-experiment
+Tue Jan 16 00:45:15 CET 2024
+Starting few-shot-initial
+[SUCCESS] few-shot-initial
+Tue Jan 16 00:46:54 CET 2024
+Starting base-experiment-temperature
+[SUCCESS] base-experiment-temperature
+Tue Jan 16 01:06:37 CET 2024
+Starting base-experiment-separator-and-german-only
+[SUCCESS] base-experiment-separator-and-german-only
+Tue Jan 16 01:21:14 CET 2024
+Starting prompt-experiment-large-variants-only
+[SUCCESS] prompt-experiment-large-variants-only
+Tue Jan 16 01:25:20 CET 2024
+Starting prompt-experiment-large-llama2-vs-leolm
+[SUCCESS] prompt-experiment-large-llama2-vs-leolm
+Tue Jan 16 01:43:45 CET 2024
+Starting prompt-experiment-large-all-llama-comparison-good-prompts
+[SUCCESS] prompt-experiment-large-all-llama-comparison-good-prompts
+Tue Jan 16 01:54:17 CET 2024
+Starting least-to-most-prompting-stage2
+[SUCCESS] least-to-most-prompting-stage2
+Tue Jan 16 02:05:00 CET 2024
+Starting mds-summarization-chain
+[SUCCESS] mds-summarization-chain
+Tue Jan 16 02:20:46 CET 2024
+Starting mds-2stage-experiment
+[SUCCESS] mds-2stage-experiment
+Tue Jan 16 02:28:35 CET 2024
+Starting mds-baseline
+[SUCCESS] mds-baseline
+Tue Jan 16 02:33:26 CET 2024
+Starting mds-cluster-chunks-experiment
+[SUCCESS] mds-cluster-chunks-experiment
+Tue Jan 16 02:46:58 CET 2024
+Starting mds-cluster-chunks-vs-2stage-experiment
+[SUCCESS] mds-cluster-chunks-vs-2stage-experiment
+Tue Jan 16 02:54:46 CET 2024
+Starting mds-ordered-chunks-initial-1sentence
+[SUCCESS] mds-ordered-chunks-initial-1sentence
+Tue Jan 16 03:04:00 CET 2024
+Starting mds-ordered-chunks-initial-overview
+[SUCCESS] mds-ordered-chunks-initial-overview
+Tue Jan 16 03:24:49 CET 2024
+Starting mds-prefix-experiment
+[SUCCESS] mds-prefix-experiment
+Tue Jan 16 03:41:17 CET 2024
+Starting mds-shuffling-and-annotation-experiment
+[SUCCESS] mds-shuffling-and-annotation-experiment
+Tue Jan 16 03:47:34 CET 2024
+Starting few-shot-experiment-main-1536
+[SUCCESS] few-shot-experiment-main-1536
+Tue Jan 16 04:03:31 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Tue Jan 16 04:13:45 CET 2024
+Starting few-shot-experiment-clustering-WikinewsExamples
+[SUCCESS] few-shot-experiment-clustering-WikinewsExamples
+Tue Jan 16 04:19:08 CET 2024
+Starting few-shot-experiment-full-20MinutesExamples
+[SUCCESS] few-shot-experiment-full-20MinutesExamples
+Tue Jan 16 04:38:23 CET 2024
+Starting few-shot-experiment-full-1024
+[SUCCESS] few-shot-experiment-full-1024
+Tue Jan 16 04:50:54 CET 2024
+Starting few-shot-experiment-full-1536
+[SUCCESS] few-shot-experiment-full-1536
+Tue Jan 16 05:02:40 CET 2024
+Starting few-shot-experiment-full-2048
+[SUCCESS] few-shot-experiment-full-2048
+Tue Jan 16 05:05:58 CET 2024
+Starting few-shot-experiment-full
+[SUCCESS] few-shot-experiment-full
+Tue Jan 16 05:31:13 CET 2024
+Starting few-shot-experiment-full-WikinewsExamples
+[SUCCESS] few-shot-experiment-full-WikinewsExamples
+Tue Jan 16 20:30:31 CET 2024
+Starting mds-summarization-chain
+[SUCCESS] mds-summarization-chain
+Tue Jan 16 21:11:25 CET 2024
+Starting mds-2stage-experiment
+[SUCCESS] mds-2stage-experiment
+Tue Jan 16 21:25:16 CET 2024
+Starting mds-baseline
+[SUCCESS] mds-baseline
+Tue Jan 16 21:34:35 CET 2024
+Starting mds-cluster-chunks-experiment
+[SUCCESS] mds-cluster-chunks-experiment
+Tue Jan 16 22:02:46 CET 2024
+Starting mds-cluster-chunks-vs-2stage-experiment
+[SUCCESS] mds-cluster-chunks-vs-2stage-experiment
+Tue Jan 16 22:25:42 CET 2024
+Starting mds-ordered-chunks-initial-1sentence
+[SUCCESS] mds-ordered-chunks-initial-1sentence
+Tue Jan 16 22:55:09 CET 2024
+Starting mds-ordered-chunks-initial-overview
+Wed Jan 17 06:02:48 CET 2024
+Starting mds-prefix-experiment
+[SUCCESS] mds-prefix-experiment
+Wed Jan 17 06:42:20 CET 2024
+Starting mds-ordered-chunks-initial-overview
+[SUCCESS] mds-ordered-chunks-initial-overview

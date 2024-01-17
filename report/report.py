@@ -118,6 +118,7 @@ def extract_dataset_and_task_name(filename):
 def load_results(results_path_base, model_name, return_concat_df=True):
     model_name = rename_hf_model(model_name)
     results_path = f"../{results_path_base}/{model_name}"
+    results_path_read = f"../results/{model_name}"
     seahorse_path = f"./results_seahorse/{model_name}"
     result_files = [f for f in os.listdir(results_path) if f.endswith(".json")]
 
@@ -126,7 +127,7 @@ def load_results(results_path_base, model_name, return_concat_df=True):
     model_names = []
     filenames = []
     for file in result_files:
-        with open(os.path.join(results_path, file), "r") as f:
+        with open(os.path.join(results_path_read, file), "r") as f:
             result = json.load(f)
 
             task_name, nshot, dataset, promptVersion, temperature, precision = extract_dataset_and_task_name(file)
@@ -142,6 +143,10 @@ def load_results(results_path_base, model_name, return_concat_df=True):
             # join with seahorse results based on doc_id
             include_seahorse_columns = ["attribution_score", "attribution_truth_value", "conciceness_score",
                                         "conciceness_truth_value", "main-ideas_score", "main-ideas_truth_value"]
+            seahorse_mds_base = ["attribution", "conciceness", "main-ideas"]
+            seahorse_mds_extensions = ["_mds_scores", "_mds_truth_values", "_mds_avg_score", "_mds_avg_truth_value", ]
+            include_seahorse_mds_columns = [f"{base}{extension}" for base in seahorse_mds_base for extension in
+                                            seahorse_mds_extensions]
             if os.path.exists(os.path.join(seahorse_path, file)):
                 with open(os.path.join(seahorse_path, file), "r") as f:
                     seahorse_result = json.load(f)
@@ -150,11 +155,15 @@ def load_results(results_path_base, model_name, return_concat_df=True):
                         doc_id = entry["doc_id"]
                         seahorse_row = seahorse_result_df[seahorse_result_df["doc_id"] == doc_id]
                         if len(seahorse_row) == 0:
-                            print(f"Warning: No Seahorse row found for model/doc_id {model_name}/{doc_id}")
+                            print(
+                                f"Warning: No Seahorse row found for model/doc_id {model_name}/{doc_id}  --  ({results_path} / {file})")
                             continue
                         seahorse_row = seahorse_row.iloc[0]
                         for column in include_seahorse_columns:
                             entry[column] = seahorse_row[column]
+                        for column in include_seahorse_mds_columns:
+                            if column in seahorse_row:
+                                entry[column] = seahorse_row[column]
             else:
                 print(f"Warning: No Seahorse file found for file {model_name}/{file}, initializing to 0")
                 for entry in result:
@@ -327,6 +336,9 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         sns.set_theme(**metric_plt_theme)
         for key in keys_to_xlabels.keys():
             hist_binwidth = keys_to_histogram_binwidth[key]
+            if dataset_name == "20Minuten" and key == "num_summary_bpe":
+                hist_binwidth = 25
+
             hist_xlabel = keys_to_xlabels[key]
             max_val = max(datasets[dataset_name][key])
             max_val_rounded = math.ceil(max_val / hist_binwidth) * hist_binwidth
@@ -347,6 +359,50 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
                 sort=False).reset_index(name='Count')
             # save as latex table
             hist_table.to_latex(hist_table_path, index=False)
+
+        # Make an additional table for the numbr of input documents
+        # ... group by the number of input documents, and calculate the following: number of entries, average article length, average summary length
+        # ... also save this as a table (latex)
+        grouped_data = datasets[dataset_name].groupby("num_input_docs")
+        num_input_docs_table = grouped_data.agg(
+            num_entries=("num_input_docs", "count"),
+            avg_article_length=("num_article_bpe", "mean"),
+            avg_summary_length=("num_summary_bpe", "mean"),
+        ).reset_index()
+        num_input_docs_table["Num. Input Documents"] = num_input_docs_table["num_input_docs"]
+        num_input_docs_table["Avg. Total Input Size"] = num_input_docs_table["avg_article_length"]
+        num_input_docs_table["Avg. Article Length"] = num_input_docs_table["avg_article_length"] / num_input_docs_table[
+            "num_input_docs"]
+        num_input_docs_table["Avg. Summary Length"] = num_input_docs_table["avg_summary_length"]
+        num_input_docs_table["Count"] = num_input_docs_table["num_entries"]
+        # Format the floats to specific precisions
+        num_input_docs_table["Num. Input Documents"] = num_input_docs_table["Num. Input Documents"].apply(
+            lambda x: f"{x:.0f}")
+        num_input_docs_table["Avg. Total Input Size"] = num_input_docs_table["Avg. Total Input Size"].apply(
+            lambda x: f"{x:.2f}")
+        num_input_docs_table["Avg. Article Length"] = num_input_docs_table["Avg. Article Length"].apply(
+            lambda x: f"{x:.2f}")
+        num_input_docs_table["Avg. Summary Length"] = num_input_docs_table["Avg. Summary Length"].apply(
+            lambda x: f"{x:.2f}")
+        # delete the old columns
+        num_input_docs_table.drop(columns=["num_input_docs", "avg_article_length", "avg_summary_length", "num_entries"],
+                                  inplace=True)
+        num_input_docs_table_path = os.path.join(dataset_insights_path, f"{dataset_name}_num_input_docs_table.tex")
+        num_input_docs_table.to_latex(num_input_docs_table_path, index=False)
+
+        # make some statistics on the sizes of the articles
+        avg_article_length = np.mean(datasets[dataset_name]["num_article_bpe"])
+        avg_summary_length = np.mean(datasets[dataset_name]["num_summary_bpe"])
+        avg_num_input_docs = np.mean(datasets[dataset_name]["num_input_docs"])
+        num_entries = len(datasets[dataset_name])
+
+        # make a text file with those statistics
+        stats_text_path = os.path.join(dataset_insights_path, f"{dataset_name}_stats.txt")
+        with open(stats_text_path, "w") as f:
+            f.write(f"Average Article Length (BPE): {avg_article_length}\n")
+            f.write(f"Average Summary Length (BPE): {avg_summary_length}\n")
+            f.write(f"Average Number of Input Documents: {avg_num_input_docs}\n")
+            f.write(f"Number of Entries: {num_entries}\n")
 
         sns.set_theme(**DEFAULT_THEME)
 
@@ -396,13 +452,101 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
     # apply some basic extension of the already existing data
     out_df["Prompt Name"] = out_df["Prompt ID"].apply(
         lambda x: prompt_name[f"{x}"] if f"{x}" in prompt_name else "[ERROR]")
-    out_df["Prompt Name"] = out_df.apply(
-        lambda row: row["Preprocessing + N-Shot"] if row["Prompt ID"] == "100" else row["Prompt Name"], axis=1)
+
+    def mds_custom_prompt_name(row):
+        # prompt_name_MDS_override[Task Name][Prompt ID] -> Prompt Name
+        if row["Task Name"] not in prompt_name_MDS_override:
+            return row["Prompt Name"]
+        else:
+            if row["Prompt ID"] not in prompt_name_MDS_override[row["Task Name"]]:
+                return row["Prompt Name"]
+            else:
+                return prompt_name_MDS_override[row["Task Name"]][row["Prompt ID"]]
+
+        # return row["Preprocessing + N-Shot"]
+
+    out_df["Prompt Name"] = out_df.apply(lambda row: mds_custom_prompt_name(row), axis=1)
+    # out_df["Prompt Name"] = out_df.apply(
+    #     lambda row: row["Preprocessing + N-Shot"] if row["Prompt ID"] == "100" else row["Prompt Name"], axis=1)
 
     # make sure seahorse scores are floats
     seahorse_float_cols = ["Attribution", "Conciseness", "Main Ideas"]
     for seahorse_float_col in seahorse_float_cols:
         out_df[seahorse_float_col] = out_df[seahorse_float_col].astype(float, copy=True)
+
+    # Process the Seahorse scores (also for MDS specific reports)
+    seahorse_metrics = ["attribution", "conciceness", "main-ideas"]
+    seahorse_metric_to_name = {
+        "attribution": "Attribution",
+        "conciceness": "Conciseness",
+        "main-ideas": "Main Ideas"
+    }
+    seahorse_base_column_subname = " (MDS Scores)"
+    seahorse_aggregate_funcs = {
+        " (St. Dev.)": np.std,
+        " (Mean)": np.mean,
+        " (Median)": np.median,
+        " (Min)": np.min,
+        " (Max)": np.max,
+        " (90th Percentile)": lambda x: np.percentile(x, 90),
+        " (75th Percentile)": lambda x: np.percentile(x, 75),
+        " (25th Percentile)": lambda x: np.percentile(x, 25),
+        " (10th Percentile)": lambda x: np.percentile(x, 10),
+        " (First)": lambda x: x[0],
+        " (Last)": lambda x: x[-1],
+        # averaging all but the first and the last
+        " (Middle)": lambda x: np.mean(x[1:-1]) if len(x) > 2 else np.mean(x),
+    }
+    # For MDS Data -> if only 1 input article -> the columns are nan now -> fill with values from base seahorse cols
+    expect_nan_col_extensions = [" (Truth Values)", " (MDS Scores)", " (Avg. Score)", " (Agreement)"]
+    expect_nan_col_names = [f"{seahorse_metric_to_name[seahorse_metric]}{extension}" for seahorse_metric in
+                            seahorse_metrics for extension in expect_nan_col_extensions]
+
+    def fill_mds_n_input_docs_one(row):
+        # if expect_nan_col_names in the dataframe -> continue
+        if not all([mds_colname in row.keys() for mds_colname in expect_nan_col_names]):
+            return row
+
+        if row["N-Input Docs"] == 1:
+            for seahorse_metric in seahorse_metrics:
+                seahorse_metric_name = seahorse_metric_to_name[seahorse_metric]
+
+                row[f"{seahorse_metric_name} (MDS Scores)"] = [row[f"{seahorse_metric_name}"]]
+                row[f"{seahorse_metric_name} (Truth Values)"] = [row[f"{seahorse_metric_name} (Truth Value)"]]
+                row[f"{seahorse_metric_name} (Avg. Score)"] = row[f"{seahorse_metric_name}"]
+                row[f"{seahorse_metric_name} (Agreement)"] = 1.0
+        return row
+
+    out_df = out_df.apply(lambda row: fill_mds_n_input_docs_one(row), axis=1)
+
+    # For MDS Data -> calculate some more aggregates based on the scores themselves
+    for seahorse_metric in seahorse_metrics:
+        seahorse_base_data_col = f"{seahorse_metric_to_name[seahorse_metric]}{seahorse_base_column_subname}"
+        if seahorse_base_data_col not in out_df.columns:
+            continue
+        # First make sure the base-column contains a list of floats
+        out_df[seahorse_base_data_col] = out_df[seahorse_base_data_col].apply(lambda x: [float(y) for y in x])
+
+        for name, agg_func in seahorse_aggregate_funcs.items():
+            seahorse_dst_col = f"{seahorse_metric_to_name[seahorse_metric]}{name}"
+            out_df[seahorse_dst_col] = out_df[seahorse_base_data_col].apply(lambda x: agg_func(x))
+
+    # add an additional column to distinguish the size of the input article
+    size_threshold = 3500
+    in_group_append = f"(>= {size_threshold} Tokens)"
+    out_group_append = f"(< {size_threshold} Tokens)"
+
+    size_subset_big = "\u2265 3500 Tokens"
+    size_subset_small = "< 3500 Tokens"
+
+    out_df["Large Article"] = out_df["#Input Article Tokens"].apply(lambda x: True if x >= size_threshold else False)
+    out_df["Size subset"] = out_df["Large Article"].apply(lambda x: size_subset_big if x else size_subset_small)
+    out_df["Dataset Annotation (incl. article size)"] = out_df.apply(
+        lambda row: f"{row['Dataset Annotation']}\n{in_group_append}" if row["Large Article"] else
+        f"{row['Dataset Annotation']}\n{out_group_append}", axis=1)
+
+    out_df["Dataset Annotation (Prompt Name)"] = out_df.apply(
+        lambda row: f"{row['Dataset Annotation']}\n{row['Prompt Name']}", axis=1)
 
     return out_df
 
@@ -430,41 +574,6 @@ def process_results_for_load(df, shortNames, datasets):
     df["Has Prompt-Summary Separator"] = df["Prompt ID"].apply(
         lambda x: prompt_annotation[x] if x in prompt_annotation else "[ERROR]")
     df["Prompt Desc. [ID]"] = df.apply(lambda row: f"{row['Prompt Description']} [{row['Prompt ID']}]", axis=1)
-
-    # Process the Seahorse scores
-    seahorse_metrics = ["attribution", "conciceness", "main-ideas"]
-    seahorse_metric_to_name = {
-        "attribution": "Attribution",
-        "conciceness": "Conciseness",
-        "main-ideas": "Main Ideas"
-    }
-    seahorse_base_column_subname = " (MDS Scores)"
-    seahorse_aggregate_funcs = {
-        " (St. Dev.)": np.std,
-        " (Mean)": np.mean,
-        " (Median)": np.median,
-        " (Min)": np.min,
-        " (Max)": np.max,
-        " (90th Percentile)": lambda x: np.percentile(x, 90),
-        " (75th Percentile)": lambda x: np.percentile(x, 75),
-        " (25th Percentile)": lambda x: np.percentile(x, 25),
-        " (10th Percentile)": lambda x: np.percentile(x, 10),
-        " (First)": lambda x: x[0],
-        " (Last)": lambda x: x[-1],
-        # averaging all but the first and the last
-        " (Middle)": lambda x: np.mean(x[1:-1]) if len(x) > 2 else np.mean(x),
-    }
-    # For MDS Data -> calculate some more aggregates based on the scores themselves
-    for seahorse_metric in seahorse_metrics:
-        seahorse_base_data_col = f"{seahorse_metric_to_name[seahorse_metric]}{seahorse_base_column_subname}"
-        if seahorse_base_data_col not in df.columns:
-            continue
-        # First make sure the base-column contains a list of floats
-        df[seahorse_base_data_col] = df[seahorse_base_data_col].apply(lambda x: [float(y) for y in x])
-
-        for name, agg_func in seahorse_aggregate_funcs.items():
-            seahorse_dst_col = f"{seahorse_metric_to_name[seahorse_metric]}{name}"
-            df[seahorse_dst_col] = df[seahorse_base_data_col].apply(lambda x: agg_func(x))
 
     tiktoken_encoder = tiktoken.get_encoding("cl100k_base")
     text_to_bpe = lambda x: tiktoken_encoder.encode(x)
@@ -667,6 +776,25 @@ def failure_statistics_plot(df_all, experiment_path, groupbyList=["Model", "Prom
     df_failures = df_all.copy()
     df_failures["failure"] = df_failures.apply(lambda x: get_failure(x), axis=1)
     df_failures['failure'] = df_failures['failure'].astype('category')
+
+    # make a table for each group-by variation, and save as csv and latex table
+    for gbl in [groupByList] + groupByListExtension:
+        df_failures_grouped = df_failures.groupby(gbl + ["failure"]).agg({"Prediction": "count"}).reset_index()
+        df_failures_grouped = df_failures_grouped.rename(columns={"Prediction": "Count"})
+        df_failures_grouped.to_csv(os.path.join(experiment_path, subfolder_name,
+                                                f"failure_statistics_group_by__{'_'.join(gbl)}.csv"), index=False)
+        # reorganize the dataframe to have the different failure types as columns
+        df_failures_grouped_pivot = df_failures_grouped.pivot_table(index=gbl, columns='failure', values='Count',
+                                                                    fill_value=math.nan).reset_index()
+        df_failures_grouped_pivot.to_csv(os.path.join(experiment_path, subfolder_name,
+                                                      f"failure_statistics_group_by__{'_'.join(gbl)}_pivot.csv"),
+                                         index=False)
+        # also save as latex table into a txt file
+        df_failures_grouped.to_latex(os.path.join(experiment_path, subfolder_name,
+                                                  f"failure_statistics_group_by__{'_'.join(gbl)}.tex"), index=False)
+        df_failures_grouped_pivot.to_latex(os.path.join(experiment_path, subfolder_name,
+                                                        f"failure_statistics_group_by__{'_'.join(gbl)}_pivot.tex"),
+                                           index=False)
 
     # Aggregate the success rates per model and prompt (by category)
     df_failure_stat = df_failures.groupby(groupbyList + ["failure", x_group]).agg({"Prediction": "count"}).reset_index()
@@ -991,6 +1119,7 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
     print("Calculating length statistics...")
 
     pathlib.Path(os.path.join(save_base_path, "length-statistics")).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(save_base_path, "length-dimension-statistics")).mkdir(parents=True, exist_ok=True)
 
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
 
@@ -1050,6 +1179,60 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
     # also save as latex table into a txt file
     df_max_length_table.to_latex(os.path.join(save_base_path, "length-statistics",
                                               f"max_length_table{file_suffix}.tex"), index=False)
+
+    # Calculate the distribution statistics in several dimensions
+    distr_dimensions = [num_sentences_colname, num_full_tokens_colname, num_bpe_tokens_colname]
+    for gbl in [groupbyList] + gblExtension:
+        for distr_dim in distr_dimensions:
+            df_len_copy = df_len.copy()
+            df_len_copy[distr_dim] = df_len_copy[distr_dim].astype(float, copy=True)
+            df_len_agg = df_len_copy.groupby(gbl).agg(
+                {distr_dim: [
+                    percentile_agg(1),
+                    percentile_agg(5),
+                    percentile_agg(25),
+                    np.median,
+                    percentile_agg(75),
+                    percentile_agg(95),
+                    percentile_agg(99),
+                    np.std,
+                    np.var,
+                ]}).reset_index()
+            new_colnames = gbl + ["1st Perc.", "5th Perc.", "25th Perc.", "Median", "75th Perc.", "95th Perc.", "99th Perc.",
+                            "Std. Dev.", "Variance"]
+            df_len_agg.columns = new_colnames
+            df_len_agg = df_len_agg.round(ROUND_TO_DECIMALS)
+            # save as csv and latex table
+            df_len_agg.to_csv(
+                os.path.join(save_base_path, "length-dimension-statistics", f"Distribution_{distr_dim}__{gbl[0]}_{gbl[1]}.csv"),
+                index=False)
+            df_len_agg.to_latex(
+                os.path.join(save_base_path, "length-dimension-statistics", f"Distribution_{distr_dim}__{gbl[0]}_{gbl[1]}.tex"),
+                index=False)
+
+# 3645
+    # 3062
+    # 1199
+    # 466
+    # 176
+    # 1884
+    # 3036
+    # 2539
+    # 350
+    # 2809
+    # 3700
+    # 731
+    # 3526
+    # 156
+    # 2301
+    # 1544
+    # 1108
+    # 1014
+    # 1323
+    # 12
+    # 1405
+    # 3393
+    # 707
 
     for gbl in gblExtension:
         for agg_func in ['mean', 'median', 'min', 'max']:
@@ -1202,7 +1385,12 @@ def length_statistics(df, save_base_path, groupbyList=["Model", "Prompt ID"], gb
 
 
 def percentile_agg(percentile):
-    return lambda x: np.percentile(x, percentile)
+    # return lambda x: np.percentile(x, percentile)
+
+    def percentile_func(x, **kwargs):
+        return np.percentile(x, q=percentile, **kwargs)
+
+    return percentile_func
 
 
 def bootstrap_CI(statistic, confidence_level=0.95, num_samples=10000):
@@ -1226,39 +1414,134 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
 
     print("Calculating statistics overview tables...")
     assert len(groupbyList) == 2, "groupbyList must contain exactly 2 elements"
-    agg_funcs = ["median", "std", "min", "max", percentile_agg(5), percentile_agg(95),
+    agg_funcs = ["median", "std", "min", "max", percentile_agg(5), percentile_agg(25), percentile_agg(50),
+                 percentile_agg(75), percentile_agg(95),
                  bootstrap_CI(np.median, confidence_level=confidence_level)]
-    agg_names = ["median", "std", "min", "max", "5th percentile", "95th percentile",
+    agg_names = ["Median", "St.Dev.", "Min", "Max", "5th Perc.", "25th Perc.", "50th Perc.", "75th Perc.", "95th Perc.",
                  f"Median {int(confidence_level * 100)}% CI"]
     agg_dict = {agg_name: agg_func for agg_name, agg_func in zip(agg_names, agg_funcs)}
 
     out_overview = []
     out_detail = []
-    ci_colname = f"Median {int(confidence_level * 100)}% CI"
+    ci_level_str = f"{int(confidence_level * 100)}% CI"
+    ci_colname = f"Median {ci_level_str}"
 
-    # make sure "overview_plots" exists
+    # make sure the directories exist
     pathlib.Path(os.path.join(experiment_path, "overview_plots")).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(experiment_path, "overview_table")).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(experiment_path, "overview_merged")).mkdir(parents=True, exist_ok=True)
+
+    for metric_name in metric_names:
+        df[metric_name] = df[metric_name].astype(float, copy=True)
+
+    # Make an aggregated overview table with medians with all relevant metrics in the same table
+    for name, relevant_metrics in OVERVIEW_TABLE_merged_table_relevant_metric_groups:
+        filtered_merged_metric_names = [metric_name for metric_name in relevant_metrics if
+                                        metric_name in df.columns]
+        if any([True for el in ["Attribution (Avg. Score)", "Main Ideas (Avg. Score)"] if
+                el in filtered_merged_metric_names]):
+            # remove the base values
+            filtered_merged_metric_names.remove("Attribution")
+            filtered_merged_metric_names.remove("Main Ideas")
+        # agg_funcs_full = [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] * len(filtered_merged_metric_names)
+        # agg_funcs_median = [np.median] * len(filtered_merged_metric_names)
+        col_new_full = [gblElement for gblElement in groupbyList]
+        col_new_median = [gblElement for gblElement in groupbyList]
+        orig_groupbyList = [gblElement for gblElement in groupbyList]
+        for metric_name in filtered_merged_metric_names:
+            if metric_name in OVERVIEW_TABLE_Rename_Map:  # rename if necessary
+                metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
+
+            col_new_full.extend([f"{metric_name}", f"{metric_name} {ci_level_str}"])
+            col_new_median.append(f"{metric_name}")
+        # Calculate multiple statistics + their CI and save them in a table
+        df_merged_full = df.groupby(orig_groupbyList).agg(
+            {metric_name: [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] for metric_name in
+             filtered_merged_metric_names}).reset_index()
+        df_merged_median = df.groupby(orig_groupbyList).agg(
+            {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
+        df_merged_full.columns = col_new_full
+        df_merged_median.columns = col_new_median
+        df_merged_full = df_merged_full.round(3)
+        df_merged_median = df_merged_median.round(3)
+        # save as csv and latex table
+        df_merged_full.to_csv(
+            os.path.join(experiment_path, "overview_merged", f"merged_overview_table_median_CI_{name}.csv"),
+            index=False)
+        df_merged_full.to_latex(
+            os.path.join(experiment_path, "overview_merged", f"merged_overview_table_median_CI_{name}.tex"),
+            float_format="%.3f", index=False)
+        df_merged_median.to_csv(
+            os.path.join(experiment_path, "overview_merged", f"merged_overview_table_median_only_{name}.csv"),
+            index=False)
+        df_merged_median.to_latex(
+            os.path.join(experiment_path, "overview_merged", f"merged_overview_table_median_only_{name}.tex"),
+            float_format="%.3f", index=False)
 
     # make a table showing the median of each metric (one table per metric), grouped by groupbyList
     for metric_name in metric_names:
-        # set the type of the metric column to float
+        if metric_name not in df.columns:  # for the SEAHORSE MDS columns
+            continue
+
+        # Calculate multiple statistics + their CI and save them in a table
         df[metric_name] = df[metric_name].astype(float, copy=True)
-        # calculate the table
+        df_metric_FULL = df.groupby(groupbyList).agg(
+            {metric_name: [
+                np.std, bootstrap_CI(np.std, confidence_level=confidence_level),
+                np.var, bootstrap_CI(np.var, confidence_level=confidence_level),
+                percentile_agg(5), bootstrap_CI(percentile_agg(5), confidence_level=confidence_level),
+                percentile_agg(25), bootstrap_CI(percentile_agg(25), confidence_level=confidence_level),
+                np.median, bootstrap_CI(np.median, confidence_level=confidence_level),
+                percentile_agg(75), bootstrap_CI(percentile_agg(75), confidence_level=confidence_level),
+                percentile_agg(95), bootstrap_CI(percentile_agg(95), confidence_level=confidence_level),
+            ]}).reset_index()
+        col_new = groupbyList + [
+            'St.Dev.', f"St.Dev. {ci_level_str}",
+            'Var.', f"Var. {ci_level_str}",
+            '5th Perc.', f"5th Perc. {ci_level_str}",
+            '25th Perc.', f"5th Perc. {ci_level_str}",
+            'Median', f"Median {ci_level_str}",
+            '75th Perc.', f"75th Perc. {ci_level_str}",
+            '95th Perc.', f"95th Perc. {ci_level_str}",
+        ]
+        df_metric_FULL.columns = col_new
+        df_metric_FULL = df_metric_FULL.round(ROUND_TO_DECIMALS)
+        out_overview.append({
+            "name": f"Full Statisics Table {metric_name}",
+            "df": df_metric_FULL
+        })
+        # save as csv and latex table
+        df_metric_FULL.to_csv(
+            os.path.join(experiment_path, "overview_table", f"overview_table_full_{metric_name}.csv"),
+            index=False)
+        df_metric_FULL.to_latex(
+            os.path.join(experiment_path, "overview_table", f"overview_table_full_{metric_name}.tex"),
+            index=False)
+
+        # Calculate the median of the metric + CI
+        df[metric_name] = df[metric_name].astype(float, copy=True)
         df_metric = df.groupby(groupbyList).agg(
             {metric_name: ["median", bootstrap_CI(np.median, confidence_level=confidence_level)]}).reset_index()
-        col_new = groupbyList + ['median', ci_colname]
+        col_new = groupbyList + ['Median', ci_colname]
         df_metric.columns = col_new
         df_metric = df_metric.round(ROUND_TO_DECIMALS)
         out_overview.append({
             "name": f"median {metric_name}",
             "df": df_metric
         })
+        # save as csv and latex table
+        df_metric.to_csv(
+            os.path.join(experiment_path, "overview_table", f"overview_table_median {metric_name}.csv"),
+            index=False)
+        df_metric.to_latex(
+            os.path.join(experiment_path, "overview_table", f"overview_table_median {metric_name}.tex"),
+            index=False)
 
         # prepare the data for the overview-table plot showing the median + confidence interval
         overview_x_1 = df_metric[groupbyList[0]]
         overview_x_2 = df_metric[groupbyList[1]]
         overview_x = [f"{x[0]}" + " / " + f"{x[1]}" for x in zip(overview_x_1, overview_x_2)]
-        overview_y = df_metric["median"]
+        overview_y = df_metric["Median"]
         overview_yerr = df_metric[ci_colname]
         # reshape overview_yerr to (2,N) array
         overview_yerr = np.array(overview_yerr.tolist()).T
@@ -1298,6 +1581,8 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
     for model_name in df["Model"].unique():
         df_model = df[df["Model"] == model_name]
         for metric_name in metric_names:
+            if metric_name not in df.columns:  # for the SEAHORSE MDS columns
+                continue
             df_metric = df_model.groupby(groupbyList).agg({metric_name: agg_funcs}).reset_index()
 
             col_new = groupbyList + agg_names
@@ -1311,6 +1596,8 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
     for promptVersion in df["Prompt ID"].unique():
         df_prompt = df[df["Prompt ID"] == promptVersion]
         for metric_name in metric_names:
+            if metric_name not in df.columns:  # for the SEAHORSE MDS columns
+                continue
             df_metric = df_prompt.groupby(groupbyList).agg({metric_name: agg_funcs}).reset_index()
 
             col_new = groupbyList + agg_names
@@ -1320,6 +1607,15 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                 "name": f"{promptVersion} {metric_name}",
                 "df": df_metric
             })
+    # save the detail tables (as csv and tex table)
+    for table in out_detail:
+        table["df"].to_csv(
+            os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"),
+            index=False)
+        # also export as latex table
+        table["df"].to_latex(
+            os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.tex"),
+            index=False)
 
     return out_overview, out_detail, agg_names
 
@@ -1962,8 +2258,9 @@ def sorted_labels_from_list(labels, prioritize_string_order=False):
 
 def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyList=["Model", "Prompt ID"],
                                      groupByListExtension=[], file_suffix="", facet_col_n_docs="N-Input Docs",
-                                     facet_col_size="#Input Article Tokens") -> Tuple[
-    List[List[str]], List[List[str]]]:
+                                     facet_col_size="#Input Article Tokens", skip_catplots=False, skip_violins=False) -> \
+        Tuple[
+            List[List[str]], List[List[str]]]:
     if df.shape[0] == 0:
         return [], []
     print("Making metric distribution figures...")
@@ -2014,23 +2311,24 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     sns.set_theme(**metric_plt_theme)
                     fig_size_name = f"{fig_size[0]}x{fig_size[1]}"
 
-                violin_plot = sns.violinplot(data=df, x=gbl[0], hue=gbl[1], y=metric_name, points=500, cut=0,
-                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
-                # plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
-                # sns.move_legend(violin_plot, "upper left", bbox_to_anchor=(1, 1))
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                    violin_plot.set_yticks(np.arange(0, 1.1, 0.1))
-                if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
-                    plt.xticks(rotation=90)
-                    plt.tight_layout()
-                # save
-                violin_plot_path = os.path.join(metric_plt_base_path,
-                                                f"{metric_name}_{gbl[0]}_{gbl[1]}_violin_plot{file_suffix}__{fig_size_name}.{suffix}")
-                plt.savefig(violin_plot_path, bbox_inches='tight', **suffix_kwargs)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    violin_plot = sns.violinplot(data=df, x=gbl[0], hue=gbl[1], y=metric_name, points=500, cut=0,
+                                                 order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                    # plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                    # sns.move_legend(violin_plot, "upper left", bbox_to_anchor=(1, 1))
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                        violin_plot.set_yticks(np.arange(0, 1.1, 0.1))
+                    if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
+                        plt.xticks(rotation=90)
+                        plt.tight_layout()
+                    # save
+                    violin_plot_path = os.path.join(metric_plt_base_path,
+                                                    f"{metric_name}_{gbl[0]}_{gbl[1]}_violin_plot{file_suffix}__{fig_size_name}.{suffix}")
+                    plt.savefig(violin_plot_path, bbox_inches='tight', **suffix_kwargs)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 # dist_plot = sns.displot(data=df.dropna(), x=groupbyList[a], hue=groupbyList[b], y=metric_name, kind="kde", fill=True)
                 # if metric_name in metric_0_1_range:
@@ -2064,32 +2362,73 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                                              f"{metric_name}_{gbl[0]}_{gbl[1]}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
                 plt.savefig(box_plot_path, bbox_inches='tight', **suffix_kwargs)
                 out_paths.append(box_plot_path)
+
+                # Also make a zoomed-in version
+                min_lim = df[metric_name].quantile(0.1)
+                max_lim = df[metric_name].quantile(0.9)
+                box_plot.set_ylim(min_lim, max_lim)
+                box_plot_path = os.path.join(metric_plt_base_path,
+                                             f"{metric_name}_{gbl[0]}_{gbl[1]}_box_plot{file_suffix}__{fig_size_name}__ZOOMED.{suffix}")
+                plt.savefig(box_plot_path, bbox_inches='tight', **suffix_kwargs)
+
                 plt.close()
 
                 df[facet_col_n_docs] = df[facet_col_n_docs].astype(int)
 
                 # Make a facet-plot with the number of input documents as the facet column
                 for fct_row, fct_hue in [(facet_col_n_docs, gbl[1]), (gbl[1], facet_col_n_docs)]:
+
                     fct_hue_order = get_sorted_labels(df, fct_hue)
                     fct_row_order = get_sorted_labels(df, fct_row)
                     fct_x___order = get_sorted_labels(df, gbl[0])
-                    catplt = sns.catplot(df, row=fct_row, row_order=fct_row_order, height=10, aspect=1.5, x=gbl[0],
-                                         order=fct_x___order, hue=fct_hue, hue_order=fct_hue_order, y=metric_name,
-                                         kind='box',
-                                         flierprops={"marker": "x"}, notch=True,
-                                         bootstrap=1000)
+                    if not skip_catplots:
+                        catplt = sns.catplot(df, row=fct_row, row_order=fct_row_order, height=10, aspect=1.5, x=gbl[0],
+                                             order=fct_x___order, hue=fct_hue, hue_order=fct_hue_order, y=metric_name,
+                                             kind='box',
+                                             flierprops={"marker": "x"}, notch=True,
+                                             bootstrap=1000)
+                        # Set y-ticks to be 0.1 steps
+                        if metric_name in metric_0_1_range:
+                            catplt.set(yticks=np.arange(0, 1.1, 0.1))
+                        # always rotate them
+                        plt.xticks(rotation=90)
+                        plt.tight_layout()
+                        metrics_n_in_docs_plt_path = os.path.join(metric_plt_base_path,
+                                                                  f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                        plt.savefig(metrics_n_in_docs_plt_path)
+                        plt.close()
+
+                    # Make also a CatAgg plot where the row and x categories are concatenated -> all shown within 1 plot instead of multiple concatenated plots
+                    df_catagg = df.copy()
+                    catagg_colname = f"{fct_row} / {gbl[0]}"
+                    df_catagg[catagg_colname] = df_catagg.apply(
+                        lambda row: f"{row[fct_row]}\n{row[gbl[0]]}", axis=1)
+                    catagg_x___order = get_sorted_labels(df_catagg, catagg_colname)
+                    catagg_hue___order = get_sorted_labels(df_catagg, fct_hue)
+                    box_plot = sns.boxplot(data=df_catagg, x=catagg_colname, hue=fct_hue, y=metric_name,
+                                           flierprops={"marker": "x"},
+                                           notch=True, bootstrap=1000,
+                                           order=catagg_x___order, hue_order=catagg_hue___order)
+                    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                    if metric_name in metric_0_1_range:
+                        box_plot.set_ylim(0, 1)
+                    # box_plot.axes.set_title("Title", fontsize=50)
+                    box_plot.set_xlabel(catagg_colname, fontsize=18)
+                    box_plot.set_ylabel(metric_name, fontsize=18)
+                    box_plot.tick_params(labelsize=16)
                     # Set y-ticks to be 0.1 steps
                     if metric_name in metric_0_1_range:
-                        catplt.set(yticks=np.arange(0, 1.1, 0.1))
-                    # always rotate them
-                    plt.xticks(rotation=90)
-                    plt.tight_layout()
+                        box_plot.set_yticks(np.arange(0, 1.1, 0.1))
+                    if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
+                        plt.xticks(rotation=90)
+                        plt.tight_layout()
+                    plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
+                    plt.setp(box_plot.get_legend().get_title(), fontsize='16')
+                    # save
                     metrics_n_in_docs_plt_path = os.path.join(metric_plt_base_path,
-                                                              f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
-                    plt.savefig(metrics_n_in_docs_plt_path)
+                                                              f"CatAggPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}__{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                    plt.savefig(metrics_n_in_docs_plt_path, bbox_inches='tight', **suffix_kwargs)
                     plt.close()
-
-                # facet_col_n_docs="N-Input Docs", facet_col_size
 
                 # Make a facet-plot with the number of input article tokens as the facet column (bucket-size 500)
                 bckt_size = 1000
@@ -2103,20 +2442,53 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     fct_hue_order = get_sorted_labels(df, fct_hue)
                     fct_row_order = get_sorted_labels(df, fct_row)
                     fct_x___order = get_sorted_labels(df, gbl[0])
-                    catplt = sns.catplot(df, row=fct_row, row_order=fct_row_order, height=10, aspect=1.5, x=gbl[0],
-                                         order=fct_x___order, hue=fct_hue, hue_order=fct_hue_order, y=metric_name,
-                                         kind='box',
-                                         flierprops={"marker": "x"}, notch=True,
-                                         bootstrap=1000)
+                    if not skip_catplots:
+                        catplt = sns.catplot(df, row=fct_row, row_order=fct_row_order, height=10, aspect=1.5, x=gbl[0],
+                                             order=fct_x___order, hue=fct_hue, hue_order=fct_hue_order, y=metric_name,
+                                             kind='box',
+                                             flierprops={"marker": "x"}, notch=True,
+                                             bootstrap=1000)
+                        # Set y-ticks to be 0.1 steps
+                        if metric_name in metric_0_1_range:
+                            catplt.set(yticks=np.arange(0, 1.1, 0.1))
+                            # always rotate them
+                            plt.xticks(rotation=90)
+                            plt.tight_layout()
+                        metrics_in_size_plt_path = os.path.join(metric_plt_base_path,
+                                                                f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                        plt.savefig(metrics_in_size_plt_path, **suffix_kwargs)
+                        plt.close()
+
+                    # Make also a CatAgg plot where the row and x categories are concatenated -> all shown within 1 plot instead of multiple concatenated plots
+                    df_catagg = df.copy()
+                    catagg_colname = f"{fct_row} / {gbl[0]}"
+                    df_catagg[catagg_colname] = df_catagg.apply(
+                        lambda row: f"{row[fct_row]}\n{row[gbl[0]]}", axis=1)
+                    catagg_x___order = get_sorted_labels(df_catagg, catagg_colname)
+                    catagg_hue___order = get_sorted_labels(df_catagg, fct_hue)
+                    box_plot = sns.boxplot(data=df_catagg, x=catagg_colname, hue=fct_hue, y=metric_name,
+                                           flierprops={"marker": "x"},
+                                           notch=True, bootstrap=1000,
+                                           order=catagg_x___order, hue_order=catagg_hue___order)
+                    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
+                    if metric_name in metric_0_1_range:
+                        box_plot.set_ylim(0, 1)
+                    # box_plot.axes.set_title("Title", fontsize=50)
+                    box_plot.set_xlabel(catagg_colname, fontsize=18)
+                    box_plot.set_ylabel(metric_name, fontsize=18)
+                    box_plot.tick_params(labelsize=16)
                     # Set y-ticks to be 0.1 steps
                     if metric_name in metric_0_1_range:
-                        catplt.set(yticks=np.arange(0, 1.1, 0.1))
-                        # always rotate them
+                        box_plot.set_yticks(np.arange(0, 1.1, 0.1))
+                    if len(sorted_x_axis_labels) > sns_num_xticks_rotation_threshold:
                         plt.xticks(rotation=90)
                         plt.tight_layout()
-                    metrics_in_size_plt_path = os.path.join(metric_plt_base_path,
-                                                            f"CatPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}_{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
-                    plt.savefig(metrics_in_size_plt_path, **suffix_kwargs)
+                    plt.setp(box_plot.get_legend().get_texts(), fontsize='16')
+                    plt.setp(box_plot.get_legend().get_title(), fontsize='16')
+                    # save
+                    metrics_n_in_docs_plt_path = os.path.join(metric_plt_base_path,
+                                                              f"CatAggPlot_{metric_name}_Cat_{fct_row}_{gbl[0]}__{fct_hue}_box_plot{file_suffix}__{fig_size_name}.{suffix}")
+                    plt.savefig(metrics_n_in_docs_plt_path, bbox_inches='tight', **suffix_kwargs)
                     plt.close()
 
                 # Reset the theme
@@ -2150,17 +2522,18 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             if len(residualGroupBy) > 0:
                 sorted_x_axis_labels = get_sorted_labels(df, "Prompt ID")
                 sorted_hue_labels = get_sorted_labels(df, residualGroupBy[0])
-                violin_plot = sns.violinplot(data=df_model, x="Prompt ID", hue=residualGroupBy[0], y=metric_name,
-                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    violin_plot = sns.violinplot(data=df_model, x="Prompt ID", hue=residualGroupBy[0], y=metric_name,
+                                                 order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, model_name,
+                                                    f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_model, x="Prompt ID", hue=residualGroupBy[0], y=metric_name,
                                        order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
@@ -2174,17 +2547,18 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(box_plot_path)
                 plt.close()
 
-                violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
-                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    violin_plot = sns.violinplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
+                                                 order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, model_name,
+                                                    f"{model_name}_{metric_name}_R_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_model, x=residualGroupBy[0], hue='Prompt ID', y=metric_name,
                                        order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
@@ -2198,18 +2572,20 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(box_plot_path)
                 plt.close()
             else:
-                sorted_x_axis_labels = get_sorted_labels(df, "Prompt ID")
-                violin_plot = sns.violinplot(data=df_model, x="Prompt ID", y=metric_name, order=sorted_x_axis_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                # sns.move_legend(box_plot, "upper left", bbox_to_anchor=(1, 1))
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, model_name,
-                                                f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    sorted_x_axis_labels = get_sorted_labels(df, "Prompt ID")
+                    violin_plot = sns.violinplot(data=df_model, x="Prompt ID", y=metric_name,
+                                                 order=sorted_x_axis_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    # sns.move_legend(box_plot, "upper left", bbox_to_anchor=(1, 1))
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, model_name,
+                                                    f"{model_name}_{metric_name}_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_model, x="Prompt ID", y=metric_name, order=sorted_x_axis_labels)
                 # sns.move_legend(box_plot, "upper left", bbox_to_anchor=(1, 1))
@@ -2233,17 +2609,18 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
             if len(residualGroupBy) > 0:
                 sorted_x_axis_labels = get_sorted_labels(df, "Model")
                 sorted_hue_labels = get_sorted_labels(df, residualGroupBy[0])
-                violin_plot = sns.violinplot(data=df_prompt, x="Model", hue=residualGroupBy[0], y=metric_name,
-                                             order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    violin_plot = sns.violinplot(data=df_prompt, x="Model", hue=residualGroupBy[0], y=metric_name,
+                                                 order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                    f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_prompt, x="Model", hue=residualGroupBy[0], y=metric_name,
                                        order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
@@ -2257,17 +2634,18 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(box_plot_path)
                 plt.close()
 
-                violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
-                                             order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    violin_plot = sns.violinplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
+                                                 order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                    f"Prompt_{promptVersion}_{metric_name}_R_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_prompt, x=residualGroupBy[0], hue="Model", y=metric_name,
                                        order=sorted_hue_labels, hue_order=sorted_x_axis_labels)
@@ -2281,17 +2659,18 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 out_paths.append(box_plot_path)
                 plt.close()
             else:
-                sorted_x_axis_labels = get_sorted_labels(df, "Model")
-                violin_plot = sns.violinplot(data=df_prompt, x="Model", y=metric_name, order=sorted_x_axis_labels)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-                if metric_name in metric_0_1_range:
-                    violin_plot.set_ylim(0, 1)
-                # save
-                violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
-                                                f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
-                plt.savefig(violin_plot_path)
-                out_paths.append(violin_plot_path)
-                plt.close()
+                if not skip_violins:
+                    sorted_x_axis_labels = get_sorted_labels(df, "Model")
+                    violin_plot = sns.violinplot(data=df_prompt, x="Model", y=metric_name, order=sorted_x_axis_labels)
+                    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+                    if metric_name in metric_0_1_range:
+                        violin_plot.set_ylim(0, 1)
+                    # save
+                    violin_plot_path = os.path.join(save_base_path, f"Prompt-{promptVersion}",
+                                                    f"Prompt_{promptVersion}_{metric_name}_violin_plot{file_suffix}.pdf")
+                    plt.savefig(violin_plot_path)
+                    out_paths.append(violin_plot_path)
+                    plt.close()
 
                 box_plot = sns.boxplot(data=df_prompt, x="Model", y=metric_name, order=sorted_x_axis_labels)
                 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
@@ -2428,7 +2807,6 @@ def make_seahorse_distribution_figures(df, save_base_path, standard_evaluation_m
                     sns.set_theme(**binary_plt_theme)
                     fig_size_name = f"{fig_size[0]}x{fig_size[1]}"
 
-
                 # make a stacked 100% bar plot (with both group-by-dimensions)
                 df_binary_grouped = df.groupby(gbl)[binary_name].value_counts(normalize=True).unstack(binary_name)
                 df_binary_grouped = df_binary_grouped.reset_index()
@@ -2444,7 +2822,8 @@ def make_seahorse_distribution_figures(df, save_base_path, standard_evaluation_m
                 sorted_hue_labels_str = [str(x) for x in sorted_hue_labels]
                 df_binary_grouped[gbl[0]] = df_binary_grouped[gbl[0]].astype(str)
                 df_binary_grouped[gbl[1]] = df_binary_grouped[gbl[1]].astype(str)
-                sns.barplot(data=df_binary_grouped, x=gbl[0], y=True, hue=gbl[1], order=sorted_x_axis_labels_str, hue_order=sorted_hue_labels_str)
+                sns.barplot(data=df_binary_grouped, x=gbl[0], y=True, hue=gbl[1], order=sorted_x_axis_labels_str,
+                            hue_order=sorted_hue_labels_str)
                 plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
                 plt.tight_layout()
                 binary_plt_path = os.path.join(binary_plt_base_path,
@@ -2457,9 +2836,9 @@ def make_seahorse_distribution_figures(df, save_base_path, standard_evaluation_m
                 df_binary_grouped_to_tex[False] = df_binary_grouped_to_tex["False real"]
                 df_binary_grouped_to_tex = df_binary_grouped_to_tex.drop(columns=["False real"])
                 df_binary_grouped_to_tex = df_binary_grouped_to_tex.rename(columns={True: "True", False: "False"})
-                binary_plt_path = os.path.join(binary_plt_base_path, f"{binary_name}__{gbl[0]}_{gbl[1]}_stacked_plot{file_suffix}__{fig_size_name}.tex")
+                binary_plt_path = os.path.join(binary_plt_base_path,
+                                               f"{binary_name}__{gbl[0]}_{gbl[1]}_stacked_plot{file_suffix}__{fig_size_name}.tex")
                 df_binary_grouped_to_tex.to_latex(binary_plt_path, index=False, escape=False, float_format="%.3f")
-
 
                 # only with 1 group-by-dimension
                 for gbl_subval in [gbl[0], gbl[1]]:
@@ -2527,25 +2906,36 @@ def make_seahorse_distribution_figures(df, save_base_path, standard_evaluation_m
                         plt.savefig(box_plot_path, bbox_inches='tight', **suffix_kwargs)
                         plt.close()
 
-    # make a pairplot for all metrics to look at the correlations
-    pairplot_seahorse_metric_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
-                                      SEAHORSE_Pairplot_Metric_Names]
-    pairplot_seahorse_metric_names = [x for x in pairplot_seahorse_metric_names if x in df.columns]
-    pairplot_metrics = StandardEval_Pairplot_Metric_Names + pairplot_seahorse_metric_names  # + binary_names
-    for gbl in [groupbyList]:  # fullGroupByList:
-        sorted_groups = get_sorted_labels(df, gbl[0], prioritize_string_order=True)
-        # sorted_hue_labels = get_sorted_labels(df, gbl[1], prioritize_string_order=True)
-
-        if len(sorted_groups) > 1: # only initial sample, do more if it is interesting
-            sorted_groups = sorted_groups[:1]
-
-        for group in sorted_groups:
-            df_group = df[df[gbl[0]] == group]
-            sns.pairplot(df_group, hue=gbl[1], vars=pairplot_metrics, kind="kde", diag_kind="kde")
-            plt.tight_layout()
-            pairplot_path = os.path.join(save_base_path, f"Pairplot_metrics_{gbl[0]}_{group}_by_{gbl[1]}.pdf")
-            plt.savefig(pairplot_path)
-            plt.close()
+    # # make a pairplot for all metrics to look at the correlations
+    # pairplot_seahorse_metric_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
+    #                                   SEAHORSE_Pairplot_Metric_Names]
+    # pairplot_seahorse_metric_names = [x for x in pairplot_seahorse_metric_names if x in df.columns]
+    # pairplot_metrics = StandardEval_Pairplot_Metric_Names + pairplot_seahorse_metric_names  # + binary_names
+    # for gbl in [groupbyList]:  # fullGroupByList:
+    #     sorted_groups = get_sorted_labels(df, gbl[0], prioritize_string_order=True)
+    #     # sorted_hue_labels = get_sorted_labels(df, gbl[1], prioritize_string_order=True)
+    #
+    #     if len(sorted_groups) > 1:  # only initial sample, do more if it is interesting
+    #         sorted_groups = sorted_groups[:1]
+    #
+    #     for group in sorted_groups:
+    #         df_group = df[df[gbl[0]] == group]
+    #
+    #         # prevent empty axes
+    #         skip = False
+    #         hue_vals = df_group[gbl[1]].unique()
+    #         for hue_val in hue_vals:
+    #             if len(df_group[df_group[gbl[1]] == hue_val]) < 50:
+    #                 skip = True
+    #                 break
+    #         if len(df_group) < 20 or skip:
+    #             continue
+    #
+    #         sns.pairplot(df_group, hue=gbl[1], vars=pairplot_metrics, kind="kde", diag_kind="kde")
+    #         plt.tight_layout()
+    #         pairplot_path = os.path.join(save_base_path, f"Pairplot_metrics_{gbl[0]}_{group}_by_{gbl[1]}.pdf")
+    #         plt.savefig(pairplot_path)
+    #         plt.close()
 
     return
 
@@ -2582,11 +2972,16 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
     ]]
     exclude += ['doc_id', 'N-Input Docs', '#Input Article Tokens', '#Input Article Full Tokens',
                 '#Predicted Tokens', '#Predicted Full Tokens', '#GT-Summary Tokens', '#GT-Summary Full Tokens',
-                'Preprocessing + N-Shot', '#Prompt Tokens', 'Prompt Name']
+                'Preprocessing + N-Shot', '#Prompt Tokens', 'Prompt Name',
+                "Large Article", "Dataset Annotation (incl. article size)", "Size subset",
+                "Dataset Annotation (Prompt Name)",
+                ]
     exclude_metrics = ["Coverage (Prompt)", "Density (Prompt)", "Compression (Prompt)", "Compression (Full)"]
     exclude_seahorse = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
                         SEAHORSE_Plot_Metric_Names]
+    exclude_seahorse_ext = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in SEAHORSE_MDS_Colnames]
     exclude.extend(exclude_metrics)
+    exclude.extend(exclude_seahorse_ext)
     exclude.extend(exclude_seahorse)
 
     metric_names = [col for col in list(df.columns) if col not in exclude]
@@ -2654,7 +3049,13 @@ base_experiment_groupByList_variants = [
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "mds-summarization-chain"
+experiment_name = "mds-2stage-experiment"
+# mds-2stage-verus-intermediate
+# mds-2stage-experiment
+# mds-summarization-chain
+# mds-prefix-experiment
+# mds-ordered-chunks-initial-overview
+
 # prompt-experiment-large-llama2-vs-leolm
 # mds-cluster-chunks-vs-2stage-experiment
 # mds-cluster-chunks-experiment
@@ -2778,9 +3179,23 @@ experiment_config = {
     "few-shot-experiment-distMMR-20MinutesExamples": fewshot_experiment__experimental_setup,
     "few-shot-experiment-distMMR-WikinewsExamples": fewshot_experiment__experimental_setup,
     "mds-baseline": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Prompt Name", "Dataset Annotation (incl. article size)"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Name", "Dataset Annotation"],
+            ["Prompt Desc. [ID]", "Dataset Annotation"],
+        ],
         "datasets": ["Wikinews"]
+    },
+    "mds-baseline-german": {
+        "groupByList": ["Prompt Name", "Dataset Annotation (incl. article size)"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Name", "Dataset Annotation"],
+            ["Prompt Desc. [ID]", "Dataset Annotation"],
+        ],
+        "datasets": ["Wikinews"],
+        "prompts_bag_alias": "mds-baseline",
     },
     "mds-summarization-chain": {
         "groupByList": ["Prompt ID", "Dataset Annotation"],
@@ -2795,8 +3210,12 @@ experiment_config = {
         "prompts_bag_alias": "mds-baseline",
     },
     "mds-shuffling-and-annotation-experiment": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Prompt Name", "Dataset Annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Prompt Name", "Dataset Annotation (incl. article size)"],
+            ["Prompt Desc. [ID]", "Dataset Annotation"],
+        ],
         "datasets": ["Wikinews"]
     },
     "mds-prefix-experiment": {
@@ -2805,10 +3224,21 @@ experiment_config = {
         "datasets": ["Wikinews"]
     },
     "mds-2stage-experiment": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Preprocessing Parameters", "Size subset"],  # preprocessing_parameters
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            ["Dataset Annotation", "Large Article"],
+        ],
         "datasets": ["Wikinews"],
         "additional_prompts": [2, 41]
+    },
+    "mds-2stage-verus-intermediate": {
+        "groupByList": ["Dataset Annotation (Prompt Name)", "Large Article"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [],
+        "datasets": ["Wikinews"],
+        "additional_prompts": [2, 41],
+        "prompts_bag_alias": "mds-2stage-experiment",
     },
     "mds-cluster-chunks-experiment": {
         "groupByList": ["Prompt ID", "Dataset Annotation"],
@@ -2848,18 +3278,18 @@ experiment_config = {
         "datasets": ["Wikinews"]
     },
     "mds-sentence-chunks-experiment": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Preprocessing Method", "Preprocessing Parameters"],
         "groupByListVariants": [
-            ["Preprocessing Method", "Preprocessing Parameters"],
+            ["Prompt Name", "Dataset Annotation"],
             ["Preprocessing Method", "Preprocessing Order"],
         ],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "datasets": ["Wikinews"]
     },
     "mds-ordered-chunks-initial-overview": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Preprocessing Method", "Preprocessing Parameters"],
         "groupByListVariants": [
-            ["Preprocessing Method", "Preprocessing Parameters"],
+            ["Prompt Name", "Dataset Annotation"],
             ["Preprocessing Method", "Preprocessing Order"],
         ],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
@@ -3319,29 +3749,29 @@ datasetAnnotationMap = {
     "MultinewsTrunc3584": "basic,\ntruncated to 3584 tokens",
     "MultiCD040SSimDyn1024": "Ex.Src: Multinews",
     "MultiCD040SSimDyn1536": "Ex.Src: Multinews",
-    "Wikinews": "basic,\nfull articles,\noriginal order",
-    "WikinewsTrunc3584": "basic,\ntruncated to 3584 tokens",
+    "Wikinews": "full articles,\noriginal order",
+    "WikinewsClean": "manual cleaning,\nfull artices,\noriginal order",
+    "WikinewsTrunc3584": "manual cleaning,\ntruncated to 3584 tokens,\noriginal order",
     "WikinewsSummarizationChain": "Summarization Chain",
-    "WikinewsClean": "cleaning,\nfull artices,\noriginal order",
     "WikinewsSimple": "no annotation,\noriginal order",
     "WikinewsSimpleS": "no annotation,\nrandom order",
     "WikinewsSimpleA": "article idx ann.,\noriginal order",
     "WikinewsSimpleAS": "article ids ann.,\nrandom order",
-    "WikinewsSC32": "token prefix,\n 32 tokens",
-    "WikinewsSC64": "token prefix,\n 64 tokens",
-    "WikinewsSC128": "token prefix,\n128 tokens",
-    "WikinewsSC256": "token prefix,\n256 tokens",
-    "WikinewsSC512": "token prefix,\n512 tokens",
-    "WikinewsSCS2": "sentence prefix,\n 2 sentences",
-    "WikinewsSCS4": "sentence prefix,\n 4 sentences",
-    "WikinewsSCS8": "sentence prefix,\n 8 sentences",
-    "WikinewsSCS16": "sentence prefix,\n16 sentences",
-    "WikinewsSCS32": "sentence prefix,\n32 sentences",
-    "WikinewsSplit": "2-stage summary,\nstage 1",
-    "WikinewsSplitS2O": "2-stage summary,\n3 sent. interm. summary,\noriginal order",
-    "WikinewsSplitS2S": "2-stage summary,\n3 sent. interm. summary,\nrandom order",
-    "WikinewsSplitS2OP41": "2-stage summary,\n10 sent. interm. summary,\noriginal order",
-    "WikinewsSplitS2SP41": "2-stage summary,\n10 sent. interm. summary,\nrandom order",
+    "WikinewsSC32": " 32 word prefix",
+    "WikinewsSC64": " 64 word prefix",
+    "WikinewsSC128": "128 word prefix",
+    "WikinewsSC256": "256 word prefix",
+    "WikinewsSC512": "512 word prefix",
+    "WikinewsSCS2": " 2 sentence prefix",
+    "WikinewsSCS4": " 4 sentence prefix",
+    "WikinewsSCS8": " 8 sentence prefix",
+    "WikinewsSCS16": "16 sentence prefix",
+    "WikinewsSCS32": "32 sentence prefix",
+    "WikinewsSplit": "2-stage, stage 1",
+    "WikinewsSplitS2O": "2-stage, SDS-2,\noriginal order",
+    "WikinewsSplitS2S": "2-stage, SDS-2,\nrandom order",
+    "WikinewsSplitS2OP41": "2-stage, SDS-4,\noriginal order",
+    "WikinewsSplitS2SP41": "2-stage, SDS-4,\nrandom order",
     "WikinewsClust1C": "Cluster,\n 1 Sentence,\ncluster size order",
     "WikinewsClust1O": "Cluster,\n 1 Sentence,\noriginal order",
     "WikinewsClust1R": "Cluster,\n 1 Sentence,\nrandom order",
@@ -3418,9 +3848,9 @@ preprocessing_method = {
     "MultiCD040SSimDyn1024": "-",
     "MultiCD040SSimDyn1536": "-",
     "Wikinews": "-",
-    "WikinewsTrunc3584": "cleaning",
+    "WikinewsTrunc3584": "manual cleaning",
+    "WikinewsClean": "manual cleaning",
     "WikinewsSummarizationChain": "Summarization Chain",
-    "WikinewsClean": "cleaning",
     "WikinewsSimple": "-",
     "WikinewsSimpleS": "-",
     "WikinewsSimpleA": "article idx ann.",
@@ -3435,7 +3865,7 @@ preprocessing_method = {
     "WikinewsSCS8": "sentence prefix",
     "WikinewsSCS16": "sentence prefix",
     "WikinewsSCS32": "sentence prefix",
-    "WikinewsSplit": "-",
+    "WikinewsSplit": "2-stage, initial",
     "WikinewsSplitS2O": "2-stage summary",
     "WikinewsSplitS2S": "2-stage summary",
     "WikinewsSplitS2OP41": "2-stage summary",
@@ -3690,27 +4120,27 @@ preprocessing_parameters = {
     "WikinewsSCS16": "16 sentences",
     "WikinewsSCS32": "32 sentences",
     "WikinewsSplit": "-",
-    "WikinewsSplitS2O": "-",
-    "WikinewsSplitS2S": "-",
-    "WikinewsSplitS2OP41": "-",
-    "WikinewsSplitS2SP41": "-",
-    "WikinewsClust1C": " 1 Sentence",
-    "WikinewsClust1O": " 1 Sentence",
-    "WikinewsClust1R": " 1 Sentence",
-    "WikinewsClust5C": " 5 Sentences",
-    "WikinewsClust5O": " 5 Sentences",
-    "WikinewsClust5R": " 5 Sentences",
-    "WikinewsClust10C": "10 Sentences",
-    "WikinewsClust10O": "10 Sentences",
-    "WikinewsClust10R": "10 Sentences",
-    "WikinewsSent1L00": " 1 Sentence",
-    "WikinewsSent1L05": " 1 Sentence",
-    "WikinewsSent3L00": " 3 Sentences",
-    "WikinewsSent3L05": " 3 Sentences",
-    "WikinewsSent5L00": " 5 Sentences",
-    "WikinewsSent5L05": " 5 Sentences",
-    "WikinewsSent10L00": "10 Sentences",
-    "WikinewsSent10L05": "10 Sentences",
+    "WikinewsSplitS2O": "SDS-2, original",
+    "WikinewsSplitS2S": "SDS-2, random",
+    "WikinewsSplitS2OP41": "SDS-4, original",
+    "WikinewsSplitS2SP41": "SDS-4, random",
+    "WikinewsClust1C": " 1 sentence, cluster size",
+    "WikinewsClust1O": " 1 sentence, original",
+    "WikinewsClust1R": " 1 sentence, random",
+    "WikinewsClust5C": " 5 sentences, cluster size",
+    "WikinewsClust5O": " 5 sentences, original",
+    "WikinewsClust5R": " 5 sentences, random",
+    "WikinewsClust10C": "10 sentences, cluster size",
+    "WikinewsClust10O": "10 sentences, original",
+    "WikinewsClust10R": "10 sentences, random",
+    "WikinewsSent1L00": " 1 sentence, MMR-lambda 0.0",
+    "WikinewsSent1L05": " 1 sentence, MMR-lambda 0.5",
+    "WikinewsSent3L00": " 3 sentences, MMR-lambda 0.0",
+    "WikinewsSent3L05": " 3 sentences, MMR-lambda 0.5",
+    "WikinewsSent5L00": " 5 sentences, MMR-lambda 0.0",
+    "WikinewsSent5L05": " 5 sentences, MMR-lambda 0.5",
+    "WikinewsSent10L00": "10 sentences, MMR-lambda 0.0",
+    "WikinewsSent10L05": "10 sentences, MMR-lambda 0.5",
     "WikiCh1024": "#Input Tokens: 1024",
     "WikiCh1536": "#Input Tokens: 1536",
     "WikiLe1024": "#Input Tokens: 1024",
@@ -3855,11 +4285,29 @@ prompt_name = {  # short description of the prompt to ID it instead of the promp
     "35": "Summarize all-1, DE",
     "36": "Summarize all-2, EN",
     "37": "Summarize all-2, DE",
-    "50": "MDS-1, EN",
-    "51": "MDS-1, DE",
-    "52": "MDS-2, DE",
+    "50": "MDS-1-S, EN",
+    "51": "MDS-1-S, DE",
+    "52": "MDS-2-S, DE",
     "100": "Custom",
 }
+prompt_name_MDS_override = {  # map from task-name to prompt-id to prompt-name
+    "MDSSumm": {},  # no override rules
+    "MDSFCO": {
+        "100": "SDS-1",
+    },
+    "MDSChain": {
+        "100": "SDS-1",
+    },
+    "MDS2S": {
+        "2": "SDS-2",
+        "41": "SDS-4",
+    },
+    "MDS": {
+        "100": "SDS-1",  # summarization-chain
+        "42": "SDS-3",
+    },
+}
+
 if experiment_name.startswith("mds"):
     prompt_description["42"] = "MDS"
 prompt_variant = {  # general variant of the prompt (not the langage)
@@ -4018,7 +4466,27 @@ SEAHORSE_Plot_Metric_Names = [
     " (90th Percentile)", " (75th Percentile)", " (25th Percentile)", " (10th Percentile)",
     " (First)", " (Last)", " (Middle)",
 ]
+SEAHORSE_MDS_Colnames = [" (Truth Values)", " (MDS Scores)"]
 SEAHORSE_Pairplot_Metric_Names = ["", " (Avg. Score)", " (Agreement)", " (Mean)", " (Median)"]
+SEAHORSE_overview_plot_additional_extensions = [
+    " (Avg. Score)", " (Agreement)", " (St. Dev.)", " (First)", " (Last)", " (Middle)", " (Median)",
+    " (90th Percentile)", " (75th Percentile)", " (25th Percentile)", " (10th Percentile)",
+]
+SEAHORSE_overview_plot_additional_names = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
+                                           SEAHORSE_overview_plot_additional_extensions]
+OVERVIEW_TABLE_merged_table_relevant_metric_groups = [
+    ("metrics", ["R-1", "R-2", "R-L", "BertScore F1", "BertScore Precision", "BertScore Recall", ]),
+    ("extracts", ["Coverage", "Density", "Compression", ]),
+    ("seahorse", ["Attribution", "Attribution (Avg. Score)", "Main Ideas", "Main Ideas (Avg. Score)"]),
+]
+OVERVIEW_TABLE_Rename_Map = {
+    "BertScore F1": "Bert-F1",
+    "BertScore Precision": "Bert-Prec.",
+    "BertScore Recall": "Bert-Rec.",
+    "Attribution (Avg. Score)": "Attribution",
+    "Main Ideas (Avg. Score)": "Main Ideas",
+}
+
 StandardEval_Pairplot_Metric_Names = [
     "R-1",  # "R-2", "R-L",
     "BertScore F1",  # "BertScore Precision", "BertScore Recall",
@@ -4063,7 +4531,10 @@ def main(reload_data=True, reload_preprocessed_dataset=False, no_cache_reload_al
         create_preprocessed_report(df_dataset, report_name, metric_names, prompts, skip_lang=False)
 
 
-def make_report_plots(prioritize_inspect_examples=False):
+def make_report_plots(skip_cost_estimate=False, skip_metric_plots=False, skip_seahorse_plots=False,
+                      skip_length_statistics=False, skip_inspect_examples=False, prioritize_inspect_examples=False,
+                      skip_language_statistics=False, skip_failure_statistics=False,
+                      skip_statistics_overview_tables=False, skip_catplots=False, skip_violins=False):
     prompts = get_prompts_by_experiment_name(experiment_name)
 
     print("Creating report plots ...")
@@ -4126,6 +4597,8 @@ def make_report_plots(prioritize_inspect_examples=False):
         df_prompts['Prompt'] = df_prompts.apply(lambda x: prompts[f"{x['Prompt ID']}"], axis=1)
         df_prompts.sort_values(by='Prompt ID', inplace=True)
         df_prompts.reset_index(inplace=True, drop=True)
+        df_prompts["Prompt Length"] = df_prompts["Prompt"].apply(lambda x: len(text_to_llama_bpe(x)))
+
         # df_prompts = df_prompts.transpose()
         df_prompts = df_prompts.apply(lambda row: df_row_replace(row, ['Prompt'], '\n', '<br>'), axis=1)
         html_data = df_prompts.to_html(escape=False).replace("\\n", "").replace("\n", "")
@@ -4144,30 +4617,31 @@ def make_report_plots(prioritize_inspect_examples=False):
         """
             EXPERIMENT COST ESTIMATE (IN TOKENS)
         """
-        # Calculate the number of tokens per experiment
-        df_dataset = df_all[df_all["Dataset"] == dataset]
-        df_dataset_model = df_dataset[df_dataset["Model"] == shortNames[models[0]]]
-        # concatenate the 'prompt_0' columns to 1 string
-        prompt_list = df_dataset_model["Prompt"].tolist()
-        total_prompt = " ".join(prompt_list)
-        # split into tokens (using approximation)
-        tokens = approxTokenize(total_prompt)
-        numTokens = len(tokens)
-        # calculate the average summary size (for all entries that did work out)
-        df_dataset = df[df["Dataset"] == dataset]
-        df_dataset_model = df_dataset[df_dataset["Model"] == shortNames[models[0]]]
-        summary_list = df_dataset_model["GT-Summary"].tolist()
-        summary_tokens = [approxTokenize(summary) for summary in summary_list]
-        summary_tokens = [len(tokens) for tokens in summary_tokens if tokens]
-        if len(summary_tokens) == 0:
-            avgSummarySize = 0
-        else:
-            avgSummarySize = sum(summary_tokens) / len(summary_tokens)
-        # Print out the cost
-        numRows = df_dataset_model.shape[0]
-        numPrompts = len(df['Prompt ID'].unique().tolist())
-        print(
-            f"Cost for {dataset} ({numPrompts} prompts): input {numTokens}, output {(numRows * avgSummarySize)}\n\tTokens: {numTokens}\n\tAvg. Summary Size: {avgSummarySize}\n\tNum. Rows: {numRows}\n")
+        if not skip_cost_estimate:
+            # Calculate the number of tokens per experiment
+            df_dataset = df_all[df_all["Dataset"] == dataset]
+            df_dataset_model = df_dataset[df_dataset["Model"] == shortNames[models[0]]]
+            # concatenate the 'prompt_0' columns to 1 string
+            prompt_list = df_dataset_model["Prompt"].tolist()
+            total_prompt = " ".join(prompt_list)
+            # split into tokens (using approximation)
+            tokens = approxTokenize(total_prompt)
+            numTokens = len(tokens)
+            # calculate the average summary size (for all entries that did work out)
+            df_dataset = df[df["Dataset"] == dataset]
+            df_dataset_model = df_dataset[df_dataset["Model"] == shortNames[models[0]]]
+            summary_list = df_dataset_model["GT-Summary"].tolist()
+            summary_tokens = [approxTokenize(summary) for summary in summary_list]
+            summary_tokens = [len(tokens) for tokens in summary_tokens if tokens]
+            if len(summary_tokens) == 0:
+                avgSummarySize = 0
+            else:
+                avgSummarySize = sum(summary_tokens) / len(summary_tokens)
+            # Print out the cost
+            numRows = df_dataset_model.shape[0]
+            numPrompts = len(df['Prompt ID'].unique().tolist())
+            print(
+                f"Cost for {dataset} ({numPrompts} prompts): input {numTokens}, output {(numRows * avgSummarySize)}\n\tTokens: {numTokens}\n\tAvg. Summary Size: {avgSummarySize}\n\tNum. Rows: {numRows}\n")
 
         df_all_langs = pd.concat([df, df_non_german])
 
@@ -4237,46 +4711,70 @@ def make_report_plots(prioritize_inspect_examples=False):
                       "w") as f:
                 json.dump(inspect_examples, f, indent=4)
 
-        if prioritize_inspect_examples:
-            inspect_examples_report()
+        if not skip_inspect_examples:
+            if prioritize_inspect_examples:
+                inspect_examples_report()
 
         gblExtension = experiment_config[experiment_name].get("groupByListVariants", [])
 
-        # Make plots showing the failure rate
-        bucket_size = 1000
-        bucket_colname = f"#Input Article Tokens Bucket"
-        df_all[bucket_colname] = df_all["#Input Article Tokens"].apply(
-            lambda x: f"{int(math.floor(x / bucket_size)) * bucket_size}".rjust(
-                5) + "-" + f"{int(math.ceil(x / bucket_size)) * bucket_size}".rjust(5))
-        x_group = "Temperature"
-        if x_group in groupByList:
-            x_group = "Model"
+        if not skip_failure_statistics:
+            # Make plots showing the failure rate
+            bucket_size = 1000
+            bucket_colname = f"#Input Article Tokens Bucket"
+            df_all[bucket_colname] = df_all["#Input Article Tokens"].apply(
+                lambda x: f"{int(math.floor(x / bucket_size)) * bucket_size}".rjust(
+                    5) + "-" + f"{int(math.ceil(x / bucket_size)) * bucket_size}".rjust(5))
+            x_group = "Temperature"
+            if x_group in groupByList:
+                x_group = "Model"
 
-        # # TODO: DELETE
-        # df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList,
-        #                                             gblExtension=gblExtension, approximation=True)
+            failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
+                                    x_group=x_group,
+                                    groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
+                                                     "N-Input Docs"])
 
-        # failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
-        #                         x_group=x_group,
-        #                         groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
-        #                                          "N-Input Docs"])
-        #
-        # # make violin (distribution) plot showing distribution of metric values per model and prompt
-        # # ... group by model (comparing prompts)
-        # # ... group by prompt (comparing models)
-        # _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
-        #                                      groupByListExtension=gblExtension, file_suffix="")
-        _ = make_seahorse_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
-                                               groupByListExtension=gblExtension, file_suffix="")
+        if not skip_metric_plots:
+            # make violin (distribution) plot showing distribution of metric values per model and prompt
+            # ... group by model (comparing prompts)
+            # ... group by prompt (comparing models)
+            _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
+                                                 groupByListExtension=gblExtension, file_suffix="",
+                                                 skip_catplots=skip_catplots, skip_violins=skip_violins)
+
+        if not skip_statistics_overview_tables:
+            # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
+            # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
+            # ... showing 1 table for (model, prompt)
+            # ... showing 1 table for (model) -> comparing prompts
+            # ... showing 1 table for (prompt) -> comparing models
+            pathlib.Path(os.path.join(experiment_path, "overview_table")).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(os.path.join(experiment_path, "detail_table")).mkdir(parents=True, exist_ok=True)
+            if "Prompt ID" in groupByList:
+                # copy the groupByList, and replace "Prompt ID" with "Prompt Desc. [ID]" in-place
+                gbl = groupByList.copy()
+                gbl[gbl.index("Prompt ID")] = "Prompt Desc. [ID]"
+                gblList = [groupByList, gbl]
+            else:
+                gblList = [groupByList]
+            for gbl in gblList:
+                statistics_overview_metric_names = metric_names + SEAHORSE_Base_Names + SEAHORSE_overview_plot_additional_names
+                tables_overview, tables_detail, agg_names = statistics_overview(experiment_path, df,
+                                                                                statistics_overview_metric_names,
+                                                                                groupbyList=gbl)
+
+        if not skip_seahorse_plots:
+            _ = make_seahorse_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
+                                                   groupByListExtension=gblExtension, file_suffix="")
         # _ = make_metric_distribution_figures(df_all, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_all")
         # _ = make_metric_distribution_figures(df_non_german, experiment_path, metric_names, groupbyList=groupByList, file_suffix="_non_german")
 
-        # re-do language statistics plots
-        # _ = language_statistics(df_all_langs, experiment_path, prompts)
-        df_lang_stat, df_prompt_lang_effect = language_statistics(df_all_langs, experiment_path, prompts,
-                                                                  groupbyList=groupByList)
-        df_lang_stat.to_csv(os.path.join(experiment_path, "df_lang_stat.csv"), index=False)
-        df_prompt_lang_effect.to_csv(os.path.join(experiment_path, "df_prompt_lang_effect.csv"), index=False)
+        if not skip_language_statistics:
+            # re-do language statistics plots
+            # _ = language_statistics(df_all_langs, experiment_path, prompts)
+            df_lang_stat, df_prompt_lang_effect = language_statistics(df_all_langs, experiment_path, prompts,
+                                                                      groupbyList=groupByList)
+            df_lang_stat.to_csv(os.path.join(experiment_path, "df_lang_stat.csv"), index=False)
+            df_prompt_lang_effect.to_csv(os.path.join(experiment_path, "df_prompt_lang_effect.csv"), index=False)
 
         # per metric -> sample 2 documents with the worst performance and 2 documents with the best performance
         # ... and 2 documents with the median performance
@@ -4284,96 +4782,26 @@ def make_report_plots(prioritize_inspect_examples=False):
         # inspect_examples_all = find_inspect_examples(df_all, experiment_path, metric_names, groupbyList=groupByList, suffix="_all")
         # inspect_examples_mp = find_inspect_examples(df, experiment_path, metric_names, groupbyList=["Model", "Prompt ID"])
 
-        # calculate a statistics overview table (per model and prompt) -> calculate df, re-arrange for different views
-        # ... showing median, 10th percentile, 90th percentile, and the stderr for each metric
-        # ... showing 1 table for (model, prompt)
-        # ... showing 1 table for (model) -> comparing prompts
-        # ... showing 1 table for (prompt) -> comparing models
-        pathlib.Path(os.path.join(experiment_path, "overview_table")).mkdir(parents=True, exist_ok=True)
-        pathlib.Path(os.path.join(experiment_path, "detail_table")).mkdir(parents=True, exist_ok=True)
-        if "Prompt ID" in groupByList:
-            # copy the groupByList, and replace "Prompt ID" with "Prompt Desc. [ID]" in-place
-            gbl = groupByList.copy()
-            gbl[gbl.index("Prompt ID")] = "Prompt Desc. [ID]"
-            gblList = [groupByList, gbl]
-        else:
-            gblList = [groupByList]
-        for gbl in gblList:
-            tables_overview, tables_detail, agg_names = statistics_overview(experiment_path, df, metric_names,
-                                                                            groupbyList=gbl)
+        if not skip_length_statistics:
+            # create the statistics for the token lengths and number of sentences
+            gblExtension = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
+            df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList,
+                                                        gblExtension=gblExtension, approximation=True)
+            # _ = length_statistics(df_all, experiment_path, groupbyList=groupByList, gblExtension=gblExtension,
+            #                       approximation=True, file_suffix="_all")
+            if df_prompt_length_impact is not None:
+                df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact_mean.csv"),
+                                               index=False)
 
-            if tables_overview is not None:
-                for table in tables_overview:
-                    table["df"].to_csv(
-                        os.path.join(experiment_path, "overview_table", f"overview_table_{table['name']}.csv"),
-                        index=False)
-                    # also export as latex table
-                    table["df"].to_latex(
-                        os.path.join(experiment_path, "overview_table", f"overview_table_{table['name']}.tex"),
-                        index=False)
-            if tables_detail is not None:
-                for table in tables_detail:
-                    table["df"].to_csv(
-                        os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.csv"), index=False)
-                    # also export as latex table
-                    table["df"].to_latex(
-                        os.path.join(experiment_path, "detail_table", f"detail_table_{table['name']}.tex"),
-                        index=False)
-
-        # create the statistics for the token lengths and number of sentences
-        gblExtension = [groupByList] + experiment_config[experiment_name].get("groupByListVariants", [])
-        df_prompt_length_impact = length_statistics(df, experiment_path, groupbyList=groupByList,
-                                                    gblExtension=gblExtension, approximation=True)
-        # _ = length_statistics(df_all, experiment_path, groupbyList=groupByList, gblExtension=gblExtension,
-        #                       approximation=True, file_suffix="_all")
-        if df_prompt_length_impact is not None:
-            df_prompt_length_impact.to_csv(os.path.join(experiment_path, "df_prompt_length_impact_mean.csv"),
-                                           index=False)
-
-        # save inspect examples in JSON
-        if not prioritize_inspect_examples:
-            inspect_examples_report()
+        if not skip_inspect_examples:
+            # save inspect examples in JSON
+            if not prioritize_inspect_examples:
+                inspect_examples_report()
 
         # with open(os.path.join(experiment_path, f"inspect_examples_{groupByList[0]}_{groupByList[1]}_all.json"), "w") as f:
         #     json.dump(inspect_examples_all, f, indent=4)
         # with open(os.path.join(experiment_path, f"inspect_examples_model_promptVersion.json"), "w") as f:
         #     json.dump(inspect_examples_mp, f, indent=4)
-
-def make_only_metrics_report_plots():
-    for dataset in datasets:
-        experiment_path = os.path.join("reports", f"{experiment_name}-{dataset}")
-
-        # Load all prepared data
-        df = pd.read_csv(os.path.join(experiment_path, "df_filtered.csv"))
-        df_all = pd.read_csv(os.path.join(experiment_path, "df_all.csv"))
-        df_non_german = pd.read_csv(os.path.join(experiment_path, "df_non_german.csv"))
-        df_empty = pd.read_csv(os.path.join(experiment_path, "df_empty.csv"))
-
-        metric_names, _ = get_metrics_info(df)
-
-        gblExtension = experiment_config[experiment_name].get("groupByListVariants", [])
-
-        # Make plots showing the failure rate
-        bucket_size = 1000
-        bucket_colname = f"#Input Article Tokens Bucket"
-        df_all[bucket_colname] = df_all["#Input Article Tokens"].apply(
-            lambda x: f"{int(math.floor(x / bucket_size)) * bucket_size}".rjust(
-                5) + "-" + f"{int(math.ceil(x / bucket_size)) * bucket_size}".rjust(5))
-        x_group = "Temperature"
-        if x_group in groupByList:
-            x_group = "Model"
-
-        failure_statistics_plot(df_all, experiment_path, groupbyList=groupByList, groupByListExtension=gblExtension,
-                                x_group=x_group,
-                                groupByIterator=["Prompt Desc. [ID]", "Model", "Temperature", bucket_colname,
-                                                 "N-Input Docs"])
-
-        # make violin (distribution) plot showing distribution of metric values per model and prompt
-        # ... group by model (comparing prompts)
-        # ... group by prompt (comparing models)
-        _ = make_metric_distribution_figures(df, experiment_path, metric_names, groupbyList=groupByList,
-                                             groupByListExtension=gblExtension, file_suffix="")
-    return
 
 
 if __name__ == "__main__":
@@ -4395,15 +4823,34 @@ if __name__ == "__main__":
             print(f"Experiment name {experiment_name_arg} not found in experiment_config")
             exit(-1)
 
-    if "--only-metrics" in sys.argv:
-        make_only_metrics_report_plots()
-        exit(0)
-
     # if passing argument --full, run the main function
     if "--full" in sys.argv:
         reload_data = "--reload" in sys.argv
         reload_preprocessed_dataset = "--base_dataset_reload" in sys.argv
         main(reload_data=reload_data, reload_preprocessed_dataset=reload_preprocessed_dataset)
 
-    prioritize_inspect_examples_data = "--inspect-examples" in sys.argv
-    make_report_plots(prioritize_inspect_examples=prioritize_inspect_examples_data)
+    skip_cost_estimate = "--skip_cost_estimate" in sys.argv
+    skip_metric_plots = "--skip_metric_plots" in sys.argv
+    skip_seahorse_plots = "--skip_seahorse_plots" in sys.argv
+    skip_length_statistics = "--skip_length_statistics" in sys.argv
+    skip_inspect_examples = "--skip_inspect_examples" in sys.argv
+    skip_language_statistics = "--skip_language_statistics" in sys.argv
+    skip_failure_statistics = "--skip_failure_statistics" in sys.argv
+    skip_statistics_overview_tables = "--skip_statistics_overview_tables" in sys.argv
+    prioritize_inspect_examples = "--inspect-examples" in sys.argv
+    skip_catplots = "--skip_catplots" in sys.argv
+    skip_violins = "--skip_violins" in sys.argv
+
+    make_report_plots(
+        skip_cost_estimate=skip_cost_estimate,
+        skip_metric_plots=skip_metric_plots,
+        skip_seahorse_plots=skip_seahorse_plots,
+        skip_length_statistics=skip_length_statistics,
+        skip_inspect_examples=skip_inspect_examples,
+        prioritize_inspect_examples=prioritize_inspect_examples,
+        skip_language_statistics=skip_language_statistics,
+        skip_failure_statistics=skip_failure_statistics,
+        skip_statistics_overview_tables=skip_statistics_overview_tables,
+        skip_catplots=skip_catplots,
+        skip_violins=skip_violins,
+    )

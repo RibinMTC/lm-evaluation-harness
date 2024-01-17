@@ -1212,6 +1212,10 @@ class MDS_Baseline_truncated_3584_wikinewssum(SummarizationFCO_Fewshot_Base):
     VERSION = 0
     DATASET_PATH = "roysc/wikinewssum_baseline_truncated_3584"
 
+class MDS_Baseline_truncated_3584_wikinewssum_SUBSET(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_baseline_truncated_3584_SUBSET"
+
 class MDS_Baseline_truncated_3584_multinews(SummarizationFCO_Fewshot_Base):
     VERSION = 0
     DATASET_PATH = "roysc/multinews_baseline_truncated_3584"

@@ -1119,6 +1119,9 @@ def postprocess_seahorse_results():
         "conciceness": "../results/mtc-NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
+    only_process_filenames = [ # if list non-empty -> only process these files
+        "seahorse_missing_100_write_out_info.json",
+    ]
     exclude_filenames = [
         "seahorse_base_datasets_100_write_out_info.json",
         "seahorse_testq1_100_write_out_info.json",
@@ -1158,6 +1161,9 @@ def postprocess_seahorse_results():
 
         # remove the files that should be excluded
         filenames[key] = [f for f in filenames[key] if f not in exclude_filenames]
+
+        if len(only_process_filenames) > 0:
+            filenames[key] = [f for f in filenames[key] if f in only_process_filenames]
 
 
     # process the files
