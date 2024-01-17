@@ -62,8 +62,7 @@ class FullDisagreementsFaithfulnessMultiClassificationWithExplanationTask(
     DATASET_PATH = "mtc/final_german_faithfulness_benchmark_with_full_disagreements"
 
 
-class AbsinthWithExplanationEmptyArticleTask(
-    FaithfulnessMultiClassificationWithExplanationTask):
+class AbsinthWithExplanationEmptyArticleTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/absinth_correctly_predicted_samples_by_leo_mistral_cot_3epochs"
 
     def format_prompt(self, doc):
@@ -83,8 +82,7 @@ class AbsinthWithExplanationEmptyArticleTask(
         return out_doc
 
 
-class AbsinthWithExplanationUnrelatedArticleTask(
-    FaithfulnessMultiClassificationWithExplanationTask):
+class AbsinthWithExplanationUnrelatedArticleTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/absinth_correctly_predicted_samples_by_leo_mistral_cot_3epochs"
     UNRELATED_ARTICLE = """Das Hämoglobin im Blut ist nicht nur für die typisch rote Farbe verantwortlich. Es ist der wichtigste Bestandteil der roten Blutkörperchen (Erythrozyten). Diese haben die Aufgabe, alle Körperzellen mit lebenswichtigem Sauerstoff zu versorgen und auf dem Rückweg zur Lunge Kohlendioxid als Stoffwechselendprodukt zu entfernen. Sauerstoff und Kohlendioxid werden mit Hilfe des Hämoglobins transportiert. Im Hämoglobin ist Eisen enthalten, das den Sauerstoff bindet.
 Rote Blutkörperchen haben eine Lebensdauer 100 bis 140 Tagen, d. h. es werden ständig ältere Erythrozyten abgebaut und neue kommen hinzu. Im Monat werden insgesamt rund 1,2 Liter Blut neu gebildet. Das im roten Blutfarbstoff (Hämoglobin) enthaltene Eisen wird hierbei fast vollständig wieder zum Neubau von Hämoglobin verwendet. Jeder gesunde Mensch verfügt über eine natürliche Eisenreserve, mit der Verluste normalerweise rasch ausgeglichen werden können. Im Bedarfsfall steigt die Neubildung von roten Blutkörperchen bis auf das 15-Fache des Normalwertes an.
@@ -107,8 +105,7 @@ Bei einer Blutspende oder bei größerem Blutverlust geht für den Neuaufbau von
         return out_doc
 
 
-class AbsinthWithExplanationArticleWithNoiseTask(
-    FaithfulnessMultiClassificationWithExplanationTask):
+class AbsinthWithExplanationArticleWithNoiseTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/absinth_correctly_predicted_samples_by_leo_mistral_cot_3epochs"
     NOISE = """Das Hämoglobin im Blut ist nicht nur für die typisch rote Farbe verantwortlich. Es ist der wichtigste Bestandteil der roten Blutkörperchen (Erythrozyten). Diese haben die Aufgabe, alle Körperzellen mit lebenswichtigem Sauerstoff zu versorgen und auf dem Rückweg zur Lunge Kohlendioxid als Stoffwechselendprodukt zu entfernen. Sauerstoff und Kohlendioxid werden mit Hilfe des Hämoglobins transportiert. Im Hämoglobin ist Eisen enthalten, das den Sauerstoff bindet.
 Rote Blutkörperchen haben eine Lebensdauer 100 bis 140 Tagen, d. h. es werden ständig ältere Erythrozyten abgebaut und neue kommen hinzu. Im Monat werden insgesamt rund 1,2 Liter Blut neu gebildet. Das im roten Blutfarbstoff (Hämoglobin) enthaltene Eisen wird hierbei fast vollständig wieder zum Neubau von Hämoglobin verwendet. Jeder gesunde Mensch verfügt über eine natürliche Eisenreserve, mit der Verluste normalerweise rasch ausgeglichen werden können. Im Bedarfsfall steigt die Neubildung von roten Blutkörperchen bis auf das 15-Fache des Normalwertes an.
@@ -123,9 +120,12 @@ Bei einer Blutspende oder bei größerem Blutverlust geht für den Neuaufbau von
         return prompt
 
 
-class AbsinthWithExplanationFaithfulDoubleNegationTask(
-    FaithfulnessMultiClassificationWithExplanationTask):
+class AbsinthWithExplanationFaithfulDoubleNegationTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/absinth_double_negations_gpt4_test"
+
+
+class AbsinthSelfConsistencyTask(FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/absinth_self_consistency_test_set"
 
 
 class SeahorseFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
