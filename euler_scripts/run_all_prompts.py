@@ -17,7 +17,7 @@ models = [
     # "tiiuae/falcon-7b-instruct",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    # "meta-llama/Llama-2-70b-chat-hf",
+    "meta-llama/Llama-2-70b-chat-hf",
     # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
@@ -25,9 +25,9 @@ models = [
     # "LeoLM/leo-hessianai-13b",
     # "LeoLM/leo-hessianai-7b-chat",
     # "LeoLM/leo-hessianai-13b-chat",
-    "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
-    "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
-    "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    # "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
     # "google/seahorse-large-q1",
     # "google/seahorse-large-q2",
     # "google/seahorse-large-q3",
@@ -43,12 +43,31 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "seahorse-metric-" + ''.join(
+experiment_name = "distance-mmr-09-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584SUBS",
     # "WikinewsTrunc3584",
     # "MultinewsTrunc3584",
+
+    # TODO: NEW START
+    # "WikiDi090S1024",
+    # "WikiDi090S1536",
+    # "WikiDi091SW1024",
+    # "WikiDi091SW1536",
+    # "WikiDi092SW1024",
+    # "WikiDi092SW1536",
+
+    "WikiChN1024",
+    "WikiChN1536",
+    "WikiChN1S1024",
+    "WikiChN1S1536",
+    "WikiChN2S1024",
+    "WikiChN2S1536",
+    ## "MDSFCO_WikiCl0S2048_100_8b",
+    "MDSFCO_WikiCl1SSimDynW2048_100_8b",
+    "MDSFCO_WikiCl2SSimDynW2048_100_8b",
+    # TODO: NEW END
 
     # "MultiCD040SSimDyn1024",
     # "MultiCD040SSimDyn1536", # TODO: Wait to see if finishes (39554644)
@@ -196,7 +215,7 @@ dataset_names = [
     # "llama270b17",
     # "llama270b18",
     # "missing",
-    "missing2",
+    # "missing2",
 
     # SEAHORSE METRIC EVALUATION ON TEST SET
     # "testq1",
@@ -213,18 +232,18 @@ prompt_versions = [100]
 #
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    "seahorse_",
+    # "seahorse_",
     # "RepeatExperimentBugfix_",
 
     # "SummarizationTask_",
     # "SummSample_",
     # "MDSChain_",
     # "MDS_",
-    # "MDSFCO_",
+    "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = [""]  # ["", "8b"]
+precision_values = ["8b"]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents
@@ -365,7 +384,7 @@ inferable_args = {
         "palm2": "08:00",
         "meta-llama/Llama-2-7b-chat-hf": "4:00",
         "meta-llama/Llama-2-13b-chat-hf": "18:00",
-        "meta-llama/Llama-2-70b-chat-hf": "04:00",  # 24
+        "meta-llama/Llama-2-70b-chat-hf": "24:00",  # 24
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "12:00",  # 24
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "30:00",
         "garage-bAInd/Platypus2-70B-instruct": "50:00",
@@ -398,7 +417,7 @@ inferable_args = {
         "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": "rtx_4090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "rtx_3090",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "rtx_3090",
