@@ -1124,16 +1124,16 @@ def postprocess_seahorse_results():
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
     only_process_filenames = [ # if list non-empty -> only process these files
-        "seahorse_missing_100_write_out_info.json",
+        "seahorse_missing2_100_write_out_info.json",
     ]
     exclude_filenames = [
-        "seahorse_base_datasets_100_write_out_info.json",
-        "seahorse_testq1_100_write_out_info.json",
-        "seahorse_testq2_100_write_out_info.json",
-        "seahorse_testq3_100_write_out_info.json",
-        "seahorse_testq4_100_write_out_info.json",
-        "seahorse_testq5_100_write_out_info.json",
-        "seahorse_testq6_100_write_out_info.json",
+        # "seahorse_base_datasets_100_write_out_info.json",
+        # "seahorse_testq1_100_write_out_info.json",
+        # "seahorse_testq2_100_write_out_info.json",
+        # "seahorse_testq3_100_write_out_info.json",
+        # "seahorse_testq4_100_write_out_info.json",
+        # "seahorse_testq5_100_write_out_info.json",
+        # "seahorse_testq6_100_write_out_info.json",
         # DEBUGGING
         # "seahorse_bloomz7b1_100_write_out_info.json",
         # "seahorse_bloomz7b2_100_write_out_info.json",
