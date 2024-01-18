@@ -635,6 +635,9 @@ process_files_llama2_70b_18 = [
 process_files_missing = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSummarizationChain_100_8b_write_out_info.json"
 ]
+process_files_missing_2 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsTrunc3584SUBS_52_8b_write_out_info.json",
+]
 
 """
 Llama-2-7b Notes: 
@@ -685,7 +688,8 @@ process_queue = [
     # ("SEAHORSE_llama2_70b_16", process_files_llama2_70b_16),
     # ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
     # ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
-    ("SEAHORSE_missing", process_files_missing),
+    # ("SEAHORSE_missing", process_files_missing),
+    ("SEAHORSE_missing2", process_files_missing_2),
 ]
 
 worker_lang = "de"

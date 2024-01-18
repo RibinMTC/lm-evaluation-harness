@@ -3613,6 +3613,7 @@ datasetNameMap = {
     "MultiCD040SSimDyn1536": "Multinews",
     "Wikinews": "Wikinews",
     "WikinewsTrunc3584": "Wikinews",
+    "WikinewsTrunc3584SUBS": "Wikinews",
     "WikinewsSummarizationChain": "Wikinews",
     "WikinewsCDS2i0": "Wikinews",
     "WikinewsCDS4i10": "Wikinews",
