@@ -983,6 +983,60 @@ class MDS_CHAIN_Wikinews_ClustDist_Stage2_SDS_Prep(SummarizationFCO_SummChainSta
     VERSION = 0
     DATASET_PATH = "roysc/mds_chain_S2_clustDist_total_2048_leave_512"
 
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_0(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_0_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_1(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_1_total_4096_leave_512"
+
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_2(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_2_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_3(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_3_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_4(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_4_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_5(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_5_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_6(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_6_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_7(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_7_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_8(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_8_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_9(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_9_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_10(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_10_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_11(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_11_total_4096_leave_512"
+
+class MDS_CHAIN_Wikinews_ABLATION_Stage4_it_12(SummarizationFCO_SummChainStage4):
+    VERSION = 0
+    DATASET_PATH = "roysc/mds_chain_ABLATION_it_12_total_4096_leave_512"
+
+
 class MDS_CHAIN_Wikinews_ClustDist_Stage4_it_0(SummarizationFCO_SummChainStage4):
     VERSION = 0
     DATASET_PATH = "roysc/mds_chain_S4_clustDist_it_0_total_2048_leave_512"

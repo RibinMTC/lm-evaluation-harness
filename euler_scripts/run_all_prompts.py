@@ -57,16 +57,15 @@ dataset_names = [
     # "WikiDi091SW1536",
     # "WikiDi092SW1024",
     # "WikiDi092SW1536",
-
+    ## "MDSFCO_WikiCl0S2048_100_8b",
+    "WikiCl1SSimDynW2048",
+    "WikiCl2SSimDynW2048",
     "WikiChN1024",
     "WikiChN1536",
     "WikiChN1S1024",
     "WikiChN1S1536",
     "WikiChN2S1024",
     "WikiChN2S1536",
-    ## "MDSFCO_WikiCl0S2048_100_8b",
-    "MDSFCO_WikiCl1SSimDynW2048_100_8b",
-    "MDSFCO_WikiCl2SSimDynW2048_100_8b",
     # TODO: NEW END
 
     # "MultiCD040SSimDyn1024",

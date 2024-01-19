@@ -145,6 +145,8 @@ def load_results(results_path_base, model_name, return_concat_df=True):
                                         "conciceness_truth_value", "main-ideas_score", "main-ideas_truth_value"]
             seahorse_mds_base = ["attribution", "conciceness", "main-ideas"]
             seahorse_mds_extensions = ["_mds_scores", "_mds_truth_values", "_mds_avg_score", "_mds_avg_truth_value", ]
+            seahorse_list_exts = [f"{base}{extension}" for base in seahorse_mds_base for extension in
+                                            ["_mds_scores", "_mds_truth_values"]]
             include_seahorse_mds_columns = [f"{base}{extension}" for base in seahorse_mds_base for extension in
                                             seahorse_mds_extensions]
             if os.path.exists(os.path.join(seahorse_path, file)):
@@ -169,6 +171,12 @@ def load_results(results_path_base, model_name, return_concat_df=True):
                 for entry in result:
                     for column in include_seahorse_columns:
                         entry[column] = 0.0
+                    for column in include_seahorse_mds_columns:
+                        if column in seahorse_list_exts:
+                            entry[column] = [0.0]
+                        else:
+                            entry[column] = 0.0
+
 
             all_results.append(result)
             model_names.append(model_name)
@@ -451,7 +459,7 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
 
     # apply some basic extension of the already existing data
     out_df["Prompt Name"] = out_df["Prompt ID"].apply(
-        lambda x: prompt_name[f"{x}"] if f"{x}" in prompt_name else "[ERROR]")
+        lambda x: prompt_name_map[f"{x}"] if f"{x}" in prompt_name_map else "[ERROR]")
 
     def mds_custom_prompt_name(row):
         # prompt_name_MDS_override[Task Name][Prompt ID] -> Prompt Name
@@ -569,6 +577,39 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         lambda
             row: f"({row['N-Shot']}-shot) ({remove_token_str(row['Preprocessing Parameters'])}) ({example_source_abbreviation(row['Dataset Annotation'])})",
         axis=1)
+
+    # Specific annotations for the Summarization-Chain analysis
+    # TODO: Extemd to apply to other comparison methods depending on requirements
+    def method_annotation(row):
+        preprocessing_method = row["Preprocessing Method"]
+        preprocessing_params = row["Preprocessing Parameters"]
+        dataset_ann = row["Dataset Annotation"]
+        prompt_id = row["Prompt ID"]
+        task_name = row["Task Name"]
+
+        prompt_name = prompt_name_map[f"{prompt_id}"]
+        if task_name in prompt_name_MDS_override:
+            if prompt_id in prompt_name_MDS_override[task_name]:
+                prompt_name = prompt_name_MDS_override[task_name][f"{prompt_id}"]
+
+        if task_name == "MDS2S": # 2-stage summarization
+            return f"2-Stage ({preprocessing_params})"
+        elif task_name == "MDS":
+            if preprocessing_method == "Summarization Chain": # Summarization-Chain
+                return "Summ.-Chain"
+            elif "truncated" in dataset_ann: # truncated baseline
+                return "Baseline (truncated)"
+            else:
+                return "ERROR!?"
+        elif task_name == "MDSSumm":
+            if "cleaning" in dataset_ann:
+                return "Baseline (cleaned)"
+            else:
+                return f"Baseline ({prompt_name})"
+
+        return preprocessing_method
+
+    out_df["Method"] = out_df.apply(lambda row: method_annotation(row), axis=1)
 
     # NOTE: using "Dataset ID", can re-assign annotations when necessary here
 
@@ -3005,7 +3046,7 @@ def get_metrics_info(df) -> Tuple[List[str], Dict[str, bool]]:
                 "Large Article", "Dataset Annotation (incl. article size)", "Size subset",
                 "Dataset Annotation (Prompt Name)", "Dataset ID",
                 "Preprocessing (N-Shot) (#Tokens)", "Method (N-Shot) (#Tokens)",
-                "Method (N-Shot) (Source)", "Method (#Tokens) (Source)", "(N-Shot) (#Tokens) (Source)"
+                "Method (N-Shot) (Source)", "Method (#Tokens) (Source)", "(N-Shot) (#Tokens) (Source)", "Method",
                 ]
     exclude_metrics = ["Coverage (Prompt)", "Density (Prompt)", "Compression (Prompt)", "Compression (Full)"]
     exclude_seahorse = [f"{base}{extension}" for base in SEAHORSE_Base_Names for extension in
@@ -3088,7 +3129,7 @@ base_experiment_groupByList_variants = [
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "few-shot-experiment-full"
+experiment_name = "few-shot-experiment-distMMR"
 # mds-baseline-german
 # mds-2stage-verus-intermediate
 # mds-2stage-experiment
@@ -3109,66 +3150,6 @@ experiment_name = "few-shot-experiment-full"
 # prompt-experiment-large-all-llama-comparison
 # prompt-experiment-large-all-llama-comparison-good-prompts
 
-# TODO SDS
-# versions-experiment
-# few-shot-initial
-# base-experiment-temperature
-# base-experiment-separator-and-german-only
-# prompt-experiment-large-variants-only-20Minuten
-# prompt-experiment-large-llama2-vs-leolm
-# prompt-experiment-large-all-llama-comparison-good-prompts
-# least-to-most-prompting-stage2
-# TODO MDS
-# mds-summarization-chain
-# mds-2stage-experiment
-# mds-baseline
-# mds-cluster-chunks-experiment
-# mds-cluster-chunks-vs-2stage-experiment
-# mds-ordered-chunks-initial-1sentence
-# mds-ordered-chunks-initial-overview
-# mds-prefix-experiment
-# mds-shuffling-and-annotation-experiment
-# mds-summarization-chain
-# few-shot-experiment-main-1536
-# few-shot-experiment-clustering
-# few-shot-experiment-clustering-WikinewsExamples
-# few-shot-experiment-full-20MinutesExamples
-# few-shot-experiment-full-1024
-# few-shot-experiment-full-1536
-# few-shot-experiment-full-2048
-# few-shot-experiment-full
-# few-shot-experiment-full-WikinewsExamples
-#
-# TODO MAYBE
-# base-experiment
-# prompt-experiment-large
-# prompt-experiment-large-all-llama-comparison
-#
-#
-
-# TODO (OLD)
-# prompt-experiment-large-llama2-vs-leolm
-# base-experiment-shard2
-# base-experiment-shard1
-# experiment-sizes
-# versions-experiment
-# versions-experiment-llama2-gpt4-palm2
-# versions-experiment-llama2-gpt4-palm2-prompts-2-4
-# versions-experiment-gpt4-only
-# empty-experiment
-# prompt-experiment-large-basic
-# prompt-experiment-large-NZZ
-# prompt-experiment-large-output-size
-# prompt-experiment-large-variants-only
-# prompt-experiment-large-vs-llama2-gpt4-palm2
-
-
-# TODO: IMPORTANT
-#  -> recalculate the coverage, density, compression metrics ad-hoc using the original article?
-#  -> use fragment = Fragments(article, prediction, language=self.LANGUAGE)
-#       fragment.coverage()
-#       fragment.density()
-#       fragment.compression()
 
 """
     ADD NEW EXPERIMENTS HERE
@@ -3241,13 +3222,18 @@ experiment_config = {
         "prompts_bag_alias": "mds-baseline",
     },
     "mds-summarization-chain": {
-        "groupByList": ["Prompt ID", "Dataset Annotation"],
+        "groupByList": ["Method", "Size subset"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "groupByListVariants": [
-            ["Prompt Name", "Dataset Annotation"],
-            ["Prompt Desc. [ID]", "Dataset Annotation"],
-            ["Prompt Desc. [ID]", "Prompt Name"],
-            ["Preprocessing + N-Shot", "Prompt Desc. [ID]"],
+        ],
+        "datasets": ["Wikinews"],
+        "prompts_bag_alias": "mds-baseline",
+    },
+    "mds-summarization-chain-comparison": { # TODO: Extend with groupbyvariants depending on what methods we compare to
+        "groupByList": ["Prompt Name", "Size subset"],
+        "models": ["meta-llama/Llama-2-70b-chat-hf"],
+        "groupByListVariants": [
+            # TODO: Include 2-stage, and best methods from few-shot MDS experiment, as well as truncated baseline
         ],
         "datasets": ["Wikinews"],
         "prompts_bag_alias": "mds-baseline",
@@ -4356,7 +4342,7 @@ prompt_description = {  # short description of the prompt to ID it instead of th
     "52": "MDS",
     "100": "Basic",
 }
-prompt_name = {  # short description of the prompt to ID it instead of the prompt ID
+prompt_name_map = {  # short description of the prompt to ID it instead of the prompt ID
     "1": "Basic-1-S, EN",
     "2": "Basic-1-S, DE",
     "40": "Basic-2-S, DE",
@@ -4410,14 +4396,14 @@ prompt_name_MDS_override = {  # map from task-name to prompt-id to prompt-name
         "100": "SDS-1",
     },
     "MDSChain": {
-        "100": "SDS-1",
+        "100": "Chain-Update", #
     },
     "MDS2S": {
         "2": "SDS-2",
         "41": "SDS-4",
     },
     "MDS": {
-        "100": "SDS-1",  # summarization-chain
+        "100": "Chain-Update",  # summarization-chain
         "42": "SDS-3",
     },
 }
@@ -4723,7 +4709,7 @@ def make_report_plots(skip_cost_estimate=False, skip_metric_plots=False, skip_se
 
         # also save as a latex table
         df_prompts["Prompt ID"] = df_prompts["Prompt ID"].apply(
-            lambda x: prompt_name[f"{x}"] if f"{x}" in prompt_name else x)
+            lambda x: prompt_name_map[f"{x}"] if f"{x}" in prompt_name_map else x)
         df_prompts["Prompt"] = df_prompts["Prompt"].apply(lambda x: x.replace("<br>", " \\newline "))
         df_prompts.to_latex(os.path.join(experiment_path, "prompts_overview.tex"), index=False,
                             column_format='p|p{0.8\\textwidth}')
