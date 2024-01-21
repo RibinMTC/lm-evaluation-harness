@@ -638,6 +638,43 @@ process_files_missing = [
 process_files_missing_2 = [
     "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsTrunc3584SUBS_52_8b_write_out_info.json",
 ]
+process_files_missing_3 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi090S1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi092SW1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi092SW1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi091SW1536_100_8b_write_out_info.json",
+]
+process_files_missing_4 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl2SSimDynW2048_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiCl1SSimDynW2048_100_8b_write_out_info.json",
+]
+process_files_missing_5 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi091SW1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi090S1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDS_WikinewsSummarizationChainAblation_100_8b_write_out_info.json",
+]
+process_files_missing_6 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN2S1024_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN2S1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN1S1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiChN1S1024_100_8b_write_out_info.json",
+]
+process_files_missing_7 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi9_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi8_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi7_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi6_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi5_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi4_100_8b_write_out_info.json",
+]
+process_files_missing_8 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi3_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi2_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi1_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi0_100_8b_write_out_info.json",
+]
 
 """
 Llama-2-7b Notes: 
@@ -689,7 +726,13 @@ process_queue = [
     # ("SEAHORSE_llama2_70b_17", process_files_llama2_70b_17),
     # ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
     # ("SEAHORSE_missing", process_files_missing),
-    ("SEAHORSE_missing2", process_files_missing_2),
+    # ("SEAHORSE_missing2", process_files_missing_2),
+    ("SEAHORSE_missing3", process_files_missing_3),
+    ("SEAHORSE_missing4", process_files_missing_4),
+    ("SEAHORSE_missing5", process_files_missing_5),
+    # ("SEAHORSE_missing6", process_files_missing_6), # WAITING FOR RESULTS
+    # ("SEAHORSE_missing7", process_files_missing_7), # Chain-Ablation
+    # ("SEAHORSE_missing8", process_files_missing_8), # Chain-Ablation
 ]
 
 worker_lang = "de"
@@ -1123,7 +1166,7 @@ def postprocess_seahorse_results():
         "conciceness": "../results/mtc-NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
-    only_process_filenames = [ # if list non-empty -> only process these files
+    only_process_filenames = [  # if list non-empty -> only process these files
         "seahorse_missing2_100_write_out_info.json",
     ]
     exclude_filenames = [
@@ -1168,7 +1211,6 @@ def postprocess_seahorse_results():
 
         if len(only_process_filenames) > 0:
             filenames[key] = [f for f in filenames[key] if f in only_process_filenames]
-
 
     # process the files
     seahorse_keys = list(seahorse_paths.keys())

@@ -146,7 +146,7 @@ def load_results(results_path_base, model_name, return_concat_df=True):
             seahorse_mds_base = ["attribution", "conciceness", "main-ideas"]
             seahorse_mds_extensions = ["_mds_scores", "_mds_truth_values", "_mds_avg_score", "_mds_avg_truth_value", ]
             seahorse_list_exts = [f"{base}{extension}" for base in seahorse_mds_base for extension in
-                                            ["_mds_scores", "_mds_truth_values"]]
+                                  ["_mds_scores", "_mds_truth_values"]]
             include_seahorse_mds_columns = [f"{base}{extension}" for base in seahorse_mds_base for extension in
                                             seahorse_mds_extensions]
             if os.path.exists(os.path.join(seahorse_path, file)):
@@ -176,7 +176,6 @@ def load_results(results_path_base, model_name, return_concat_df=True):
                             entry[column] = [0.0]
                         else:
                             entry[column] = 0.0
-
 
             all_results.append(result)
             model_names.append(model_name)
@@ -579,7 +578,7 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         axis=1)
 
     # Specific annotations for the Summarization-Chain analysis
-    # TODO: Extemd to apply to other comparison methods depending on requirements
+    # TODO: Extend to apply to other comparison methods depending on requirements
     def method_annotation(row):
         preprocessing_method = row["Preprocessing Method"]
         preprocessing_params = row["Preprocessing Parameters"]
@@ -592,12 +591,14 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
             if prompt_id in prompt_name_MDS_override[task_name]:
                 prompt_name = prompt_name_MDS_override[task_name][f"{prompt_id}"]
 
-        if task_name == "MDS2S": # 2-stage summarization
+        if task_name == "MDS2S":  # 2-stage summarization
             return f"2-Stage ({preprocessing_params})"
         elif task_name == "MDS":
-            if preprocessing_method == "Summarization Chain": # Summarization-Chain
+            if preprocessing_method == "Summarization Chain":  # Summarization-Chain
                 return "Summ.-Chain"
-            elif "truncated" in dataset_ann: # truncated baseline
+            elif preprocessing_method == "Summarization Chain (Ablation)":  # Summarization-Chain (Ablation)
+                return "Summ.-Chain Ablation"
+            elif "truncated" in dataset_ann:  # truncated baseline
                 return "Baseline (truncated)"
             else:
                 return "ERROR!?"
@@ -3197,7 +3198,7 @@ experiment_config = {
     "few-shot-experiment-distMMR-20MinutesExamples": fewshot_experiment__experimental_setup,
     "few-shot-experiment-distMMR-WikinewsExamples": fewshot_experiment__experimental_setup,
     "few-shot-experiment-COMPARISONS": fewshot_experiment__experimental_setup,
-    "few-shot-experiment-SELECTION": {}, # TODO
+    "few-shot-experiment-SELECTION": {},  # TODO
     "few-shot-experiment-main-1024": fewshot_experiment__experimental_setup,
     "few-shot-experiment-main-1536": fewshot_experiment__experimental_setup,
     "few-shot-experiment-main": fewshot_experiment__experimental_setup,
@@ -3229,7 +3230,7 @@ experiment_config = {
         "datasets": ["Wikinews"],
         "prompts_bag_alias": "mds-baseline",
     },
-    "mds-summarization-chain-comparison": { # TODO: Extend with groupbyvariants depending on what methods we compare to
+    "mds-summarization-chain-comparison": {  # TODO: Extend with groupbyvariants depending on what methods we compare to
         "groupByList": ["Prompt Name", "Size subset"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],
         "groupByListVariants": [
@@ -3645,6 +3646,7 @@ datasetNameMap = {
     "WikinewsTrunc3584": "Wikinews",
     "WikinewsTrunc3584SUBS": "Wikinews",
     "WikinewsSummarizationChain": "Wikinews",
+    "WikinewsSummarizationChainAblation": "Wikinews",
     "WikinewsCDS2i0": "Wikinews",
     "WikinewsCDS4i10": "Wikinews",
     "WikinewsCDS4i11": "Wikinews",
@@ -3769,6 +3771,20 @@ datasetNameMap = {
     "WikiCD063SSimDyn1536": "Wikinews",
     "WikiCl1SSimDyn1536": "Wikinews",
     "WikiCl2SSimDyn1536": "Wikinews",
+    "WikiChN1024": "Wikinews",
+    "WikiChN1536": "Wikinews",
+    "WikiChN1S1024": "Wikinews",
+    "WikiChN1S1536": "Wikinews",
+    "WikiChN2S1024": "Wikinews",
+    "WikiChN2S1536": "Wikinews",
+    "WikiCl1SSimDynW2048": "Wikinews",
+    "WikiCl2SSimDynW2048": "Wikinews",
+    "WikiDi090S1024": "Wikinews",
+    "WikiDi090S1536": "Wikinews",
+    "WikiDi091SW1024": "Wikinews",
+    "WikiDi091SW1536": "Wikinews",
+    "WikiDi092SW1024": "Wikinews",
+    "WikiDi092SW1536": "Wikinews",
 }
 datasetAnnotationMap = {
     "20Minuten": "20Minuten, 250 samples",
@@ -3790,6 +3806,7 @@ datasetAnnotationMap = {
     "WikinewsClean": "manual cleaning,\nfull artices,\noriginal order",
     "WikinewsTrunc3584": "manual cleaning,\ntruncated to 3584 tokens,\noriginal order",
     "WikinewsSummarizationChain": "Summarization Chain",
+    "WikinewsSummarizationChainAblation": "Summarization Chain (Ablation)",
     "WikinewsSimple": "no annotation,\noriginal order",
     "WikinewsSimpleS": "no annotation,\nrandom order",
     "WikinewsSimpleA": "article idx ann.,\noriginal order",
@@ -3854,12 +3871,6 @@ datasetAnnotationMap = {
     "WikiDi1SW1024": "Ex.Src: Wikinews",
     "WikiDi1SW1536": "Ex.Src: Wikinews",
     "WikiDi2SW1024": "Ex.Src: Wikinews",
-    "WikiDi090S1024": "Ex.Src: Wikinews",
-    "WikiDi090S1536": "Ex.Src: Wikinews",
-    "WikiDi091SW1024": "Ex.Src: Wikinews",
-    "WikiDi091SW1536": "Ex.Src: Wikinews",
-    "WikiDi092SW1024": "Ex.Src: Wikinews",
-    "WikiDi092SW1536": "Ex.Src: Wikinews",
     "WikiLe1S21024": "Ex.Src: 20Minuten",
     "WikiLe1S21536": "Ex.Src: 20Minuten",
     "WikiRa1S21024": "Ex.Src: 20Minuten",
@@ -3884,6 +3895,20 @@ datasetAnnotationMap = {
     "WikiCD063SSimDyn1536": "Ex.Src: Wikinews",
     "WikiCl1SSimDyn1536": "Ex.Src: Wikinews",
     "WikiCl2SSimDyn1536": "Ex.Src: Wikinews",
+    "WikiChN1024": "-",
+    "WikiChN1536": "-",
+    "WikiChN1S1024": "Ex.Src: Wikinews",
+    "WikiChN1S1536": "Ex.Src: Wikinews",
+    "WikiChN2S1024": "Ex.Src: Wikinews",
+    "WikiChN2S1536": "Ex.Src: Wikinews",
+    "WikiCl1SSimDynW2048": "Ex.Src: Wikinews",
+    "WikiCl2SSimDynW2048": "Ex.Src: Wikinews",
+    "WikiDi090S1024": "-",
+    "WikiDi090S1536": "-",
+    "WikiDi091SW1024": "Ex.Src: Wikinews",
+    "WikiDi091SW1536": "Ex.Src: Wikinews",
+    "WikiDi092SW1024": "Ex.Src: Wikinews",
+    "WikiDi092SW1536": "Ex.Src: Wikinews",
 }
 
 
@@ -3897,6 +3922,7 @@ def example_source_abbreviation(example_source) -> str:
         return abbreviations[example_source]
     return example_source
 
+
 preprocessing_method = {
     "20Minuten": "-",
     "MultinewsTrunc3584": "-",
@@ -3906,6 +3932,7 @@ preprocessing_method = {
     "WikinewsTrunc3584": "manual cleaning",
     "WikinewsClean": "manual cleaning",
     "WikinewsSummarizationChain": "Summarization Chain",
+    "WikinewsSummarizationChainAblation": "Summarization Chain (Ablation)",
     "WikinewsSimple": "-",
     "WikinewsSimpleS": "-",
     "WikinewsSimpleA": "article idx ann.",
@@ -3970,12 +3997,6 @@ preprocessing_method = {
     "WikiDi1SW1024": "Distance-MMR (0.75)",
     "WikiDi1SW1536": "Distance-MMR (0.75)",
     "WikiDi2SW1024": "Distance-MMR (0.75)",
-    "WikiDi090S1024": "Distance-MMR (0.9)",
-    "WikiDi090S1536": "Distance-MMR (0.9)",
-    "WikiDi091SW1024": "Distance-MMR (0.9)",
-    "WikiDi091SW1536": "Distance-MMR (0.9)",
-    "WikiDi092SW1024": "Distance-MMR (0.9)",
-    "WikiDi092SW1536": "Distance-MMR (0.9)",
     "WikiLe1S21024": "Lead",
     "WikiLe1S21536": "Lead",
     "WikiRa1S21024": "Random",
@@ -4000,6 +4021,20 @@ preprocessing_method = {
     "WikiCD063SSimDyn1536": "ClustDist 0.6 (SimDyn)",
     "WikiCl1SSimDyn1536": "Clustering (SimDyn)",
     "WikiCl2SSimDyn1536": "Clustering (SimDyn)",
+    "WikiChN1024": "Cheat",
+    "WikiChN1536": "Cheat",
+    "WikiChN1S1024": "Cheat",
+    "WikiChN1S1536": "Cheat",
+    "WikiChN2S1024": "Cheat",
+    "WikiChN2S1536": "Cheat",
+    "WikiCl1SSimDynW2048": "Clustering (SimDyn)",
+    "WikiCl2SSimDynW2048": "Clustering (SimDyn)",
+    "WikiDi090S1024": "Distance-MMR (0.9)",
+    "WikiDi090S1536": "Distance-MMR (0.9)",
+    "WikiDi091SW1024": "Distance-MMR (0.9)",
+    "WikiDi091SW1536": "Distance-MMR (0.9)",
+    "WikiDi092SW1024": "Distance-MMR (0.9)",
+    "WikiDi092SW1536": "Distance-MMR (0.9)",
 }
 
 
@@ -4029,6 +4064,7 @@ preprocessing_order = {
     "MultiCD040SSimDyn1536": "original",
     "Wikinews": "original",
     "WikinewsSummarizationChain": "original",
+    "WikinewsSummarizationChainAblation": "original",
     "WikinewsTrunc3584": "original",
     "WikinewsClean": "original",
     "WikinewsSimple": "original",
@@ -4095,12 +4131,6 @@ preprocessing_order = {
     "WikiDi1SW1024": "original",
     "WikiDi1SW1536": "original",
     "WikiDi2SW1024": "original",
-    "WikiDi090S1024": "original",
-    "WikiDi090S1536": "original",
-    "WikiDi091SW1024": "original",
-    "WikiDi091SW1536": "original",
-    "WikiDi092SW1024": "original",
-    "WikiDi092SW1536": "original",
     "WikiLe1S21024": "original",
     "WikiLe1S21536": "original",
     "WikiRa1S21024": "original",
@@ -4125,10 +4155,25 @@ preprocessing_order = {
     "WikiCD063SSimDyn1536": "original",
     "WikiCl1SSimDyn1536": "original",
     "WikiCl2SSimDyn1536": "original",
+    "WikiChN1024": "original",
+    "WikiChN1536": "original",
+    "WikiChN1S1024": "original",
+    "WikiChN1S1536": "original",
+    "WikiChN2S1024": "original",
+    "WikiChN2S1536": "original",
+    "WikiCl1SSimDynW2048": "original",
+    "WikiCl2SSimDynW2048": "original",
+    "WikiDi090S1024": "original",
+    "WikiDi090S1536": "original",
+    "WikiDi091SW1024": "original",
+    "WikiDi091SW1536": "original",
+    "WikiDi092SW1024": "original",
+    "WikiDi092SW1536": "original",
 }
 dataset_n_fewshot_annotation_map = {
     "MultinewsTrunc3584": "0",
     "WikinewsSummarizationChain": "1",
+    "WikinewsSummarizationChainAblation": "0",
     "MultiCD040SSimDyn1024": "0",
     "MultiCD040SSimDyn1536": "0",
     "WikiCh1024": "0",
@@ -4159,12 +4204,6 @@ dataset_n_fewshot_annotation_map = {
     "WikiDi1SW1024": "1",
     "WikiDi1SW1536": "1",
     "WikiDi2SW1024": "2",
-    "WikiDi090S1024": "0",
-    "WikiDi090S1536": "0",
-    "WikiDi091SW1024": "1",
-    "WikiDi091SW1536": "1",
-    "WikiDi092SW1024": "2",
-    "WikiDi092SW1536": "2",
     "WikiLe1S21024": "1",
     "WikiLe1S21536": "1",
     "WikiRa1S21024": "1",
@@ -4189,6 +4228,20 @@ dataset_n_fewshot_annotation_map = {
     "WikiCD063SSimDyn1536": "3",
     "WikiCl1SSimDyn1536": "1",
     "WikiCl2SSimDyn1536": "2",
+    "WikiChN1024": "0",
+    "WikiChN1536": "0",
+    "WikiChN1S1024": "1",
+    "WikiChN1S1536": "1",
+    "WikiChN2S1024": "2",
+    "WikiChN2S1536": "2",
+    "WikiCl1SSimDynW2048": "1",
+    "WikiCl2SSimDynW2048": "2",
+    "WikiDi090S1024": "0",
+    "WikiDi090S1536": "0",
+    "WikiDi091SW1024": "1",
+    "WikiDi091SW1536": "1",
+    "WikiDi092SW1024": "2",
+    "WikiDi092SW1536": "2",
 }
 preprocessing_parameters = {
     "20Minuten": "-",
@@ -4198,6 +4251,7 @@ preprocessing_parameters = {
     "Wikinews": "-",
     "WikinewsTrunc3584": "-",
     "WikinewsSummarizationChain": "-",
+    "WikinewsSummarizationChainAblation": "-",
     "WikinewsClean": "-",
     "WikinewsSimple": "-",
     "WikinewsSimpleS": "-",
@@ -4263,12 +4317,6 @@ preprocessing_parameters = {
     "WikiDi1SW1024": "1024 Tokens",
     "WikiDi1SW1536": "1536 Tokens",
     "WikiDi2SW1024": "1024 Tokens",
-    "WikiDi090S1024": "1024 Tokens",
-    "WikiDi090S1536": "1536 Tokens",
-    "WikiDi091SW1024": "1024 Tokens",
-    "WikiDi091SW1536": "1536 Tokens",
-    "WikiDi092SW1024": "1024 Tokens",
-    "WikiDi092SW1536": "1536 Tokens",
     "WikiLe1S21024": "1024 Tokens",
     "WikiLe1S21536": "1536 Tokens",
     "WikiRa1S21024": "1024 Tokens",
@@ -4293,6 +4341,20 @@ preprocessing_parameters = {
     "WikiCD063SSimDyn1536": "1536 Tokens",
     "WikiCl1SSimDyn1536": "1536 Tokens",
     "WikiCl2SSimDyn1536": "1536 Tokens",
+    "WikiChN1024": "1024 Tokens",
+    "WikiChN1536": "1536 Tokens",
+    "WikiChN1S1024": "1024 Tokens",
+    "WikiChN1S1536": "1536 Tokens",
+    "WikiChN2S1024": "1024 Tokens",
+    "WikiChN2S1536": "1536 Tokens",
+    "WikiCl1SSimDynW2048": "2048 Tokens",
+    "WikiCl2SSimDynW2048": "2048 Tokens",
+    "WikiDi090S1024": "1024 Tokens",
+    "WikiDi090S1536": "1536 Tokens",
+    "WikiDi091SW1024": "1024 Tokens",
+    "WikiDi091SW1536": "1536 Tokens",
+    "WikiDi092SW1024": "1024 Tokens",
+    "WikiDi092SW1536": "1536 Tokens",
 }
 prompt_description = {  # short description of the prompt to ID it instead of the prompt ID
     "1": "Basic",
@@ -4396,7 +4458,7 @@ prompt_name_MDS_override = {  # map from task-name to prompt-id to prompt-name
         "100": "SDS-1",
     },
     "MDSChain": {
-        "100": "Chain-Update", #
+        "100": "Chain-Update",  # summarization-chain-intermediate
     },
     "MDS2S": {
         "2": "SDS-2",

@@ -28,6 +28,7 @@ lm_cache
 /configs/prompt_templates/MDS2S*.json
 /configs/prompt_templates/MDSFCO_*.json
 /configs/prompt_templates/MDSChain_*.json
+/configs/prompt_templates/MDSChainAbl_*.json
 /configs/prompt_templates/SummNonEmpty_*.json
 /configs/prompt_templates/SummEmpty_*.json
 /configs/prompt_templates/seahorse_*.json

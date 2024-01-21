@@ -43,7 +43,7 @@ models = [
 ]
 
 # TODO: CHANGE PARAMETERS + NAME
-experiment_name = "distance-mmr-09-" + ''.join(
+experiment_name = "summchain-ablation-" + ''.join(
     random.choice(string.ascii_lowercase) for i in range(5))
 dataset_names = [
     # "WikinewsTrunc3584SUBS",
@@ -58,14 +58,28 @@ dataset_names = [
     # "WikiDi092SW1024",
     # "WikiDi092SW1536",
     ## "MDSFCO_WikiCl0S2048_100_8b",
-    "WikiCl1SSimDynW2048",
-    "WikiCl2SSimDynW2048",
-    "WikiChN1024",
-    "WikiChN1536",
-    "WikiChN1S1024",
-    "WikiChN1S1536",
-    "WikiChN2S1024",
-    "WikiChN2S1536",
+    # "WikiCl1SSimDynW2048",
+    # "WikiCl2SSimDynW2048",
+    # "WikiChN1024",
+    # "WikiChN1536",
+    # "WikiChN1S1024",
+    # "WikiChN1S1536",
+    # "WikiChN2S1024",
+    # "WikiChN2S1536",
+
+    # "Wikinewsi0",
+    # "Wikinewsi1",
+    # "Wikinewsi2",
+    # "Wikinewsi3",
+    # "Wikinewsi4",
+    # "Wikinewsi5",
+    # "Wikinewsi6",
+    # "Wikinewsi7",
+    # "Wikinewsi8",
+    # "Wikinewsi9", # CURRENTLY RUNNING
+    # "Wikinewsi10",
+    # "Wikinewsi11",
+    # "Wikinewsi12",
     # TODO: NEW END
 
     # "MultiCD040SSimDyn1024",
@@ -215,6 +229,12 @@ dataset_names = [
     # "llama270b18",
     # "missing",
     # "missing2",
+    "missing3",
+    "missing4",
+    "missing5",
+    # "missing6", # WAITING ON RESULTS
+    "missing7",
+    "missing8",
 
     # SEAHORSE METRIC EVALUATION ON TEST SET
     # "testq1",
@@ -231,18 +251,19 @@ prompt_versions = [100]
 #
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    # "seahorse_",
+    "seahorse_",
     # "RepeatExperimentBugfix_",
 
     # "SummarizationTask_",
     # "SummSample_",
     # "MDSChain_",
+    # "MDSChainAbl_",
     # "MDS_",
-    "MDSFCO_",
+    # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents

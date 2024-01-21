@@ -858,7 +858,12 @@ TASK_REGISTRY = {
     "seahorse_llama270b18_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_llama2_70b_18,
     "seahorse_missing_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing,
     "seahorse_missing2_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing2,
-    "seahorse_missing3_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing2,
+    "seahorse_missing3_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing3,
+    "seahorse_missing4_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing4,
+    "seahorse_missing5_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing5,
+    "seahorse_missing6_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing6,
+    "seahorse_missing7_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing7,
+    "seahorse_missing8_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing8,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
