@@ -323,6 +323,8 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
+    min_text_length = 50
+    max_text_length = 180
 
     def training_docs(self):
         if self.has_training_docs():
@@ -332,7 +334,8 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
                 train_df["num_words_article"] = train_df[self.article_key_name].str.len() + train_df[
                     self.sentence_key_name].str.len()
                 filtered_train_df = train_df[
-                    (train_df["num_words_article"] > 50) & (train_df["num_words_article"] < 200)]
+                    (train_df["num_words_article"] > self.min_text_length) & (
+                                train_df["num_words_article"] < self.max_text_length)]
                 faithful_samples_df = filtered_train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[0]].head(100)
                 intrinsic_samples_df = filtered_train_df.loc[
