@@ -72,7 +72,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         if self.has_training_docs():
             if self._training_docs is None:
                 train_df = self.dataset["train"].to_pandas()
-                train_df["num_words_article"] = train_df["lead_with_article"].str.len()
+                train_df["num_words_article"] = train_df[self.article_key_name].str.len()
                 sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
                 faithful_samples_df = sorted_train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[0]].head(100)
