@@ -324,7 +324,7 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
     sentence_key_name = "hypothesis"
     label_key_name = "label"
     min_text_length = 50
-    max_text_length = 180
+    max_text_length = 150
 
     def training_docs(self):
         if self.has_training_docs():
