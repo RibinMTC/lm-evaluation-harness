@@ -104,7 +104,7 @@ ssh euler ARG1=\"$1\" \
 
     # Activate environment
     echo "### Activating environment..."
-    source /cluster/home/roysc/scratch/env/bin/activate
+    source /cluster/home/roysc/roysc/lm-evaluation-harness/env/bin/activate
     #    source env/bin/activate
     echo ""
 

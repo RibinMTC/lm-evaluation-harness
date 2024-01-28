@@ -17,7 +17,7 @@ models = [
     # "tiiuae/falcon-7b-instruct",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
@@ -25,9 +25,9 @@ models = [
     # "LeoLM/leo-hessianai-13b",
     # "LeoLM/leo-hessianai-7b-chat",
     # "LeoLM/leo-hessianai-13b-chat",
-    # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
-    # "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
-    # "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
     # "google/seahorse-large-q1",
     # "google/seahorse-large-q2",
     # "google/seahorse-large-q3",
@@ -229,12 +229,14 @@ dataset_names = [
     # "llama270b18",
     # "missing",
     # "missing2",
-    "missing3",
-    "missing4",
-    "missing5",
+    # "missing3",
+    # "missing4",
+    # "missing5",
     # "missing6", # WAITING ON RESULTS
-    "missing7",
+    # "missing7",
     "missing8",
+
+    # "20Minuten",
 
     # SEAHORSE METRIC EVALUATION ON TEST SET
     # "testq1",
@@ -244,7 +246,7 @@ dataset_names = [
     # "testq5",
     # "testq6",
 ]  # ["20Minuten", "Wikinews"], ["20min0", "20min1", "20min2", "20min3"]
-prompt_versions = [100]
+prompt_versions = [100] # 22, 23, 25, 40, 41, 42
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 # 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 # 22,23,40,41,42,43,44,45,46,47,48,49,
@@ -445,8 +447,8 @@ inferable_args = {
         "LeoLM/leo-hessianai-13b": "rtx_3090",
         "LeoLM/leo-hessianai-7b-chat": "rtx_3090",
         "LeoLM/leo-hessianai-13b-chat": "rtx_3090",
-        "bigscience/bloomz-7b1-mt": "rtx_3090",
-        "tiiuae/falcon-7b-instruct": "rtx_3090",
+        "bigscience/bloomz-7b1-mt": "rtx_4090",
+        "tiiuae/falcon-7b-instruct": "rtx_4090",
         "tiiuae/falcon-40b-instruct": "a100-pcie-40gb",
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": "rtx_4090",
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": "rtx_4090",
@@ -479,7 +481,7 @@ inferable_args = {
         "LeoLM/leo-hessianai-7b-chat": 1,
         "LeoLM/leo-hessianai-13b-chat": 3,
         "bigscience/bloomz-7b1-mt": 2,
-        "tiiuae/falcon-7b-instruct": 2,
+        "tiiuae/falcon-7b-instruct": 1,
         "tiiuae/falcon-40b-instruct": 4,
         "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged": 1,
         "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged": 1,

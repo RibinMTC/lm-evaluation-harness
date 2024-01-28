@@ -442,3 +442,15 @@ class AutomaticSeahorseClassificationTask_SEAHORSE_missing8(AutomaticSeahorseCla
     VERSION = 0
     DATASET_PATH = "roysc/SEAHORSE_missing8"
     load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing9(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing9"
+    load_lcl = False
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing10(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing10"
+    load_lcl = False

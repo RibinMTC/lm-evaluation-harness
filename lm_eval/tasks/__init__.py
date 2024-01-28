@@ -864,6 +864,8 @@ TASK_REGISTRY = {
     "seahorse_missing6_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing6,
     "seahorse_missing7_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing7,
     "seahorse_missing8_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing8,
+    "seahorse_missing9_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing9,
+    "seahorse_missing10_100": seahorse_classification_automatic.AutomaticSeahorseClassificationTask_SEAHORSE_missing10,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

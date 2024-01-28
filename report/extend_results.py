@@ -668,12 +668,48 @@ process_files_missing_7 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi6_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi5_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi4_100_8b_write_out_info.json",
-]
-process_files_missing_8 = [
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi3_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi2_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi1_100_8b_write_out_info.json",
     "meta-llama-Llama-2-70b-chat-hf/MDSChainAbl_Wikinewsi0_100_8b_write_out_info.json",
+]
+process_files_missing_8 = [
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_1_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_2_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_5_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_22_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_23_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_25_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_40_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_41_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_42_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_43_write_out_info.json",
+]
+process_files_missing_9 = [
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_44_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_45_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_46_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_47_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_48_write_out_info.json",
+    "tiiuae-falcon-7b-instruct/SummarizationTask_20Minuten_49_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_1_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_2_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_5_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_22_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_23_write_out_info.json",
+]
+process_files_missing_10 = [
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_25_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_40_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_41_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_42_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_43_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_44_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_45_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_46_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_47_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_48_write_out_info.json",
+    "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_49_write_out_info.json",
 ]
 
 """
@@ -727,12 +763,14 @@ process_queue = [
     # ("SEAHORSE_llama2_70b_18", process_files_llama2_70b_18),
     # ("SEAHORSE_missing", process_files_missing),
     # ("SEAHORSE_missing2", process_files_missing_2),
-    ("SEAHORSE_missing3", process_files_missing_3),
-    ("SEAHORSE_missing4", process_files_missing_4),
-    ("SEAHORSE_missing5", process_files_missing_5),
-    # ("SEAHORSE_missing6", process_files_missing_6), # WAITING FOR RESULTS
+    # ("SEAHORSE_missing3", process_files_missing_3),
+    # ("SEAHORSE_missing4", process_files_missing_4),
+    # ("SEAHORSE_missing5", process_files_missing_5),
+    # ("SEAHORSE_missing6", process_files_missing_6),  # WAITING FOR RESULTS
     # ("SEAHORSE_missing7", process_files_missing_7), # Chain-Ablation
-    # ("SEAHORSE_missing8", process_files_missing_8), # Chain-Ablation
+    ("SEAHORSE_missing8", process_files_missing_8), # Redo-of bloomz and falcon german prompts
+    ("SEAHORSE_missing9", process_files_missing_9), # Redo-of bloomz and falcon german prompts
+    ("SEAHORSE_missing10", process_files_missing_10), # Redo-of bloomz and falcon german prompts
 ]
 
 worker_lang = "de"
@@ -1167,7 +1205,10 @@ def postprocess_seahorse_results():
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
     only_process_filenames = [  # if list non-empty -> only process these files
-        "seahorse_missing2_100_write_out_info.json",
+        "seahorse_missing3_100_write_out_info.json",
+        "seahorse_missing4_100_write_out_info.json",
+        "seahorse_missing5_100_write_out_info.json",
+        "seahorse_missing6_100_write_out_info.json",
     ]
     exclude_filenames = [
         # "seahorse_base_datasets_100_write_out_info.json",
