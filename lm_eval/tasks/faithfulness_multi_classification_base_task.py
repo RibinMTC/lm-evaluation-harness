@@ -131,7 +131,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         return full_prompt
 
     def format_prompt_target(self, doc):
-        return doc[self.label_key_name]
+        return " " + doc[self.label_key_name]
 
     @staticmethod
     def cantor_pairing(doc_id, article_id):
