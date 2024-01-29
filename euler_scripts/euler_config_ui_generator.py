@@ -1,8 +1,6 @@
 
 import tkinter as tk
 from tkinter import ttk, messagebox
-from typing import List
-from subprocess import call
 from euler_config_generation_utils import *
 
 
@@ -31,11 +29,19 @@ class EulerConfigAndRunUIManager:
                                                     box_values=self.config_ui_values.model_name_values)
         self.model_listbox.bind('<<ListboxSelect>>', self.update_prompt_version_listbox)
 
+        # Max Length values
+        self.max_lengths_listbox = self.generate_list_box(label_text="Max Context Length:", select_mode=tk.SINGLE,
+                                                          box_width=default_width,
+                                                          box_height=default_height,
+                                                          box_values=self.config_ui_values.max_context_length_values,
+                                                          )
+
         # Fewshot label and multi-select Listbox
         self.fewshot_listbox = self.generate_list_box(label_text="Fewshots:", select_mode=tk.MULTIPLE,
                                                       box_width=default_width,
                                                       box_height=default_height,
                                                       box_values=self.config_ui_values.few_shot_values)
+
 
         # Seed label and multi-select Listbox
         self.fewshot_strategies_listbox = self.generate_list_box(label_text="Fewshot strategies:",
@@ -70,10 +76,10 @@ class EulerConfigAndRunUIManager:
         self.create_config_files_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
         self.current_ui_row += 1
 
-        self.run_euler_jobs_button = ttk.Button(self.root, text="Run euler jobs",
-                                                command=self.execute_run_euler_jobs_script)
-        self.run_euler_jobs_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
-        self.current_ui_row += 1
+        # self.run_euler_jobs_button = ttk.Button(self.root, text="Run euler jobs",
+        #                                         command=self.execute_run_euler_jobs_script)
+        # self.run_euler_jobs_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
+        # self.current_ui_row += 1
 
         # Output label to show the script execution result
         self.output_label = ttk.Label(self.root, text="")
@@ -91,7 +97,8 @@ class EulerConfigAndRunUIManager:
                                        config_values["few_shot_values"]["upper_range"])),
             tasks_with_prompt_templates=config_values["tasks_with_prompt_templates"],
             seeds=config_values["seeds"],
-            few_shot_sampling_strategies=config_values["few_shot_sampling_strategies"]
+            few_shot_sampling_strategies=config_values["few_shot_sampling_strategies"],
+            max_context_length_values=config_values["max_context_length_values"]
         )
 
         return ui_config_values
@@ -161,6 +168,11 @@ class EulerConfigAndRunUIManager:
             TaskConfig(task_name=selected_task, prompt_template=selected_prompt_template, prompt_version=prompt_version)
             for prompt_version in selected_prompt_version_names]
 
+        max_context_length_selection = self.max_lengths_listbox.curselection()
+        max_context_length = None
+        if max_context_length_selection:
+            max_context_length = int(self.max_lengths_listbox.get(max_context_length_selection[0]))
+
         if len(model_names) == 0 or len(fewshots) == 0 or len(seeds) == 0 or len(
                 few_shot_sampling_strategies) == 0 or len(selected_prompt_version_names) == 0:
             messagebox.showwarning("Warning", "Please select at least one value from each of the boxes!")
@@ -175,36 +187,13 @@ class EulerConfigAndRunUIManager:
             seeds=seeds,
             few_shot_sampling_strategies=few_shot_sampling_strategies,
             load_in_8bit=self.load_in_8bit_checkbox_value.get(),
-            use_flash_attention_2=self.use_flash_attention_2_checkbox_value.get())
+            use_flash_attention_2=self.use_flash_attention_2_checkbox_value.get(),
+            max_context_length=max_context_length)
 
         save_config_files(selected_ui_config_values=selected_ui_config_values)
 
         # Provide feedback
         self.output_label.config(text="Script executed successfully!")
-
-    def execute_run_euler_jobs_script(self):
-        # Fetch selected values
-        model_names = [self.model_listbox.get(i) for i in self.model_listbox.curselection()]
-        fewshots = [str(self.fewshot_listbox.get(i)) for i in self.fewshot_listbox.curselection()]
-        seeds = [str(self.seed_listbox.get(i)) for i in self.seed_listbox.curselection()]
-        few_shot_sampling_strategies = [self.fewshot_strategies_listbox.get(i) for i in
-                                        self.fewshot_strategies_listbox.curselection()]
-        selected_task = [self.tasks_listbox.get(i) for i in
-                         self.tasks_listbox.curselection()][0]
-
-        if len(model_names) == 0 or len(fewshots) == 0 or len(seeds) == 0 or len(few_shot_sampling_strategies) == 0:
-            messagebox.showwarning("Warning", "Please select at least one value from each of the boxes!")
-            return
-        # Convert lists to space-separated strings
-        models_str = " ".join(model_names)
-        num_shots_str = " ".join(fewshots)
-        strategies_str = " ".join(few_shot_sampling_strategies)
-        seeds_str = " ".join(seeds)
-        base_config_dir = self.config_ui_values.base_config_dir
-
-        # Call the bash script with the values as arguments
-        call(['euler_scripts/euler_run_scheduler.sh', models_str, num_shots_str, strategies_str, seeds_str,
-              selected_task, base_config_dir])
 
     def on_closing(self):
         # Any other cleanup tasks you might want to do can be added here
@@ -212,8 +201,8 @@ class EulerConfigAndRunUIManager:
 
 
 def main():
-    # config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
-    config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
+    config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
+    #config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
     EulerConfigAndRunUIManager(config_values_file=config_values_file)
 
 

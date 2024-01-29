@@ -1,7 +1,7 @@
 import json
 import os
 from dataclasses import dataclass, asdict
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import yaml
 
@@ -17,10 +17,16 @@ MODEL_NAME_TO_TYPE_MAP = {
     "LeoLM/leo": "hf-causal-experimental",
     "mtc/LeoLM": "hf-causal-experimental",
     "ehartford/dolphin": "hf-causal-experimental",
+    "microsoft/Orca": "hf-causal-experimental",
     "mtc/ehartford-dolphin": "hf-causal-experimental",
     "meta-llama": "hf-causal-experimental",
-    "mistralai/Mistral-7B-Instruct-v0.1": "hf-causal-experimental",
-    "lmsys/vicuna-13b-v1.5-16k": "hf-causal-experimental"
+    "mistralai": "hf-causal-experimental",
+    "lmsys/vicuna-13b-v1.5-16k": "hf-causal-experimental",
+    "lmsys/vicuna-7b-v1.5-16k": "hf-causal-experimental",
+    "mtc/microsoft": "hf-causal-experimental",
+    "mtc/mistralai": "hf-causal-experimental",
+    "mtc/upstage": "hf-causal-experimental",
+    "mtc/leo-mistral-absinth-finetuned-3-epochs-GGUF": "ctransformers-casual"
 }
 
 
@@ -32,6 +38,7 @@ class UIConfigValues:
     tasks_with_prompt_templates: Dict[str, str]
     seeds: List[int]
     few_shot_sampling_strategies: List[str]
+    max_context_length_values: List[int]
 
 
 @dataclass
@@ -44,6 +51,7 @@ class SelectedUIConfigValues:
     few_shot_sampling_strategies: List[str]
     load_in_8bit: bool
     use_flash_attention_2: bool
+    max_context_length: Optional[int] = None
 
 
 def read_json(json_file_name: str):
@@ -87,13 +95,21 @@ def update_string(original_string: str, string_pattern: str, string_value: str) 
     return updated_string
 
 
-def update_model_args(models_args: str, load_in_8bit: bool, use_flash_attention_2: bool) -> str:
+def update_model_args(models_args: str, load_in_8bit: bool, use_flash_attention_2: bool,
+                      max_context_length: Optional[int] = None) -> str:
     load_in_8bit_string = "load_in_8bit="
-    use_flash_attention_2_string = "use_flash_attention_2="
+    use_flash_attention_2_string = "attn_implementation="
+    max_context_length_string = "max_length="
     updated_model_args = update_string(original_string=models_args, string_pattern=load_in_8bit_string,
                                        string_value=str(load_in_8bit))
-    updated_model_args = update_string(original_string=updated_model_args, string_pattern=use_flash_attention_2_string,
-                                       string_value=str(use_flash_attention_2))
+    if use_flash_attention_2:
+        updated_model_args = update_string(original_string=updated_model_args,
+                                           string_pattern=use_flash_attention_2_string,
+                                           string_value="flash_attention_2")
+    if max_context_length:
+        updated_model_args = update_string(original_string=updated_model_args,
+                                           string_pattern=max_context_length_string,
+                                           string_value=str(max_context_length))
     return updated_model_args
 
 
@@ -101,6 +117,7 @@ def save_config_files(selected_ui_config_values: SelectedUIConfigValues):
     base_config_template_name = os.path.join(selected_ui_config_values.base_config_dir,
                                              "base_template_eval_config.yaml")
     base_config_yaml = read_yaml(yaml_file_name=base_config_template_name)
+    max_context_length = selected_ui_config_values.max_context_length
 
     for model_name in selected_ui_config_values.model_name_values:
         cleaned_model_name = model_name.replace("/", "-")
@@ -115,7 +132,8 @@ def save_config_files(selected_ui_config_values: SelectedUIConfigValues):
                         models_args = BASE_MODEL_ARGS.format(model_name=model_name)
                         updated_model_args = update_model_args(models_args,
                                                                load_in_8bit=selected_ui_config_values.load_in_8bit,
-                                                               use_flash_attention_2=selected_ui_config_values.use_flash_attention_2)
+                                                               use_flash_attention_2=selected_ui_config_values.use_flash_attention_2,
+                                                               max_context_length=max_context_length)
                         new_config["model"] = model_type
                         new_config["model_args"] = updated_model_args
                         # new_config["tasks"] = task_name
