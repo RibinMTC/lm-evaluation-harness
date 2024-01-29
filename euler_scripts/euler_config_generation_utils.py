@@ -39,6 +39,10 @@ class UIConfigValues:
     seeds: List[int]
     few_shot_sampling_strategies: List[str]
     max_context_length_values: List[int]
+    batch_size: str = '1'
+    start_range: int = None
+    end_range: int = None
+
 
 
 @dataclass
@@ -52,6 +56,9 @@ class SelectedUIConfigValues:
     load_in_8bit: bool
     use_flash_attention_2: bool
     max_context_length: Optional[int] = None
+    selected_batch_size: str = '1'
+    start_range: int = None
+    end_range: int = None
 
 
 def read_json(json_file_name: str):
@@ -134,6 +141,9 @@ def save_config_files(selected_ui_config_values: SelectedUIConfigValues):
                                                                load_in_8bit=selected_ui_config_values.load_in_8bit,
                                                                use_flash_attention_2=selected_ui_config_values.use_flash_attention_2,
                                                                max_context_length=max_context_length)
+                        new_config["batch_size"] = selected_ui_config_values.selected_batch_size
+                        new_config["start_range"] = selected_ui_config_values.start_range
+                        new_config["end_range"] = selected_ui_config_values.end_range
                         new_config["model"] = model_type
                         new_config["model_args"] = updated_model_args
                         # new_config["tasks"] = task_name

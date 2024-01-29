@@ -1,8 +1,8 @@
-
 import tkinter as tk
 from tkinter import ttk, messagebox
-from euler_config_generation_utils import *
+from typing import Callable, Any
 
+from euler_config_generation_utils import *
 
 from lm_eval.utils import TaskConfig
 
@@ -42,7 +42,6 @@ class EulerConfigAndRunUIManager:
                                                       box_height=default_height,
                                                       box_values=self.config_ui_values.few_shot_values)
 
-
         # Seed label and multi-select Listbox
         self.fewshot_strategies_listbox = self.generate_list_box(label_text="Fewshot strategies:",
                                                                  select_mode=tk.MULTIPLE,
@@ -67,6 +66,17 @@ class EulerConfigAndRunUIManager:
                                                                        box_height=default_height,
                                                                        box_values=[])
 
+        self.batch_size_listbox = self.generate_list_box(label_text="Batch Size:",
+                                                         select_mode=tk.SINGLE,
+                                                         box_width=default_width,
+                                                         box_height=default_height,
+                                                         box_values=["1", "2", "4", "8", "16", "32", "64"])
+
+        validate_command = (self.root.register(self.is_number), '%P')
+        self.start_range_entry = self.generate_entry(label_description="Start Range", validate_command=validate_command)
+
+        self.end_range_entry = self.generate_entry(label_description="End Range", validate_command=validate_command)
+
         self.load_in_8bit_checkbox_value = self.generate_checkbox("Load in 8bit")
         self.use_flash_attention_2_checkbox_value = self.generate_checkbox("Use Flash Attention 2")
 
@@ -76,16 +86,18 @@ class EulerConfigAndRunUIManager:
         self.create_config_files_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
         self.current_ui_row += 1
 
-        # self.run_euler_jobs_button = ttk.Button(self.root, text="Run euler jobs",
-        #                                         command=self.execute_run_euler_jobs_script)
-        # self.run_euler_jobs_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
-        # self.current_ui_row += 1
-
         # Output label to show the script execution result
         self.output_label = ttk.Label(self.root, text="")
         self.output_label.grid(row=self.current_ui_row, column=0, columnspan=3, pady=5)
         self.current_ui_row += 1
         self.root.mainloop()
+
+    @staticmethod
+    def is_number(input):
+        # Allow only numeric input or empty input (for None)
+        if input.isdigit() or input == "":
+            return True
+        return False
 
     @staticmethod
     def init_config_values(config_file: str) -> UIConfigValues:
@@ -122,6 +134,14 @@ class EulerConfigAndRunUIManager:
         checkbox.grid(row=self.current_ui_row, column=1, padx=5, pady=5)
         self.current_ui_row += 1
         return checkbox_value
+
+    def generate_entry(self, label_description: str, validate_command: Any):
+        entry_label = ttk.Label(self.root, text=label_description)
+        entry = tk.Entry(self.root, validate="key", validatecommand=validate_command)
+        entry_label.grid(row=self.current_ui_row, column=0, sticky='w', padx=5, pady=5)
+        entry.grid(row=self.current_ui_row, column=1, padx=5, pady=5)
+        self.current_ui_row += 1
+        return entry
 
     def update_prompt_version_listbox(self, event):
         # Clear the current items from the dynamic_listbox
@@ -178,6 +198,11 @@ class EulerConfigAndRunUIManager:
             messagebox.showwarning("Warning", "Please select at least one value from each of the boxes!")
             return
 
+        selected_batch_index = self.batch_size_listbox.curselection()[0]
+        selected_batch_size = self.batch_size_listbox.get(selected_batch_index)
+        start_range = int(self.start_range_entry.get()) if self.start_range_entry.get() else None
+        end_range = int(self.end_range_entry.get()) if self.end_range_entry.get() else None
+
         # You can set these values in the config_generator.py script and then run its main()
         selected_ui_config_values = SelectedUIConfigValues(
             base_config_dir=self.config_ui_values.base_config_dir,
@@ -188,7 +213,10 @@ class EulerConfigAndRunUIManager:
             few_shot_sampling_strategies=few_shot_sampling_strategies,
             load_in_8bit=self.load_in_8bit_checkbox_value.get(),
             use_flash_attention_2=self.use_flash_attention_2_checkbox_value.get(),
-            max_context_length=max_context_length)
+            max_context_length=max_context_length,
+            selected_batch_size=selected_batch_size,
+            start_range=start_range,
+            end_range=end_range)
 
         save_config_files(selected_ui_config_values=selected_ui_config_values)
 
@@ -202,7 +230,7 @@ class EulerConfigAndRunUIManager:
 
 def main():
     config_values_file = "euler_scripts/configs/faithfulness_model_configs.json"
-    #config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
+    # config_values_file = "euler_scripts/configs/domain_adaptation_summarization_model_configs.json"  # "euler_scripts/configs/faithfulness_model_configs.json"
     EulerConfigAndRunUIManager(config_values_file=config_values_file)
 
 
