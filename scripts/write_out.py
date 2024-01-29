@@ -66,11 +66,13 @@ def main():
     if args.end_range:
         end_index = args.end_range
     else:
-        raise ValueError("Endindex cannot be null")
+        end_index = 1
+        print("No end index specified, therefore only 1 sample will be generated.")
     num_examples = end_index - start_index
 
     if not args.output_path:
-        raise ValueError("Specify output_path to save sample prompts")
+        args.output_path = "write_out_test"
+        print(f"No output path specified, saving to default path {args.output_path}")
 
     os.makedirs(args.output_path, exist_ok=True)
     for task_name, task in task_dict.items():
