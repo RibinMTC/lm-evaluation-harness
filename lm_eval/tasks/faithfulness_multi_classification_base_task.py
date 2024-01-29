@@ -18,10 +18,6 @@ from lm_eval.tasks.faithfulness_classification_base_task import \
 
 def get_article_ids_above_min_number_of_rows_per_label(dataset_df: DataFrame, min_number_of_rows_per_label: int) -> \
         List[int]:
-    # grouped_df = self._training_docs["full"].groupby("article_id")["label"].nunique()
-    # valid_article_ids = grouped_df[grouped_df >= 3].index
-    # return list(valid_article_ids)
-    # First, group by both article_id and label and count the number of rows for each combination
     grouped_label_counts = dataset_df.groupby(["article_id", "label"]).size().unstack()
 
     # Check for each label whether the count is greater than min_number_of_rows_per_label
@@ -44,9 +40,6 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     sentence_key_name = "text"
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
-
-    # negative_samples_df = None
-    # positive_samples_df = None
 
     default_prompt_template = (
         "Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information "
@@ -114,12 +107,31 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt(self, doc):
         if not self.prompt_template:
             self.prompt_template = self.default_prompt_template
-        prompt = self.prompt_template.format(article=doc[self.article_key_name],
-                                             sentence=doc[self.sentence_key_name])
+        if self.prompt_sample_template:
+            prompt = self.prompt_sample_template.format(article=doc[self.article_key_name],
+                                                        sentence=doc[self.sentence_key_name])
+        else:
+            prompt = self.prompt_template.format(article=doc[self.article_key_name],
+                                                 sentence=doc[self.sentence_key_name])
         return prompt
 
+    def format_fewshot_prompt(self, doc, few_shot_samples):
+        if not self.prompt_only:
+            raise ValueError(
+                "For fewshot, please specify prompt only and prompt sample template separate in the prompt template file")
+        full_prompt = self.prompt_only
+        for few_shot_sample in few_shot_samples:
+            prompt = self.prompt_sample_template.format(article=few_shot_sample[self.article_key_name],
+                                                        sentence=few_shot_sample[self.sentence_key_name])
+            prompt += self.format_prompt_target(few_shot_sample)
+            full_prompt += prompt
+
+        full_prompt += doc['query']
+
+        return full_prompt
+
     def format_prompt_target(self, doc):
-        return " " + doc[self.label_key_name]
+        return doc[self.label_key_name]
 
     @staticmethod
     def cantor_pairing(doc_id, article_id):
@@ -190,10 +202,12 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
         combined_examples = faithful_examples + intrinsic_examples + extrinsic_examples
         unique_examples = [example for example in combined_examples if example != doc][:num_fewshot]
         rnd.shuffle(unique_examples)
-        formatted_examples = [
-            self.format_prompt(example) + self.format_prompt_target(example) for example in unique_examples
-        ]
-        return "\n\n".join(formatted_examples) + "\n\n"
+        # formatted_examples = [
+        #     self.format_prompt(example) + self.format_prompt_target(example) for example in unique_examples
+        # ]
+        # return "\n\n".join(formatted_examples) + "\n\n"
+        full_fewshot_prompt = self.format_fewshot_prompt(doc=doc, few_shot_samples=unique_examples)
+        return full_fewshot_prompt
 
     def fewshot_context(self, doc, num_fewshot, provide_description=None, rnd=None,
                         description=None, fewshot_sampling: str = None):
@@ -223,9 +237,9 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 assert num_fewshot % 3 == 0, ("When selecting stratified strategy, num_fewshot has to be multiple of 3 "
                                               "for the multi-labeling task")
                 num_samples_per_class = num_fewshot // 3
-                labeled_examples = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
-                                                                 num_samples_per_class=num_samples_per_class, doc=doc)
-                full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
+                full_prompt = self._format_default_examples(rnd=rnd, num_fewshot=num_fewshot,
+                                                            num_samples_per_class=num_samples_per_class, doc=doc)
+                # full_prompt = f"{description}{labeled_examples}\n{doc['query']}"
             elif fewshot_sampling == "packed":
                 # raise NotImplementedError
                 assert num_fewshot > 8 and num_fewshot % 3 == 0, (f"{num_fewshot} has to be larger than 6 and a "
@@ -248,7 +262,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
     def _process_doc(self, doc):
         out_doc = {
-            "query": self.format_prompt(doc),
+            "query": self.format_prompt(doc) if self.prompt_only else self.format_prompt(doc),
             "choices": self.choices,
             "gold": self.choices.index(self.convert_label(doc[self.label_key_name])),
             "original_doc": doc
@@ -335,7 +349,7 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
                     self.sentence_key_name].str.len()
                 filtered_train_df = train_df[
                     (train_df["num_words_article"] > self.min_text_length) & (
-                                train_df["num_words_article"] < self.max_text_length)]
+                            train_df["num_words_article"] < self.max_text_length)]
                 faithful_samples_df = filtered_train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[0]].head(100)
                 intrinsic_samples_df = filtered_train_df.loc[

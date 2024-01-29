@@ -1,5 +1,5 @@
 import abc
-from typing import Iterable
+from typing import Iterable, Dict, Union
 import numpy as np
 import random
 import re
@@ -262,16 +262,18 @@ class BaseLM(LM):
         # pull longest context sample from request
         if len(re_ord.get_reordered()) > 0:
             _, context_enc, continuation_enc = re_ord.get_reordered()[0]
-            max_context = len((context_enc + continuation_enc)[-(self.max_length + 1) :][:-1])
+            max_context = len((context_enc + continuation_enc)[-(self.max_length + 1):][:-1])
             if (self.batch_size == 'auto'):
 
                 if override_bs is None:
                     print('Passed argument batch_size = auto. Detecting largest batch size')
-                    @find_executable_batch_size(starting_batch_size=512) # if OOM, then halves batch_size and tries again
+
+                    @find_executable_batch_size(
+                        starting_batch_size=512)  # if OOM, then halves batch_size and tries again
                     def forward_batch(batch_size):
                         test_batch = torch.ones((batch_size, max_context), device=self.device).long()
                         for _ in range(5):
-                            out = F.log_softmax(self._model_call(test_batch), dim = -1).cpu()
+                            out = F.log_softmax(self._model_call(test_batch), dim=-1).cpu()
                         return batch_size
 
                     batch_size = forward_batch()
@@ -284,8 +286,8 @@ class BaseLM(LM):
             adaptive_batch_size = 0 if override_bs is None else override_bs
 
         for chunk in utils.chunks(
-            tqdm(re_ord.get_reordered(), disable=disable_tqdm),
-            self.batch_size if self.batch_size != "auto" else adaptive_batch_size,
+                tqdm(re_ord.get_reordered(), disable=disable_tqdm),
+                self.batch_size if self.batch_size != "auto" else adaptive_batch_size,
         ):
             inps = []
             cont_toks_list = []
@@ -312,7 +314,7 @@ class BaseLM(LM):
 
                 # when too long to fit in context, truncate from the left
                 inp = torch.tensor(
-                    (context_enc + continuation_enc)[-(self.max_length + 1) :][:-1],
+                    (context_enc + continuation_enc)[-(self.max_length + 1):][:-1],
                     dtype=torch.long,
                 ).to(self.device)
                 (inplen,) = inp.shape
@@ -345,12 +347,12 @@ class BaseLM(LM):
             ).cpu()  # [batch, padding_length, vocab]
 
             for (cache_key, _, _), logits, inp, inplen, cont_toks in zip(
-                chunk, multi_logits, inps, inplens, cont_toks_list
+                    chunk, multi_logits, inps, inplens, cont_toks_list
             ):
 
                 # Slice to original seq length
                 contlen = len(cont_toks)
-                logits = logits[inplen - contlen : inplen].unsqueeze(
+                logits = logits[inplen - contlen: inplen].unsqueeze(
                     0
                 )  # [1, seq, vocab]
 
@@ -402,7 +404,7 @@ class BaseLM(LM):
                 primary_until = None
 
             context_enc = torch.tensor(
-                [self.tok_encode(context)[self.max_gen_toks - self.max_length :]]
+                [self.tok_encode(context)[self.max_gen_toks - self.max_length:]]
             ).to(self.device)
 
             max_gen_tokens = min(
@@ -412,7 +414,7 @@ class BaseLM(LM):
                 context_enc, context_enc.shape[1] + max_gen_tokens, primary_until
             )
 
-            s = self.tok_decode(cont[0].tolist()[context_enc.shape[1] :])
+            s = self.tok_decode(cont[0].tolist()[context_enc.shape[1]:])
 
             for term in until:
                 s = s.split(term)[0]
@@ -442,7 +444,7 @@ class Task(abc.ABC):
     # The name of a subset within `DATASET_PATH`.
     DATASET_NAME: str = None
 
-    def __init__(self, data_dir=None, cache_dir=None, download_mode=None, prompt_template: str = None):
+    def __init__(self, data_dir=None, cache_dir=None, download_mode=None, prompt_template: Union[str, Dict] = None):
         """
         :param data_dir: str
             Stores the path to a local folder containing the `Task`'s data files.
@@ -468,7 +470,12 @@ class Task(abc.ABC):
         self.download(data_dir, cache_dir, download_mode)
         self._training_docs = None
         self._fewshot_docs = None
-        self.prompt_template = prompt_template
+        if isinstance(prompt_template, dict):
+            self.prompt_only = prompt_template["prompt_only"]
+            self.prompt_sample_template = prompt_template["prompt_sample_template"]
+            self.prompt_template = self.prompt_only + self.prompt_sample_template
+        else:
+            self.prompt_template = prompt_template
 
     def download(self, data_dir=None, cache_dir=None, download_mode=None):
         """Downloads and returns the task dataset.
@@ -631,7 +638,7 @@ class Task(abc.ABC):
 
     @utils.positional_deprecated
     def fewshot_context(
-        self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling=None
+            self, doc, num_fewshot, provide_description=None, rnd=None, description=None, fewshot_sampling=None
     ):
         """Returns a fewshot context string that is made up of a prepended description
         (if provided), the `num_fewshot` number of examples, and an appended prompt example.
@@ -651,7 +658,7 @@ class Task(abc.ABC):
             The fewshot context.
         """
         assert (
-            rnd is not None
+                rnd is not None
         ), "A `random.Random` generator argument must be provided to `rnd`"
         assert not provide_description, (
             "The `provide_description` arg will be removed in future versions. To prepend "
@@ -686,13 +693,13 @@ class Task(abc.ABC):
                 fewshotex = [x for x in fewshotex if x != doc][:num_fewshot]
 
             labeled_examples = (
-                "\n\n".join(
-                    [
-                        self.doc_to_text(doc) + self.doc_to_target(doc)
-                        for doc in fewshotex
-                    ]
-                )
-                + "\n\n"
+                    "\n\n".join(
+                        [
+                            self.doc_to_text(doc) + self.doc_to_target(doc)
+                            for doc in fewshotex
+                        ]
+                    )
+                    + "\n\n"
             )
 
         example = self.doc_to_text(doc)
@@ -748,13 +755,13 @@ class PerplexityTask(Task, abc.ABC):
         return []
 
     def fewshot_context(
-        self, doc, num_fewshot, provide_description=None, rnd=None, description=None
+            self, doc, num_fewshot, provide_description=None, rnd=None, description=None
     ):
         assert (
-            num_fewshot == 0
+                num_fewshot == 0
         ), "The number of fewshot examples must be 0 for perplexity tasks."
         assert (
-            rnd is not None
+                rnd is not None
         ), "A `random.Random` generator argument must be provided to `rnd`."
         assert not provide_description, (
             "The `provide_description` arg will be removed in future versions. To prepend "
@@ -928,9 +935,9 @@ class Request:
 
     def __eq__(self, other):
         return (
-            self.request_type == other.request_type
-            and self.args == other.args
-            and self.index == other.index
+                self.request_type == other.request_type
+                and self.args == other.args
+                and self.index == other.index
         )
 
     def __repr__(self):
