@@ -12,6 +12,8 @@ class AbsinthReasoningGenerationTask(Task):
         pass
 
     def process_results(self, doc, results):
+        if len(results[0]) == 0:
+            return 0
         results = wordlength.compute(data=results[0])
         return results
 
