@@ -68,9 +68,6 @@ from . import germanquad
 from . import germeval2017
 from . import x_stance
 from . import cnndm_paraphrase
-from . import factcc_hallucination_classification
-from . import frank_hallucination_classification
-from . import xsum_faith_hallucination_classification
 from . import swisstext23_summarization
 from . import seahorse_classification
 from . import faithfulness_classification_base_task
@@ -335,9 +332,6 @@ TASK_REGISTRY = {
     "germeval2017": germeval2017.GermEval2017,
     "x_stance_de": x_stance.XStanceDE,
     "cnn_dm_paraphrase": cnndm_paraphrase.CnnDMParaphraseTask,
-    "factcc_hallucination_classification": factcc_hallucination_classification.FactCCHallucinationClassificationTask,
-    "frank_hallucination_classification": frank_hallucination_classification.FrankHallucinationClassificationTask,
-    "xsum_faith_hallucination_classification": xsum_faith_hallucination_classification.XsumFaithHallucinationClassificationTask,
     "swisstext23_summarization": swisstext23_summarization.SwissText23SummarizationTask,
     "seahorse_classification": seahorse_classification.SeahorseClassificationTask,
     "faithfulness_benchmark_factcc": faithfulness_classification_base_task.FaithfulnessClassificationTaskFactCC,
