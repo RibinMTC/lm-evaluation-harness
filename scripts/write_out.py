@@ -93,7 +93,7 @@ def main():
 
         docs = join_iters(iters)
 
-        with open(os.path.join(args.output_path, task_name), "w") as f:
+        with open(os.path.join(args.output_path, task_name + f"_num_shot_{str(args.num_fewshot)}"), "w") as f:
             for i, doc in (
                     zip(range(num_examples), docs)
                     if num_examples > 0
