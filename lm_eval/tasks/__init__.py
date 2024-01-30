@@ -363,6 +363,8 @@ TASK_REGISTRY = {
     "pubmed_2k_domain_adaptation_summarization": domain_adaptation_summarization.PubmedDomainAdaptationSummarizationTask2kWindow,
     "pubmed_2shot_domain_adaptation_summarization": domain_adaptation_summarization.Pubmed2ShotDomainAdaptationSummarizationTask,
     "absinth_reasoning_generation": absinth_reasoning_generation.AbsinthReasoningGenerationTask,
+    "xnli_reasoning_generation": absinth_reasoning_generation.XnliReasoningGenerationTask,
+    "xsum_faith_reasoning_generation": absinth_reasoning_generation.XsumFaithReasoningGenerationTask,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
