@@ -107,12 +107,12 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt(self, doc):
         if not self.prompt_template:
             self.prompt_template = self.default_prompt_template
-        if self.prompt_sample_template:
-            prompt = self.prompt_sample_template.format(article=doc[self.article_key_name],
-                                                        sentence=doc[self.sentence_key_name])
-        else:
-            prompt = self.prompt_template.format(article=doc[self.article_key_name],
-                                                 sentence=doc[self.sentence_key_name])
+        # if self.prompt_sample_template:
+        #     prompt = self.prompt_sample_template.format(article=doc[self.article_key_name],
+        #                                                 sentence=doc[self.sentence_key_name])
+        # else:
+        prompt = self.prompt_template.format(article=doc[self.article_key_name],
+                                             sentence=doc[self.sentence_key_name])
         return prompt
 
     def format_fewshot_prompt(self, doc, few_shot_samples):
@@ -126,7 +126,9 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
             prompt += self.format_prompt_target(few_shot_sample)
             full_prompt += prompt
 
-        full_prompt += doc['query']
+        original_doc = doc["original_doc"]
+        full_prompt += self.prompt_sample_template.format(article=original_doc[self.article_key_name],
+                                                          sentence=original_doc[self.sentence_key_name])
 
         return full_prompt
 
@@ -262,7 +264,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
     def _process_doc(self, doc):
         out_doc = {
-            "query": self.format_prompt(doc) if self.prompt_only else self.format_prompt(doc),
+            "query": self.format_prompt(doc),
             "choices": self.choices,
             "gold": self.choices.index(self.convert_label(doc[self.label_key_name])),
             "original_doc": doc
