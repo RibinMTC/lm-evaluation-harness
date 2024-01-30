@@ -16,19 +16,6 @@ from lm_eval.tasks.faithfulness_classification_base_task import \
     get_num_samples_per_article_from_num_articles_and_num_fewshot, get_unique_elements_with_preserved_order
 
 
-def get_article_ids_above_min_number_of_rows_per_label(dataset_df: DataFrame, min_number_of_rows_per_label: int) -> \
-        List[int]:
-    grouped_label_counts = dataset_df.groupby(["article_id", "label"]).size().unstack()
-
-    # Check for each label whether the count is greater than min_number_of_rows_per_label
-    valid_rows_for_each_label = (grouped_label_counts > min_number_of_rows_per_label).all(axis=1)
-
-    # Filter out the article_ids that satisfy the condition for all labels
-    valid_article_ids = valid_rows_for_each_label[valid_rows_for_each_label].index
-
-    return list(valid_article_ids)
-
-
 class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     VERSION = 0
     DATASET_PATH = "mtc/final_german_faithfulness_benchmark"
@@ -38,6 +25,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     language = "German"
     article_key_name = "lead_with_article"
     sentence_key_name = "text"
+    article_id_key_name = "article_id"
 
     choices = ["Faithful", "Intrinsic Hallucination", "Extrinsic Hallucination"]
 
@@ -61,10 +49,24 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def has_test_docs(self):
         return True
 
+    def get_article_ids_above_min_number_of_rows_per_label(self, dataset_df: DataFrame,
+                                                           min_number_of_rows_per_label: int) -> \
+            List[int]:
+        grouped_label_counts = dataset_df.groupby([self.article_id_key_name, "label"]).size().unstack()
+
+        # Check for each label whether the count is greater than min_number_of_rows_per_label
+        valid_rows_for_each_label = (grouped_label_counts > min_number_of_rows_per_label).all(axis=1)
+
+        # Filter out the article_ids that satisfy the condition for all labels
+        valid_article_ids = valid_rows_for_each_label[valid_rows_for_each_label].index
+
+        return list(valid_article_ids)
+
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
                 train_df = self.dataset["train"].to_pandas()
+                train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
                 train_df["num_words_article"] = train_df[self.article_key_name].str.len()
                 sorted_train_df = train_df.sort_values(by="num_words_article", ascending=True)
                 faithful_samples_df = sorted_train_df.loc[
@@ -74,11 +76,12 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
                 extrinsic_samples_df = sorted_train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[2]].head(100)
                 # consider only article ids, which have at least 3 samples per label for easier implementation
-                article_ids_with_at_least_3_samples_per_label = get_article_ids_above_min_number_of_rows_per_label(
+                article_ids_with_at_least_3_samples_per_label = self.get_article_ids_above_min_number_of_rows_per_label(
                     dataset_df=sorted_train_df, min_number_of_rows_per_label=3)
                 valid_sorted_dataset = sorted_train_df[
-                    sorted_train_df["article_id"].isin(article_ids_with_at_least_3_samples_per_label)]
-                valid_sorted_article_ids = get_unique_elements_with_preserved_order(valid_sorted_dataset["article_id"])
+                    sorted_train_df[self.article_id_key_name].isin(article_ids_with_at_least_3_samples_per_label)]
+                valid_sorted_article_ids = get_unique_elements_with_preserved_order(
+                    valid_sorted_dataset[self.article_id_key_name])
                 assert len(valid_sorted_article_ids) > 3, (
                     f"We don't have enough article with "
                     f"at least 3 samples per label for"
@@ -372,6 +375,48 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
         elif label == 1:
             return "Extrinsic Hallucination"
         elif label == 2:
+            return "Intrinsic Hallucination"
+        else:
+            raise ValueError(f"Unsupported value for label {label}")
+
+
+class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
+    DATASET_PATH = "mtc/full_cleaned_xsum_faith"
+    article_key_name = "document"
+    sentence_key_name = "claim"
+    label_key_name = "label"
+    article_id_key_name = "bbcid"
+    min_text_length = 20
+    max_text_length = 3000
+
+    def training_docs(self):
+        if self.has_training_docs():
+            if self._training_docs is None:
+                train_df = self.dataset["train"].to_pandas()
+                train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
+                train_df["num_words_article"] = train_df[self.article_key_name].str.len()
+                filtered_train_df = train_df[
+                    (train_df["num_words_article"] > self.min_text_length) & (
+                            train_df["num_words_article"] < self.max_text_length)]
+                faithful_samples_df = filtered_train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[0]].head(100)
+                intrinsic_samples_df = filtered_train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[1]].head(100)
+                extrinsic_samples_df = filtered_train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[2]].head(100)
+                self._training_docs = {
+                    "faithful": Dataset.from_pandas(faithful_samples_df),
+                    "intrinsic": Dataset.from_pandas(intrinsic_samples_df),
+                    "extrinsic": Dataset.from_pandas(extrinsic_samples_df),
+                }
+            return self._training_docs
+
+    def convert_label(self, label: int) -> str:
+        if label == "faithful":
+            return "Faithful"
+        elif label == "extrinsic":
+            return "Extrinsic Hallucination"
+        elif label == "intrinsic":
             return "Intrinsic Hallucination"
         else:
             raise ValueError(f"Unsupported value for label {label}")

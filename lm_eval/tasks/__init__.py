@@ -353,6 +353,7 @@ TASK_REGISTRY = {
     "absinth_self_consistency": faithfulness_multi_classification_with_explanation_task.AbsinthSelfConsistencyTask,
     "xnli_multi_label": faithfulness_multi_classification_base_task.XnliFaithfulnessMultiClassificationTask,
     "xnli_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.XnliFaithfulnessMultiClassificationWithExplanationTask,
+    "xsum_faith_multi_label": faithfulness_multi_classification_base_task.XSumFaithfulnessMultiClassificationTask,
     "seahorse_attribution_with_explanation_multi_label": faithfulness_multi_classification_with_explanation_task.SeahorseFaithfulnessMultiClassificationWithExplanationTask,
     "arxiv_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask,
     "arxiv_2k_domain_adaptation_summarization": domain_adaptation_summarization.ArxivDomainAdaptationSummarizationTask2kWindow,
