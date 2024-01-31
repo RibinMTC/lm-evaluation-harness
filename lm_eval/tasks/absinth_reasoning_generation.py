@@ -9,11 +9,11 @@ wordlength = evaluate.load("word_length", module_type="measurement")
 
 class AbsinthReasoningGenerationTask(Task):
     def doc_to_target(self, doc):
-        pass
+        return doc[self.label_key_name]
 
     def process_results(self, doc, results):
         if len(results[0]) == 0:
-            return 0
+            return {"average_word_length": 0}
         results = wordlength.compute(data=results[0])
         return results
 
