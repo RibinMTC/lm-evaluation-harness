@@ -80,16 +80,11 @@ Erklärung:"""
         return continuation
 
 
-class XnliReasoningGenerationTask(AbsinthReasoningGenerationTask):
-    DATASET_PATH = "xnli"
-    DATASET_NAME = "de"
+class XnliReasoningAndLabelGenerationTask(AbsinthReasoningGenerationTask):
+    DATASET_PATH = "mtc/xnli_de_sub_sampled_3000"
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
-    min_text_length = 50
-    max_text_length = 2000
-    seed = 42
-    sub_sample_size = 3000
 
     default_prompt_template = """Reply ONLY in German. For the specified article, sentence, and label, explain in detail why the label was selected and the others label were not chosen. The label 'Faithful' indicates the sentence aligns with the article's content, 'Intrinsic Hallucination' means it contradicts or misrepresents the article and 'Extrinsic hallucination' suggests it includes information not present in the article. Don't reply with: the label was chosen... but instead simply provide a concise explanation without mentioning the label. Think step by step before providing final explanation.
        Artikel: {article}
@@ -111,17 +106,19 @@ class XnliReasoningGenerationTask(AbsinthReasoningGenerationTask):
         if self.has_test_docs():
             train_df = self.dataset["train"].to_pandas()
             train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
-            train_df["num_words_article"] = train_df[self.article_key_name].str.len() + train_df[
-                self.sentence_key_name].str.len()
-            filtered_train_df = train_df[
-                (train_df["num_words_article"] > self.min_text_length) & (
-                        train_df["num_words_article"] < self.max_text_length)]
-            sub_sampled_train_df = filtered_train_df.sample(n=self.sub_sample_size, random_state=self.seed)
-            print(sub_sampled_train_df["label"].value_counts())
-            return Dataset.from_pandas(sub_sampled_train_df.reset_index(drop=True))
+            return Dataset.from_pandas(train_df.reset_index(drop=True))
+
+    def doc_to_text(self, doc):
+        if self.prompt_template is None:
+            self.prompt_template = self.default_prompt_template
+
+        prompt = self.prompt_template.format(article=doc[self.article_key_name],
+                                             sentence=doc[self.sentence_key_name])
+
+        return prompt
 
 
-class XsumFaithReasoningGenerationTask(AbsinthReasoningGenerationTask):
+class XsumFaithReasoningAndLabelGenerationTask(AbsinthReasoningGenerationTask):
     DATASET_PATH = "mtc/full_cleaned_xsum_faith"
     article_key_name = "document"
     sentence_key_name = "claim"
@@ -132,3 +129,12 @@ class XsumFaithReasoningGenerationTask(AbsinthReasoningGenerationTask):
            Sentence: {sentence}
            Label: {label}
            Explanation:"""
+
+    def doc_to_text(self, doc):
+        if self.prompt_template is None:
+            self.prompt_template = self.default_prompt_template
+
+        prompt = self.prompt_template.format(article=doc[self.article_key_name],
+                                             sentence=doc[self.sentence_key_name])
+
+        return prompt
