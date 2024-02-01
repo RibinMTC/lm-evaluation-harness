@@ -338,7 +338,7 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
 class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
     DATASET_PATH = "mtc/xnli_de_sub_sampled_3000_with_explanations"
-    valid_labels = ['Treu', 'Neutral', 'Widerspruch']
+    choices = ["Treu", "Neutral", "Widerspruch", "Invalid"]
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
@@ -365,7 +365,7 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
             return self._training_docs
 
     def convert_label(self, label: int):
-        return self.valid_labels[label]
+        return self.choices[label]
 
 
 class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
@@ -374,7 +374,7 @@ class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
     sentence_key_name = "claim"
     label_key_name = "label"
     article_id_key_name = "bbcid"
-    valid_labels = ['Faithful', 'Neutral', 'Contradiction']
+    choices = ["Faithful", "Neutral", "Contradiction", "Invalid"]
 
     def training_docs(self):
         if self.has_training_docs():
@@ -397,10 +397,10 @@ class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
 
     def convert_label(self, label: str) -> str:
         if label == "faithful":
-            return self.valid_labels[0]
+            return self.choices[0]
         elif label == "extrinsic":
-            return self.valid_labels[1]
+            return self.choices[1]
         elif label == "intrinsic":
-            return self.valid_labels[2]
+            return self.choices[2]
         else:
             raise ValueError(f"Unknown label {label}")

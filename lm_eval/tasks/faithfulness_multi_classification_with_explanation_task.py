@@ -157,18 +157,18 @@ class SeahorseFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMul
 
 class XnliFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/xnli_de_sub_sampled_3000_with_explanations"
-    valid_labels = ['Treu', 'Neutral', 'Widerspruch']
+    choices = ["Treu", "Neutral", "Widerspruch", "Invalid"]
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
 
     def convert_label(self, label: int):
-        return self.valid_labels[label]
+        return self.choices[label]
 
 
 class XsumFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
     DATASET_PATH = "mtc/full_cleaned_xsum_faith_with_explanations"
-    valid_labels = ['Faithful', 'Neutral', 'Contradiction']
+    choices = ["Faithful", "Neutral", "Contradiction", "Invalid"]
     article_key_name = "document"
     sentence_key_name = "claim"
     label_key_name = "label"
@@ -177,10 +177,10 @@ class XsumFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiCl
 
     def convert_label(self, label: str) -> str:
         if label == "faithful":
-            return self.valid_labels[0]
+            return self.choices[0]
         elif label == "extrinsic":
-            return self.valid_labels[1]
+            return self.choices[1]
         elif label == "intrinsic":
-            return self.valid_labels[2]
+            return self.choices[2]
         else:
             raise ValueError(f"Unknown label {label}")
