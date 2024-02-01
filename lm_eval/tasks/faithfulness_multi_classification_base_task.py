@@ -337,13 +337,11 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
 
 
 class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
-    DATASET_PATH = "xnli"
-    DATASET_NAME = "de"
+    DATASET_PATH = "mtc/xnli_de_sub_sampled_3000_with_explanations"
+    valid_labels = ['Treu', 'Neutral', 'Widerspruch']
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
-    min_text_length = 50
-    max_text_length = 150
 
     def training_docs(self):
         if self.has_training_docs():
@@ -352,14 +350,11 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
                 train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
                 train_df["num_words_article"] = train_df[self.article_key_name].str.len() + train_df[
                     self.sentence_key_name].str.len()
-                filtered_train_df = train_df[
-                    (train_df["num_words_article"] > self.min_text_length) & (
-                            train_df["num_words_article"] < self.max_text_length)]
-                faithful_samples_df = filtered_train_df.loc[
+                faithful_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[0]].head(100)
-                intrinsic_samples_df = filtered_train_df.loc[
+                intrinsic_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[1]].head(100)
-                extrinsic_samples_df = filtered_train_df.loc[
+                extrinsic_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[2]].head(100)
                 self._training_docs = {
                     "faithful": Dataset.from_pandas(faithful_samples_df),
@@ -369,25 +364,17 @@ class XnliFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
 
             return self._training_docs
 
-    def convert_label(self, label: int) -> str:
-        if label == 0:
-            return "Faithful"
-        elif label == 1:
-            return "Extrinsic Hallucination"
-        elif label == 2:
-            return "Intrinsic Hallucination"
-        else:
-            raise ValueError(f"Unsupported value for label {label}")
+    def convert_label(self, label: int):
+        return self.valid_labels[label]
 
 
 class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBaseTask):
-    DATASET_PATH = "mtc/full_cleaned_xsum_faith"
+    DATASET_PATH = "mtc/full_cleaned_xsum_faith_with_explanations"
     article_key_name = "document"
     sentence_key_name = "claim"
     label_key_name = "label"
     article_id_key_name = "bbcid"
-    min_text_length = 20
-    max_text_length = 3000
+    valid_labels = ['Faithful', 'Neutral', 'Contradiction']
 
     def training_docs(self):
         if self.has_training_docs():
@@ -395,14 +382,11 @@ class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
                 train_df = self.dataset["train"].to_pandas()
                 train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
                 train_df["num_words_article"] = train_df[self.article_key_name].str.len()
-                filtered_train_df = train_df[
-                    (train_df["num_words_article"] > self.min_text_length) & (
-                            train_df["num_words_article"] < self.max_text_length)]
-                faithful_samples_df = filtered_train_df.loc[
+                faithful_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[0]].head(100)
-                intrinsic_samples_df = filtered_train_df.loc[
+                intrinsic_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[1]].head(100)
-                extrinsic_samples_df = filtered_train_df.loc[
+                extrinsic_samples_df = train_df.loc[
                     lambda example: example[self.label_key_name] == self.choices[2]].head(100)
                 self._training_docs = {
                     "faithful": Dataset.from_pandas(faithful_samples_df),
@@ -411,12 +395,12 @@ class XSumFaithfulnessMultiClassificationTask(FaithfulnessMultiClassificationBas
                 }
             return self._training_docs
 
-    def convert_label(self, label: int) -> str:
+    def convert_label(self, label: str) -> str:
         if label == "faithful":
-            return "Faithful"
+            return self.valid_labels[0]
         elif label == "extrinsic":
-            return "Extrinsic Hallucination"
+            return self.valid_labels[1]
         elif label == "intrinsic":
-            return "Intrinsic Hallucination"
+            return self.valid_labels[2]
         else:
-            raise ValueError(f"Unsupported value for label {label}")
+            raise ValueError(f"Unknown label {label}")

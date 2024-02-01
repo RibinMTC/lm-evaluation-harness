@@ -9,6 +9,8 @@ from lm_eval.tasks.faithfulness_multi_classification_base_task import Faithfulne
 class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationBaseTask):
     DATASET_PATH = "mtc/final_german_faithfulness_benchmark_with_explanations"
     explanation_key_name = "explanation"
+    explanation_output_key_name = "Erklärung"
+    label_output_key_name = "Label"
 
     ANS_RE = re.compile(r"(?i)label:\s*(.*?)(?=\n|$)")
     INVALID_ANS = "Invalid"
@@ -18,7 +20,7 @@ class FaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassi
     def format_prompt_target(self, doc):
         explanation = doc[self.explanation_key_name]
         label = doc[self.label_key_name]
-        explanation_with_label = f"Erklärung:{explanation}\nLabel:{label}"
+        explanation_with_label = f"{self.explanation_output_key_name}: {explanation}\n{self.label_output_key_name}: {label}"
         return explanation_with_label
 
     def construct_requests(self, doc, ctx):
@@ -154,18 +156,31 @@ class SeahorseFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMul
 
 
 class XnliFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
-    DATASET_PATH = "xnli"
-    DATASET_NAME = "de"
+    DATASET_PATH = "mtc/xnli_de_sub_sampled_3000_with_explanations"
+    valid_labels = ['Treu', 'Neutral', 'Widerspruch']
     article_key_name = "premise"
     sentence_key_name = "hypothesis"
     label_key_name = "label"
 
-    def convert_label(self, label: int) -> str:
-        if label == 0:
-            return "Faithful"
-        elif label == 1:
-            return "Extrinsic Hallucination"
-        elif label == 2:
-            return "Intrinsic Hallucination"
+    def convert_label(self, label: int):
+        return self.valid_labels[label]
+
+
+class XsumFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiClassificationWithExplanationTask):
+    DATASET_PATH = "mtc/full_cleaned_xsum_faith_with_explanations"
+    valid_labels = ['Faithful', 'Neutral', 'Contradiction']
+    article_key_name = "document"
+    sentence_key_name = "claim"
+    label_key_name = "label"
+    article_id_key_name = "bbcid"
+    explanation_output_key_name = "Explanation"
+
+    def convert_label(self, label: str) -> str:
+        if label == "faithful":
+            return self.valid_labels[0]
+        elif label == "extrinsic":
+            return self.valid_labels[1]
+        elif label == "intrinsic":
+            return self.valid_labels[2]
         else:
-            raise ValueError(f"Unsupported value for label {label}")
+            raise ValueError(f"Unknown label {label}")

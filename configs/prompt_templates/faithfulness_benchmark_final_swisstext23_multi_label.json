@@ -29,6 +29,14 @@
     "all_labels_english": {
       "prompt_only": "Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'.",
       "prompt_sample_template": "\n\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
+    },
+    "xsum_english": {
+      "prompt_only": "Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'.",
+      "prompt_sample_template": "\n\nArticle: {article}\nSentence: {sentence}\nLabel:\n"
+    },
+     "xnli_german": {
+      "prompt_only": "Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Antworte NUR auf Deutsch.",
+      "prompt_sample_template": "\n\nArtikel: {article}\nSatz: {sentence}\nLabel:\n"
     }
   },
   "mtc/LeoLM-leo": {
