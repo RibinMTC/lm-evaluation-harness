@@ -350,7 +350,7 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
 
 args = parse_args()
 # Set the folder path
-input_dir = 'token_shift_analysis_config'
+input_dir = 'token_shift_analysis/token_shift_analysis_config'
 
 # Call the function to find and print the matching CSV file names
 two_shot_runs = find_2_shot_csv_files(input_dir)
