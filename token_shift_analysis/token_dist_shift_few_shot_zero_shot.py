@@ -108,7 +108,7 @@ def get_token_idx(df, num_items_to_select=None, random_samples=False, use_all_to
     # compute only for the words that are part of the domain vocabulary
     elif use_domain_words:
         # read the domain vocabulary
-        path = f"token_shift_analysis_config/{ds}_top10000_vocabulary.txt"
+        path = f"{input_dir}/{ds}_top10000_vocabulary.txt"
 
         if not os.path.exists(path):
             print("Provided domain vocabulary path doesn't exist")
