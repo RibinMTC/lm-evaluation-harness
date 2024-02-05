@@ -1,3 +1,4 @@
+import jsonargparse
 import pandas as pd
 import random
 import os
@@ -26,6 +27,15 @@ model_key = {
     "lmsys-vicuna-7b-v1.5-16k": "lmsys/vicuna-7b-v1.5-16k",
     "lmsys-vicuna-13b-v1.5-16k": "lmsys/vicuna-13b-v1.5-16k",
 }
+
+
+def parse_args():
+    parser = jsonargparse.ArgumentParser()
+    parser.add_argument("--dataset", required=True, type=str, help="Dataset for analysis, must be in [arxiv, pubmed]")
+    parser.add_argument("--samples_to_compute", required=True, type=int, help="Number of samples to analyze [1,10]", default=1)
+    parser.add_argument('--config', action=jsonargparse.ActionConfigFile)
+
+    return parser.parse_args()
 
 
 def add_prompt(article):
@@ -338,6 +348,7 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
     wandb.finish()
 
 
+args = parse_args()
 # Set the folder path
 input_dir = 'token_shift_analysis_config'
 
@@ -359,6 +370,20 @@ for i, run in enumerate(two_shot_runs):
 load_dotenv()
 connect_to_wandb()
 
+ds = args.dataset
+# randomly selecting one sample each dataset across which all models are selected
+num_pubmed_samples = 426
+num_arxiv_samples = 97
+if ds == 'pubmed':
+    num_samples = num_pubmed_samples
+else:
+    num_samples = num_arxiv_samples
+
+s = list(range(num_samples))
+random.shuffle(s)
+samples_to_compute = args.samples_to_compute
+samples = s[-samples_to_compute:]
+
 model_name = 'meta-llama-Llama-2-70b-chat-hf'
 
 model_hf_key = model_key[model_name]
@@ -374,20 +399,6 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True,
     device_map="auto",
 )
-
-ds = 'arxiv'
-# randomly selecting one sample each dataset across which all models are selected
-num_pubmed_samples = 426
-num_arxiv_samples = 97
-if ds == 'pubmed':
-    num_samples = num_pubmed_samples
-else:
-    num_samples = num_arxiv_samples
-
-s = list(range(num_samples))
-random.shuffle(s)
-samples_to_compute = 1
-samples = s[-samples_to_compute:]
 
 for i in range(len(samples)):
     row_idx = i
