@@ -1,6 +1,8 @@
 import re
 from collections import Counter
 
+from datasets import Dataset
+
 from lm_eval.base import rf
 
 from lm_eval.tasks.faithfulness_multi_classification_base_task import FaithfulnessMultiClassificationBaseTask
@@ -162,6 +164,27 @@ class XnliFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiCl
     sentence_key_name = "hypothesis"
     label_key_name = "label"
 
+    def training_docs(self):
+        if self.has_training_docs():
+            if self._training_docs is None:
+                train_df = self.dataset["train"].to_pandas()
+                train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
+                train_df["num_words_article"] = train_df[self.article_key_name].str.len() + train_df[
+                    self.sentence_key_name].str.len()
+                faithful_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[0]].head(100)
+                intrinsic_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[1]].head(100)
+                extrinsic_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[2]].head(100)
+                self._training_docs = {
+                    "faithful": Dataset.from_pandas(faithful_samples_df),
+                    "intrinsic": Dataset.from_pandas(intrinsic_samples_df),
+                    "extrinsic": Dataset.from_pandas(extrinsic_samples_df),
+                }
+
+            return self._training_docs
+
     def convert_label(self, label: int):
         return self.choices[label]
 
@@ -174,6 +197,25 @@ class XsumFaithfulnessMultiClassificationWithExplanationTask(FaithfulnessMultiCl
     label_key_name = "label"
     article_id_key_name = "bbcid"
     explanation_output_key_name = "Explanation"
+
+    def training_docs(self):
+        if self.has_training_docs():
+            if self._training_docs is None:
+                train_df = self.dataset["train"].to_pandas()
+                train_df[self.label_key_name] = train_df[self.label_key_name].apply(self.convert_label)
+                train_df["num_words_article"] = train_df[self.article_key_name].str.len()
+                faithful_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[0]].head(100)
+                intrinsic_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[1]].head(100)
+                extrinsic_samples_df = train_df.loc[
+                    lambda example: example[self.label_key_name] == self.choices[2]].head(100)
+                self._training_docs = {
+                    "faithful": Dataset.from_pandas(faithful_samples_df),
+                    "intrinsic": Dataset.from_pandas(intrinsic_samples_df),
+                    "extrinsic": Dataset.from_pandas(extrinsic_samples_df),
+                }
+            return self._training_docs
 
     def convert_label(self, label: str) -> str:
         if label == "faithful":

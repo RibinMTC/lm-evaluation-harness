@@ -110,12 +110,12 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     def format_prompt(self, doc):
         if not self.prompt_template:
             self.prompt_template = self.default_prompt_template
-        # if self.prompt_sample_template:
-        #     prompt = self.prompt_sample_template.format(article=doc[self.article_key_name],
-        #                                                 sentence=doc[self.sentence_key_name])
-        # else:
-        prompt = self.prompt_template.format(article=doc[self.article_key_name],
-                                             sentence=doc[self.sentence_key_name])
+        if self.prompt_sample_template:
+            prompt = self.prompt_sample_template.format(article=doc[self.article_key_name],
+                                                        sentence=doc[self.sentence_key_name])
+        else:
+            prompt = self.prompt_template.format(article=doc[self.article_key_name],
+                                                 sentence=doc[self.sentence_key_name])
         return prompt
 
     def format_fewshot_prompt(self, doc, few_shot_samples):
