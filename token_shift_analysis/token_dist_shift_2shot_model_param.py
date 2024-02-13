@@ -1,3 +1,5 @@
+import gc
+
 import jsonargparse
 import pandas as pd
 import random
@@ -145,11 +147,6 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
     tokenizer.pad_token = tokenizer.eos_token  # Most LLMs don't have a pad token by default
     # load the model
     model = AutoModelForCausalLM.from_pretrained(model_hf_key, device_map="auto", torch_dtype=torch.bfloat16)
-    # if '70b' in model_hf_key:
-    #     model = AutoModelForCausalLM.from_pretrained(model_hf_key, device_map="auto", torch_dtype=torch.bfloat16,
-    #                                             )
-    # else:
-    #     model = AutoModelForCausalLM.from_pretrained(model_hf_key)
 
     for input in tqdm(inputs):
         # Tokenize input text
@@ -171,6 +168,9 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
 
         top_k_values_all.append(top_k_values)
         predicted_tokens_all.append(predicted_tokens)
+    del model, tokenizer
+    gc.collect()
+    torch.cuda.empty_cache()
     return top_k_values_all, predicted_tokens_all, probability_distribution_all
 
 
