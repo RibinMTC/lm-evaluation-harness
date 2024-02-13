@@ -150,7 +150,7 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
 
     for input in tqdm(inputs):
         # Tokenize input text
-        input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation)
+        input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation).to("cuda")
 
         # Generate probabilities for the next token
         with torch.no_grad():
@@ -168,7 +168,7 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
 
         top_k_values_all.append(top_k_values)
         predicted_tokens_all.append(predicted_tokens)
-    del model, tokenizer
+    del model, tokenizer, outputs
     gc.collect()
     torch.cuda.empty_cache()
     return top_k_values_all, predicted_tokens_all, probability_distribution_all
@@ -217,7 +217,7 @@ def token_dist_model1_model2(model_1, model_2, ds, num_items_to_select=None, ran
     frequently_shift_tokens = []
     # compute for all tokens of the sample
     for prob_dist_bef, prob_dist_aft in zip(probability_distribution_all_before, probability_distribution_all_after):
-        kl_div = scipy.special.kl_div(prob_dist_bef, prob_dist_aft)
+        kl_div = scipy.special.kl_div(prob_dist_bef.cpu(), prob_dist_aft.cpu())
         kl_div = numpy.sum(kl_div.numpy())
         # print("KL Divergence: ", kl_div)
         kl_divergence.append(kl_div)
