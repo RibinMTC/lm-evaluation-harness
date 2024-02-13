@@ -177,7 +177,7 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
 def token_dist_model1_model2(model_1, model_2, ds, num_items_to_select=None, random_samples=False, context='2-shot',
                              use_all_tokens=False, use_domain_words=False):
     # Read the data
-    file_path = df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == model_2)].file_path.values[0]
+    file_path = df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == "meta-llama-Llama-2-70b-chat-hf")].file_path.values[0]
 
     df_after = pd.read_csv(file_path)
 
@@ -286,18 +286,18 @@ def token_dist_model1_model2(model_1, model_2, ds, num_items_to_select=None, ran
     return eval_scores
 
 
-def connect_to_wandb():
-    wandb_token_key: str = "WANDB_TOKEN"
-
-    load_dotenv()
-    # wandb setup
-    wandb_tok = os.environ.get(wandb_token_key)
-    assert wandb_tok and wandb_tok != "<wb_token>", "Wandb token is not defined"
-    wandb.login(key=wandb_tok)
+# def connect_to_wandb():
+#     wandb_token_key: str = "WANDB_TOKEN"
+#
+#     load_dotenv()
+#     # wandb setup
+#     wandb_tok = os.environ.get(wandb_token_key)
+#     assert wandb_tok and wandb_tok != "<wb_token>", "Wandb token is not defined"
+#     wandb.login(key=wandb_tok)
 
 
 def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token-distribution-shift",
-                  entity='anumafzal'):
+                  entity='background-tool'):
     # Prepare config
     model = f"{model_1}-{model_2}"
     sample_id = row_idx
@@ -370,7 +370,7 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
 args = parse_args()
 
 load_dotenv()
-connect_to_wandb()
+#connect_to_wandb()
 
 ds = args.dataset
 context = '2-shot'
