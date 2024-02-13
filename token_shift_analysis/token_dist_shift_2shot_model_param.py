@@ -4,6 +4,8 @@ import jsonargparse
 import pandas as pd
 import random
 import os
+
+import randomname
 import torch
 from typing import List
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -177,7 +179,8 @@ def get_token_distribution(inputs, model_name: str, top_k=5, max_len=2048, trunc
 def token_dist_model1_model2(model_1, model_2, ds, num_items_to_select=None, random_samples=False, context='2-shot',
                              use_all_tokens=False, use_domain_words=False):
     # Read the data
-    file_path = df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == "meta-llama-Llama-2-70b-chat-hf")].file_path.values[0]
+    file_path = \
+    df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == "meta-llama-Llama-2-70b-chat-hf")].file_path.values[0]
 
     df_after = pd.read_csv(file_path)
 
@@ -305,6 +308,7 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
     model_family = model if len(model.split('-')) == 1 else ''.join(model.split('-')[:2])
     config = {'model': model, 'dataset': ds, 'task': task, 'model_family': model_family}
     wandb_run_name = '_'.join([model, task, ds, str(sample_id)])
+    wandb_run_name = run_random_name + '_' + wandb_run_name
 
     wandb_mode = "online"
 
@@ -370,8 +374,9 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
 args = parse_args()
 
 load_dotenv()
-#connect_to_wandb()
+# connect_to_wandb()
 
+run_random_name = randomname.get_name()
 ds = args.dataset
 context = '2-shot'
 samples_to_compute = args.samples_to_compute
