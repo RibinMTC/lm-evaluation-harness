@@ -1152,6 +1152,12 @@ class MDS_FCO_Wikinews_Lead_1shot_20min_42_1536(SummarizationFCO_Fewshot_Base):
     VERSION = 0
     DATASET_PATH = "roysc/mds_FCO_lead_orig_1shot_ex_20Min_seed_42_chunk_1536"
 
+
+class MDS_FCO_Wikinews_Lead_1shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_mds_FCO_lead_orig_1shot_ex_Wikinews_seed_42_simSize_dyn_chunk_1536"
+
+
 class MDS_FCO_Wikinews_Rand_1024(SummarizationFCO_Fewshot_Base):
     VERSION = 0
     DATASET_PATH = "roysc/mds_FCO_rand_orig_0shot_chunk_1024"

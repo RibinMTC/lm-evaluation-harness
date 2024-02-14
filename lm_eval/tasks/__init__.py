@@ -450,6 +450,7 @@ TASK_REGISTRY = {
     "MDSFCO_WikiLe1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Lead_1536,
     "MDSFCO_WikiLe1S21024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Lead_1shot_20min_42_1024,
     "MDSFCO_WikiLe1S21536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Lead_1shot_20min_42_1536,
+    "MDSFCO_WikiLe1SW1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Lead_1shot_Wikinews_42_1536,
     "MDSFCO_WikiRa1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Rand_1024,
     "MDSFCO_WikiRa1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Rand_1536,
     "MDSFCO_WikiRa1S21024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_Rand_1shot_20min_42_1024,

@@ -359,3 +359,116 @@ Starting mds-prefix-experiment
 Wed Jan 17 06:42:20 CET 2024
 Starting mds-ordered-chunks-initial-overview
 [SUCCESS] mds-ordered-chunks-initial-overview
+Tue Jan 23 02:10:00 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+[ERROR] few-shot-experiment-20Min-vs-Wiki-Examples
+Tue Jan 23 02:10:15 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Tue Jan 23 02:47:31 CET 2024
+Starting few-shot-experiment-distMMR
+[SUCCESS] few-shot-experiment-distMMR
+Tue Jan 23 03:05:51 CET 2024
+Starting few-shot-experiment-baselines
+[ERROR] few-shot-experiment-baselines
+Tue Jan 23 03:08:56 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+Tue Jan 23 03:13:21 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+Tue Jan 23 04:13:35 CET 2024
+Starting few-shot-experiment-main
+Tue Jan 23 16:49:25 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+Tue Jan 23 17:38:04 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+[SUCCESS] few-shot-experiment-20Min-vs-Wiki-Examples
+Tue Jan 23 18:22:16 CET 2024
+Starting few-shot-experiment-main
+[SUCCESS] few-shot-experiment-main
+Tue Jan 23 19:00:18 CET 2024
+Starting few-shot-experiment-baselines
+[SUCCESS] few-shot-experiment-baselines
+Tue Jan 23 19:20:15 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Tue Jan 23 19:57:46 CET 2024
+Starting few-shot-experiment-distMMR
+[SUCCESS] few-shot-experiment-distMMR
+Wed Jan 24 16:14:34 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Wed Jan 24 17:33:24 CET 2024
+Starting few-shot-experiment-clustering-BEST
+[SUCCESS] few-shot-experiment-clustering-BEST
+Wed Jan 24 18:08:40 CET 2024
+Starting few-shot-experiment-distMMR
+[SUCCESS] few-shot-experiment-distMMR
+Wed Jan 24 18:47:17 CET 2024
+Starting few-shot-experiment-distMMR-BEST
+[SUCCESS] few-shot-experiment-distMMR-BEST
+Wed Jan 24 19:06:55 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+[SUCCESS] few-shot-experiment-20Min-vs-Wiki-Examples
+Wed Jan 24 21:55:46 CET 2024
+Starting few-shot-experiment-main
+[SUCCESS] few-shot-experiment-main
+Wed Jan 24 23:20:43 CET 2024
+Starting few-shot-experiment-baselines
+[SUCCESS] few-shot-experiment-baselines
+Thu Jan 25 00:31:13 CET 2024
+Starting versions-experiment
+[ERROR] versions-experiment
+Thu Jan 25 00:31:42 CET 2024
+Starting base-experiment-separator-and-german-only
+[ERROR] base-experiment-separator-and-german-only
+Thu Jan 25 00:33:31 CET 2024
+Starting versions-experiment
+[ERROR] versions-experiment
+Thu Jan 25 00:33:55 CET 2024
+Starting base-experiment-separator-and-german-only
+[ERROR] base-experiment-separator-and-german-only
+Thu Jan 25 00:35:04 CET 2024
+Starting versions-experiment
+Thu Jan 25 00:38:33 CET 2024
+Starting versions-experiment
+[ERROR] versions-experiment
+Thu Jan 25 00:38:55 CET 2024
+Starting base-experiment-separator-and-german-only
+Thu Jan 25 00:39:12 CET 2024
+Starting versions-experiment
+[ERROR] versions-experiment
+Thu Jan 25 00:53:51 CET 2024
+Starting base-experiment-separator-and-german-only
+[ERROR] base-experiment-separator-and-german-only
+Thu Jan 25 01:27:39 CET 2024
+Starting few-shot-experiment-clustering
+Thu Jan 25 01:31:44 CET 2024
+Starting few-shot-experiment-clustering
+[SUCCESS] few-shot-experiment-clustering
+Thu Jan 25 02:08:10 CET 2024
+Starting few-shot-experiment-clustering-BEST
+[SUCCESS] few-shot-experiment-clustering-BEST
+Thu Jan 25 02:26:43 CET 2024
+Starting few-shot-experiment-distMMR
+[SUCCESS] few-shot-experiment-distMMR
+Thu Jan 25 02:44:19 CET 2024
+Starting few-shot-experiment-distMMR-BEST
+[SUCCESS] few-shot-experiment-distMMR-BEST
+Thu Jan 25 02:55:24 CET 2024
+Starting few-shot-experiment-20Min-vs-Wiki-Examples
+[SUCCESS] few-shot-experiment-20Min-vs-Wiki-Examples
+Thu Jan 25 03:39:03 CET 2024
+Starting few-shot-experiment-main
+Thu Jan 25 04:02:49 CET 2024
+Starting mds-summarization-chain
+[SUCCESS] mds-summarization-chain
+Thu Jan 25 04:08:43 CET 2024
+Starting mds-summarization-chain-comparison
+[SUCCESS] few-shot-experiment-main
+Thu Jan 25 04:16:50 CET 2024
+Starting few-shot-experiment-baselines
+[SUCCESS] mds-summarization-chain-comparison
+Thu Jan 25 04:18:41 CET 2024
+Starting few-shot-experiment-main
+[SUCCESS] few-shot-experiment-baselines
+[SUCCESS] few-shot-experiment-main
