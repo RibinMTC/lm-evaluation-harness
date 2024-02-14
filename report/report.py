@@ -1648,6 +1648,7 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
             merged_groupbyList = [gblElement for gblElement in groupbyList]
 
             col_new_full = [gblElement for gblElement in gblList]
+            col_new_mean = [gblElement for gblElement in gblList]
             col_new_median = [gblElement for gblElement in gblList]
             orig_groupbyList = [gblElement for gblElement in gblList]
             for metric_name in filtered_merged_metric_names:
@@ -1655,16 +1656,21 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                     metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
 
                 col_new_full.extend([f"{metric_name}", f"{metric_name} {ci_level_str}"])
+                col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
                 col_new_median.append(f"{metric_name}")
             # Calculate multiple statistics + their CI and save them in a table
             df_merged_full = df.groupby(orig_groupbyList).agg(
                 {metric_name: [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] for metric_name in
                  filtered_merged_metric_names}).reset_index()
+            df_merged_mean = df.groupby(orig_groupbyList).agg(
+                {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
             df_merged_median = df.groupby(orig_groupbyList).agg(
                 {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
             df_merged_full.columns = col_new_full
+            df_merged_mean.columns = col_new_mean
             df_merged_median.columns = col_new_median
             df_merged_full = df_merged_full.round(3)
+            df_merged_mean = df_merged_mean.round(3)
             df_merged_median = df_merged_median.round(3)
 
             # make a nice table to copy the text directly from:
@@ -1700,6 +1706,14 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                 os.path.join(experiment_path, "overview_merged",
                              f"merged_overview_table_median_only_{name}____{gblString}.tex"),
                 float_format="%.3f", index=False)
+            df_merged_mean.to_csv(
+                os.path.join(experiment_path, "overview_merged",
+                             f"merged_overview_table_mean_only_{name}____{gblString}.csv"),
+                index=False)
+            df_merged_mean.to_latex(
+                os.path.join(experiment_path, "overview_merged",
+                             f"merged_overview_table_mean_only_{name}____{gblString}.tex"),
+                float_format="%.3f", index=False)
             df_merged_full_NICE.to_csv(
                 os.path.join(experiment_path, "overview_merged",
                              f"merged_overview_table_median_CI_NICE_{name}____{gblString}.csv"),
@@ -1718,6 +1732,7 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
             # agg_funcs_full = [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] * len(filtered_merged_metric_names)
             # agg_funcs_median = [np.median] * len(filtered_merged_metric_names)
             col_new_median = [gblElement for gblElement in gbl]
+            col_new_mean = [gblElement for gblElement in gbl]
             orig_groupbyList = [gblElement for gblElement in gbl]
             orig_groupbyList_First = [gbl[0]]
             orig_groupbyList_First_median = [gbl[0]]
@@ -1726,15 +1741,20 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                     metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
 
                 col_new_median.append(f"{metric_name}")
+                col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
                 orig_groupbyList_First_median.append(f"{metric_name}")
             # Calculate medians
             df_merged_median = df.groupby(orig_groupbyList).agg(
                 {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
+            df_merged_mean = df.groupby(orig_groupbyList).agg(
+                {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
             df_merged_firstGbl_median = df.groupby(orig_groupbyList_First).agg(
                 {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
             df_merged_median.columns = col_new_median
+            df_merged_mean.columns = col_new_mean
             df_merged_firstGbl_median.columns = orig_groupbyList_First_median
             df_merged_median = df_merged_median.round(3)
+            df_merged_mean = df_merged_mean.round(3)
             df_merged_firstGbl_median = df_merged_firstGbl_median.round(3)
 
             # save as csv and latex table
@@ -1745,6 +1765,14 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
             df_merged_median.to_latex(
                 os.path.join(experiment_path, "overview_merged_gbl",
                              f"merged_overview_table_median_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
+                float_format="%.3f", index=False)
+            df_merged_mean.to_csv(
+                os.path.join(experiment_path, "overview_merged_gbl",
+                             f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.csv"),
+                index=False)
+            df_merged_mean.to_latex(
+                os.path.join(experiment_path, "overview_merged_gbl",
+                             f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
                 float_format="%.3f", index=False)
             df_merged_firstGbl_median.to_csv(
                 os.path.join(experiment_path, "overview_merged_gbl",
@@ -1764,6 +1792,7 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
         df[metric_name] = df[metric_name].astype(float, copy=True)
         df_metric_FULL = df.groupby(groupbyList).agg(
             {metric_name: [
+                np.mean, bootstrap_CI(np.mean, confidence_level=confidence_level),
                 np.std, bootstrap_CI(np.std, confidence_level=confidence_level),
                 np.var, bootstrap_CI(np.var, confidence_level=confidence_level),
                 percentile_agg(5), bootstrap_CI(percentile_agg(5), confidence_level=confidence_level),
@@ -1773,6 +1802,7 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                 percentile_agg(95), bootstrap_CI(percentile_agg(95), confidence_level=confidence_level),
             ]}).reset_index()
         col_new = groupbyList + [
+            'Mean', f"Mean {ci_level_str}",
             'St.Dev.', f"St.Dev. {ci_level_str}",
             'Var.', f"Var. {ci_level_str}",
             '5th Perc.', f"5th Perc. {ci_level_str}",
@@ -2807,12 +2837,14 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                 box_plot = sns.boxplot(data=df, x=gbl[0], hue=gbl[1], y=metric_name, flierprops={"marker": "x"},
                                        notch=True, bootstrap=1000,
                                        order=sorted_x_axis_labels, hue_order=sorted_hue_labels)
-                plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5, fontsize=20)
+                plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5, fontsize=20,
+                           title=gbl[1], title_fontsize=18)
                 if metric_name in metric_0_1_range:
                     box_plot.set_ylim(0, 1)
                 # box_plot.axes.set_title("Title", fontsize=50)
                 box_plot.set_xlabel(gbl[0], fontsize=20)
-                box_plot.set_ylabel(metric_name, fontsize=20)
+                box_plot.set_ylabel(metric_name, fontsize=20, rotation=0, labelpad=20)
+                box_plot.yaxis.set_label_coords(0.0, 1.0)
                 box_plot.tick_params(labelsize=18)
                 # Set y-ticks to be 0.1 steps
                 if metric_name in metric_0_1_range:
@@ -3670,6 +3702,20 @@ summchain__experimental_setup = {
             "hue": "N-Shot",
             "is_baseline_row": lambda row: row["Method"] in ["Baseline (truncated)", "Baseline (trunc.)", "Baseline"],
         },
+        {
+            "row": "Size subset",
+            "col": "",
+            "x": "N-Shot",
+            "hue": "Method",
+            "is_baseline_row": lambda row: row["Method"] in ["Baseline (truncated)", "Baseline (trunc.)", "Baseline"],
+        },
+        {
+            "row": "N-Shot",
+            "col": "",
+            "x": "Size subset",
+            "hue": "Method",
+            "is_baseline_row": lambda row: row["Method"] in ["Baseline (truncated)", "Baseline (trunc.)", "Baseline"],
+        },
     ],
     "datasets": ["Wikinews"],
     "prompts_bag_alias": "mds-baseline",
@@ -3687,7 +3733,7 @@ base_experiment_groupByList_variants = [
     SELECT THE EXPERIMENT TO BUILD THE REPORT ON HERE
 """
 # TODO
-experiment_name = "base-experiment-temperature-basic-1-S"
+experiment_name = "mds-summarization-chain-comparison-presentation"
 # few-shot-experiment-20Min-vs-Wiki-Examples
 # few-shot-experiment-clustering
 # few-shot-experiment-clustering-BEST
@@ -3798,6 +3844,7 @@ experiment_config = {
     },
     "mds-summarization-chain": summchain__experimental_setup,
     "mds-summarization-chain-comparison": summchain__experimental_setup,
+    "mds-summarization-chain-comparison-presentation": summchain__experimental_setup,
     "mds-shuffling-and-annotation-experiment": {
         "groupByList": ["Prompt Name", "Dataset Annotation"],
         "models": ["meta-llama/Llama-2-70b-chat-hf"],

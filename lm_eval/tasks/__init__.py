@@ -482,6 +482,7 @@ TASK_REGISTRY = {
     "MDSFCO_WikiDi1SW1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_1shot_Wikinews_42_1024,
     "MDSFCO_WikiDi1SW1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_1shot_Wikinews_42_1536,
     "MDSFCO_WikiDi2SW1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_2shot_Wikinews_42_1024,
+    "MDSFCO_WikiDi2SW1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_2shot_Wikinews_42_1536,
     "MDSFCO_WikiDi090S1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_09_0shot_1024,
     "MDSFCO_WikiDi090S1536_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_09_0shot_1536,
     "MDSFCO_WikiDi091SW1024_100_8b": llm_summarization_mt.MDS_FCO_Wikinews_DistMMR_09_1shot_Wikinews_42_1024,

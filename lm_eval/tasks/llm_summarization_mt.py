@@ -1333,6 +1333,10 @@ class MDS_FCO_Wikinews_DistMMR_2shot_Wikinews_42_1024(SummarizationFCO_Fewshot_B
     VERSION = 0
     DATASET_PATH = "roysc/mds_FCO_distMMR_orig_2shot_ex_Wikinews_seed_42_chunk_1024"
 
+class MDS_FCO_Wikinews_DistMMR_2shot_Wikinews_42_1536(SummarizationFCO_Fewshot_Base):
+    VERSION = 0
+    DATASET_PATH = "roysc/wikinewssum_mds_FCO_distMMR_0_75_orig_2shot_ex_Wikinews_seed_42_simSize_dyn_chunk_1536"
+
 
 
 ### ADDED DEC 8
