@@ -2,6 +2,8 @@ import jsonargparse
 import pandas as pd
 import random
 import os
+
+import randomname
 import torch
 from typing import List
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -32,7 +34,9 @@ model_key = {
 def parse_args():
     parser = jsonargparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, type=str, help="Dataset for analysis, must be in [arxiv, pubmed]")
-    parser.add_argument("--samples_to_compute", required=True, type=int, help="Number of samples to analyze [1,10]", default=1)
+    parser.add_argument("--samples_to_compute", required=True, type=int, help="Number of samples to analyze [1,10]",
+                        default=1)
+    parser.add_argument("--model_name", required=True, type=str, help="Name of model for 0-vs-2-shot comparison")
     parser.add_argument('--config', action=jsonargparse.ActionConfigFile)
 
     return parser.parse_args()
@@ -142,7 +146,7 @@ def get_token_distribution(inputs, top_k=10, max_len=2048, truncation=True, verb
     for input in tqdm(inputs):
         # Tokenize input text
         # print(input.split("SUMMARY:")[-1])
-        input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation)
+        input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation).to("cuda")
 
         # Generate probabilities for the next token
         with torch.no_grad():
@@ -164,7 +168,7 @@ def get_token_distribution(inputs, top_k=10, max_len=2048, truncation=True, verb
     return top_k_values_all, predicted_tokens_all, probability_distribution_all
 
 
-def token_dist_0shot_2shot(model_name, ds, num_items_to_select=None, random_samples=False, row_idx=None,
+def token_dist_0shot_2shot(model_name: str, ds: str, num_items_to_select=None, random_samples=False, row_idx=None,
                            use_all_tokens=False, use_domain_words=False):
     # Read the data
     file_path = df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == model_name)].file_path.values[0]
@@ -278,7 +282,7 @@ def connect_to_wandb():
 
 
 def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token-distribution-shift",
-                  entity='anumafzal'):
+                  entity='background-tool'):
     # Prepare config
     model = model_name
     sample_id = row_idx
@@ -286,6 +290,7 @@ def push_to_wandb(eval_scores: dict, wandb_project_name="domain-adaptation-token
     model_family = model if len(model.split('-')) == 1 else ''.join(model.split('-')[:2])
     config = {'model': model, 'dataset': ds, 'task': task, 'model_family': model_family}
     wandb_run_name = '_'.join([model, task, ds, str(sample_id)])
+    wandb_run_name = run_random_name + '_' + wandb_run_name
 
     wandb_mode = "online"
 
@@ -367,9 +372,7 @@ for i, run in enumerate(two_shot_runs):
 
     df_runs.loc[i] = [run_id, model, model_family, dataset, task, file_path]
 
-load_dotenv()
-connect_to_wandb()
-
+run_random_name = randomname.get_name()
 ds = args.dataset
 # randomly selecting one sample each dataset across which all models are selected
 num_pubmed_samples = 426
@@ -384,13 +387,12 @@ random.shuffle(s)
 samples_to_compute = args.samples_to_compute
 samples = s[-samples_to_compute:]
 
-model_name = 'meta-llama-Llama-2-70b-chat-hf'
+model_name = args.model_name
 
 model_hf_key = model_key[model_name]
 # Loading the model and tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_hf_key)
-tokenizer.pad_token = tokenizer.eos_token  # Most LLMs don't have a pad token by default
-model = None
+tokenizer.pad_token = tokenizer.eos_token
 
 model = AutoModelForCausalLM.from_pretrained(
     model_hf_key,
@@ -405,5 +407,4 @@ for i in range(len(samples)):
     print(ds, row_idx)
     eval_scores = token_dist_0shot_2shot(model_name=model_name, ds=ds,
                                          use_domain_words=True)
-    # use_all_tokens=True,  num_items_to_select=3, random_samples = False,)
     push_to_wandb(eval_scores)
