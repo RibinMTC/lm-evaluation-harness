@@ -50,7 +50,7 @@ def add_prompt(article):
 
 def prepare_context(df, context: str = '0-shot', row: int = None, idx: int = None) -> List:
     if not row:
-        row = random.randint(0, len(df))
+        row = random.randint(0, len(df)-1)
     sample = df.iloc[row]
 
     pred = sample['prediction']
