@@ -202,7 +202,7 @@ def token_dist_0shot_2shot(model_name: str, ds: str, num_items_to_select=None, r
     frequently_shift_tokens = []
     # compute for all tokens of the sample
     for prob_dist_bef, prob_dist_aft in zip(probability_distribution_all_before, probability_distribution_all_after):
-        kl_div = scipy.special.kl_div(prob_dist_bef, prob_dist_aft)
+        kl_div = scipy.special.kl_div(prob_dist_bef.cpu(), prob_dist_aft.cpu())
         kl_div = numpy.sum(kl_div.numpy())
         # print("KL Divergence: ", kl_div)
         kl_divergence.append(kl_div)
