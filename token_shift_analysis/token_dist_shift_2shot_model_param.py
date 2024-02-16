@@ -180,7 +180,7 @@ def token_dist_model1_model2(model_1, model_2, ds, num_items_to_select=None, ran
                              use_all_tokens=False, use_domain_words=False):
     # Read the data
     file_path = \
-    df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == "meta-llama-Llama-2-70b-chat-hf")].file_path.values[0]
+    df_runs.loc[(df_runs['dataset'] == ds) & (df_runs['model'] == model_2)].file_path.values[0]
 
     df_after = pd.read_csv(file_path)
 
