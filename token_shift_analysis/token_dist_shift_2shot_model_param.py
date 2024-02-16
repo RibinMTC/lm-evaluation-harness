@@ -401,13 +401,20 @@ for i, run in enumerate(two_shot_runs):
     df_runs.loc[i] = [run_id, model, model_family, dataset, task, file_path]
 
 model_key = {
-    "meta-llama-Llama-2-7b-chat-hf": "meta-llama/Llama-2-7b-chat-hf",
-    "meta-llama-Llama-2-13b-chat-hf": "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama-Llama-2-70b-chat-hf": "meta-llama/Llama-2-70b-chat-hf",
-    "mistralai-Mistral-7B-Instruct-v0.1": "mistralai/Mistral-7B-Instruct-v0.1",
-    "lmsys-vicuna-7b-v1.5-16k": "lmsys/vicuna-7b-v1.5-16k",
-    "lmsys-vicuna-13b-v1.5-16k": "lmsys/vicuna-13b-v1.5-16k",
-}
+        "meta-llama-Llama-2-7b-chat-hf": "meta-llama/Llama-2-7b-chat-hf",
+        "meta-llama-Llama-2-13b-chat-hf": "meta-llama/Llama-2-13b-chat-hf",
+        "meta-llama-Llama-2-70b-chat-hf": "meta-llama/Llama-2-70b-chat-hf",
+        "mistralai-Mistral-7B-Instruct-v0.1": "mistralai/Mistral-7B-Instruct-v0.1",
+        "lmsys-vicuna-7b-v1.5-16k": "lmsys/vicuna-7b-v1.5-16k",
+        "lmsys-vicuna-13b-v1.5-16k": "lmsys/vicuna-13b-v1.5-16k",
+        "meta-llama-Llama-2-7b-hf-mtc-arxiv": "mtc/meta-llama-Llama-2-7b-hf-arxiv-summarization-5000-last_merged",
+        "meta-llama-Llama-2-7b-hf-mtc-pubmed": "mtc/meta-llama-Llama-2-7b-hf-pubmed-summarization-5000-last_merged",
+        "meta-llama-Llama-2-13b-hf-mtc-arxiv": "mtc/meta-llama-Llama-2-13b-hf-arxiv-summarization-5000-last_merged",
+        "meta-llama-Llama-2-13b-hf-mtc-pubmed": "mtc/meta-llama-Llama-2-13b-hf-pubmed-summarization-5000-last_merged",
+        "mistralai-Mistral-7B-v0.1-mtc-arxiv": "mtc/mistralai-Mistral-7B-v0.1-arxiv-summarization-5000-last_merged",
+        "mistralai-Mistral-7B-v0.1-mtc-pubmed": "mtc/mistralai-Mistral-7B-v0.1-pubmed-summarization-5000-last_merged",
+
+    }
 
 # randomly selecting one sample each dataset across which all models are selected
 pubmed_two_shot_samples = 426
