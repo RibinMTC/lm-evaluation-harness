@@ -712,6 +712,11 @@ process_files_missing_10 = [
     "bigscience-bloomz-7b1-mt/SummarizationTask_20Minuten_49_write_out_info.json",
 ]
 
+process_files_missing_11 = [
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiLe1SW1536_100_8b_write_out_info.json",
+    "meta-llama-Llama-2-70b-chat-hf/MDSFCO_WikiDi2SW1536_100_8b_write_out_info.json",
+]
+
 """
 Llama-2-7b Notes: 
 Document 990, "Der zweite Silvester in Folge, der unter dem Einfluss der Corona-Pand..." is too long
@@ -768,9 +773,10 @@ process_queue = [
     # ("SEAHORSE_missing5", process_files_missing_5),
     # ("SEAHORSE_missing6", process_files_missing_6),  # WAITING FOR RESULTS
     # ("SEAHORSE_missing7", process_files_missing_7), # Chain-Ablation
-    ("SEAHORSE_missing8", process_files_missing_8), # Redo-of bloomz and falcon german prompts
-    ("SEAHORSE_missing9", process_files_missing_9), # Redo-of bloomz and falcon german prompts
-    ("SEAHORSE_missing10", process_files_missing_10), # Redo-of bloomz and falcon german prompts
+    # ("SEAHORSE_missing8", process_files_missing_8),  # Redo-of bloomz and falcon german prompts
+    # ("SEAHORSE_missing9", process_files_missing_9),  # Redo-of bloomz and falcon german prompts
+    # ("SEAHORSE_missing10", process_files_missing_10),  # Redo-of bloomz and falcon german prompts
+    ("SEAHORSE_missing11", process_files_missing_11),  # Addition for presentation
 ]
 
 worker_lang = "de"

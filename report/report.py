@@ -585,6 +585,7 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
         if len(list(filter(None, is_bullet_line))) >= 2:
             return True
         return False
+
     out_df["Is Bulletpoint Summary"] = out_df["Prediction"].apply(lambda x: is_bulletpoint_summary(x))
     out_df["Dataset Annotation (Is Bullet Point Summary)"] = out_df.apply(
         lambda row: f"{row['Dataset Annotation']} {'(bullet-point)' if row['Is Bulletpoint Summary'] else ''}", axis=1)
@@ -2546,6 +2547,7 @@ def custom_sort_specialcase(x):
     else:
         return x
 
+
 def label_sort_key_func(x, prioritize_string_order=False):
     # if there is a number in the label, sort by that number first, then the string order
     if isinstance(x, int):
@@ -2731,6 +2733,7 @@ def make_special_catplots(df, save_base_path, metric_name, special_catplot_confi
                                                 f"SpecialCatPlot_{metric_name}__{catplot_config['row']}_{catplot_config['col']}__x_{catplot_config['x']}_hue_{catplot_config['hue']}_box_plot{data_file_suffix}__{fig_size_name}__ZOOMED.{file_suffix}")
             plt.savefig(special_catplot_path, bbox_inches='tight', **savefig_suffix_kwargs)
             plt.close()
+
 
 def get_sorted_labels(data_df, column, prioritize_string_order=False):
     sorted_axis_labels = data_df[column].unique().tolist()
@@ -4386,6 +4389,8 @@ datasetNameMap = {
     "WikiLe1536": "Wikinews",
     "WikiLe1S21024": "Wikinews",
     "WikiLe1S21536": "Wikinews",
+    "WikiLe1SW1536": "Wikinews",
+    "WikiDi2SW1536": "Wikinews",
     "WikiRa1024": "Wikinews",
     "WikiRa1536": "Wikinews",
     "WikiRa1S21024": "Wikinews",
@@ -4512,6 +4517,8 @@ datasetAnnotationMap = {
     "WikiDi2SW1024": "Ex.Src: Wikinews",
     "WikiLe1S21024": "Ex.Src: 20Minuten",
     "WikiLe1S21536": "Ex.Src: 20Minuten",
+    "WikiLe1SW1536": "Ex.Src: Wikinews",
+    "WikiDi2SW1536": "Ex.Src: Wikinews",
     "WikiRa1S21024": "Ex.Src: 20Minuten",
     "WikiRa1S21536": "Ex.Src: 20Minuten",
     "WikiRa1SW1024": "Ex.Src: Wikinews",
@@ -4614,6 +4621,8 @@ preprocessing_method = {
     "WikiLe1536": "Lead",
     "WikiRa1024": "Random",
     "WikiRa1536": "Random",
+    "WikiLe1SW1536": "Lead",
+    "WikiDi2SW1536": "Distance-MMR (0.75)",
     "WikiCl0N1024": "Clustering",
     "WikiCl0N1536": "Clustering",
     "WikiCl0N2048": "Clustering",
@@ -4749,6 +4758,8 @@ preprocessing_order = {
     "WikiLe1536": "original",
     "WikiRa1024": "original",
     "WikiRa1536": "original",
+    "WikiLe1SW1536": "original",
+    "WikiDi2SW1536": "original",
     "WikiCl0N1024": "original",
     "WikiCl0N1536": "original",
     "WikiCl0N2048": "original",
@@ -4822,6 +4833,8 @@ dataset_n_fewshot_annotation_map = {
     "WikiLe1536": "0",
     "WikiRa1024": "0",
     "WikiRa1536": "0",
+    "WikiLe1SW1536": "1",
+    "WikiDi2SW1536": "2",
     "WikiCl0N1024": "0",
     "WikiCl0N1536": "0",
     "WikiCl0N2048": "0",
@@ -4935,6 +4948,8 @@ preprocessing_parameters = {
     "WikiLe1536": "1536 Tokens",
     "WikiRa1024": "1024 Tokens",
     "WikiRa1536": "1536 Tokens",
+    "WikiLe1SW1536": "1536 Tokens",
+    "WikiDi2SW1536": "1536 Tokens",
     "WikiCl0N1024": "1024 Tokens",
     "WikiCl0N1536": "1536 Tokens",
     "WikiCl0N2048": "2048 Tokens",

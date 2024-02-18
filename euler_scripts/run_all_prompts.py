@@ -138,7 +138,8 @@ dataset_names = [
     # "WikinewsCDS4i11", # TODO: CONTINUE HERE
     # "WikinewsCDS4i12",
 
-    "WikiLe1SW1536",
+    # "WikiLe1SW1536",
+    "WikiDi2SW1536",
 
     # "20Minuten"
     # "20min0"
@@ -444,7 +445,7 @@ inferable_args = {
         "palm2": "rtx_2080_ti",
         "meta-llama/Llama-2-7b-chat-hf": "rtx_3090",
         "meta-llama/Llama-2-13b-chat-hf": "rtx_3090",
-        "meta-llama/Llama-2-70b-chat-hf": "rtx_3090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
+        "meta-llama/Llama-2-70b-chat-hf": "rtx_4090",  # 3x a100-pcie-40gb, 4-6x rtx_3090 or rtx_4090
         "mistralai/Mixtral-8x7B-Instruct-v0.1": "rtx_3090",
         "fangloveskari/ORCA_LLaMA_70B_QLoRA": "a100-pcie-40gb",
         "garage-bAInd/Platypus2-70B-instruct": "rtx_3090",

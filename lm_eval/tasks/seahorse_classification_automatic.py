@@ -454,3 +454,32 @@ class AutomaticSeahorseClassificationTask_SEAHORSE_missing10(AutomaticSeahorseCl
     VERSION = 0
     DATASET_PATH = "roysc/SEAHORSE_missing10"
     load_lcl = False
+
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing11(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing10"
+    load_lcl = False
+
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing12(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing10"
+    load_lcl = False
+
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing13(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing10"
+    load_lcl = False
+
+
+
+class AutomaticSeahorseClassificationTask_SEAHORSE_missing14(AutomaticSeahorseClassificationTask):
+    VERSION = 0
+    DATASET_PATH = "roysc/SEAHORSE_missing10"
+    load_lcl = False
+
