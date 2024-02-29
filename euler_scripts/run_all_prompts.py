@@ -17,7 +17,7 @@ models = [
     # "tiiuae/falcon-7b-instruct",
     # "meta-llama/Llama-2-7b-chat-hf",
     # "meta-llama/Llama-2-13b-chat-hf",
-    "meta-llama/Llama-2-70b-chat-hf",
+    # "meta-llama/Llama-2-70b-chat-hf",
     # "mistralai/Mixtral-8x7B-Instruct-v0.1",
     # "fangloveskari/ORCA_LLaMA_70B_QLoRA",
     # "garage-bAInd/Platypus2-70B-instruct",
@@ -25,9 +25,9 @@ models = [
     # "LeoLM/leo-hessianai-13b",
     # "LeoLM/leo-hessianai-7b-chat",
     # "LeoLM/leo-hessianai-13b-chat",
-    # "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
-    # "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
-    # "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-attribution-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
+    "mtc/NousResearch-Llama-2-7b-hf-conciseness-with-target-modules-qlora-4bit-merged",
     # "google/seahorse-large-q1",
     # "google/seahorse-large-q2",
     # "google/seahorse-large-q3",
@@ -139,7 +139,7 @@ dataset_names = [
     # "WikinewsCDS4i12",
 
     # "WikiLe1SW1536",
-    "WikiDi2SW1536",
+    # "WikiDi2SW1536",
 
     # "20Minuten"
     # "20min0"
@@ -240,7 +240,7 @@ dataset_names = [
     # "missing8",
     # "missing9",
     # "missing10",
-    # TODO: "missing11",
+    "missing11",
 
     # "20Minuten",
 
@@ -259,7 +259,7 @@ prompt_versions = [100] # 22, 23, 25, 40, 41, 42
 #
 # 23, 5, 7, 9, 11, 13, 15, 17, 19, 22, 42, 2, 40, 41, 4
 task_base_names = [
-    # "seahorse_",
+    "seahorse_",
     # "RepeatExperimentBugfix_",
 
     # "SummarizationTask_",
@@ -267,11 +267,11 @@ task_base_names = [
     # "MDSChain_",
     # "MDSChainAbl_",
     # "MDS_",
-    "MDSFCO_",
+    # "MDSFCO_",
 ]  # ["SummLtM_", "SummLtMDe_", "SummarizationTask_", "SummFewshot{num_fewshot}_", "MDSSumm_", "SummLtM1_", "SummLtM2_"]
 
 temperature_values = [0]  # [0, 0.1, 0.5, 1.0]
-precision_values = ["8b"]  # ["", "8b"]
+precision_values = [""]  # ["", "8b"]
 num_fewshot_list = [0]  # [0, 1, 2] # [0] #
 
 # TODO: MDS-split-input-documents

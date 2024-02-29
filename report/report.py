@@ -291,23 +291,25 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
     pathlib.Path(dataset_insights_path).mkdir(parents=True, exist_ok=True)
     for dataset_name in datasets:
         metric_plt_theme = {
-            "style": "darkgrid", "rc": {"figure.figsize": (15, 18), "font.size": 24, },
+            "style": "darkgrid", "rc": {"figure.figsize": (10, 12), "font.size": 24, },
         }
         sns.set_theme(**metric_plt_theme)
         # Box-Plot
+        length_box_fontsize = 24
         fig, axes = plt.subplots(1, 2)
         box_plot_1 = sns.boxplot(data=datasets[dataset_name], y="num_article_bpe", flierprops={"marker": "x"},
                                  notch=True, bootstrap=1000, ax=axes[0])
-        box_plot_1.set_xlabel('Article', fontsize=18)
-        box_plot_1.set_ylabel("Length (BPE)", fontsize=18)
-        box_plot_1.tick_params(labelsize=16)
+        box_plot_1.set_xlabel('Article', fontsize=length_box_fontsize)
+        box_plot_1.set_ylabel("Length (BPE)", fontsize=length_box_fontsize)
+        box_plot_1.tick_params(labelsize=length_box_fontsize-2)
         box_plot_2 = sns.boxplot(data=datasets[dataset_name], y="num_summary_bpe", flierprops={"marker": "x"},
                                  notch=True, bootstrap=1000, ax=axes[1])
-        box_plot_2.set_xlabel('Summary', fontsize=18)
-        box_plot_2.set_ylabel("Length (BPE)", fontsize=18)
-        box_plot_2.tick_params(labelsize=16)
+        box_plot_2.set_xlabel('Summary', fontsize=length_box_fontsize)
+        box_plot_2.set_ylabel("Length (BPE)", fontsize=length_box_fontsize)
+        box_plot_2.tick_params(labelsize=length_box_fontsize-2)
         # save
         box_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_length_box.pdf")
+        plt.tight_layout()
         plt.savefig(box_plot_path)
         plt.close()
 
@@ -344,6 +346,11 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
             "style": "darkgrid", "rc": {"figure.figsize": (15, 10), "font.size": 24, },
         }
         sns.set_theme(**metric_plt_theme)
+
+        # Additional annotations
+        affected_by_mds_fco_threshold = 1514
+        different_analysis_threshold = 3500
+
         for key in keys_to_xlabels.keys():
             hist_binwidth = keys_to_histogram_binwidth[key]
             if dataset_name == "20Minuten" and key == "num_summary_bpe":
@@ -362,6 +369,90 @@ def load_all_results(results_path, model_names, shortNames, reload_preprocessed_
             # save
             hist_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_{key}_count_histogram.pdf")
             plt.savefig(hist_plot_path)
+
+            # save additional plot with annotations
+            if key == "num_article_bpe":
+                text_ann_mode = "not-full"
+
+                if text_ann_mode == "full":
+                    histplot.axvline(affected_by_mds_fco_threshold, color='r', linestyle='--', label="Affected by MDS-ICL")
+                    histplot.axvline(different_analysis_threshold, color='g', linestyle='--', label="Different Analysis")
+
+                    # count the number of affected articles
+                    smaller_than_mds_fco = len(datasets[dataset_name][datasets[dataset_name][key] < affected_by_mds_fco_threshold])
+                    larger_than_different_analysis = len(datasets[dataset_name][datasets[dataset_name][key] > different_analysis_threshold])
+                    num_between_thresholds = len(datasets[dataset_name][
+                                                    (datasets[dataset_name][key] > affected_by_mds_fco_threshold) & (
+                                                            datasets[dataset_name][key] < different_analysis_threshold)])
+
+                    # format all three numbers to use the same number of characters, left pad with whitespace
+                    max_num_digits = max(len(str(smaller_than_mds_fco)), len(str(num_between_thresholds)), len(str(larger_than_different_analysis)))
+                    smaller_than_mds_fco = f"{smaller_than_mds_fco:>{max_num_digits}}"
+                    num_between_thresholds = f"{num_between_thresholds:>{max_num_digits}}"
+                    larger_than_different_analysis = f"{larger_than_different_analysis:>{max_num_digits}}"
+
+                    xlim_max = histplot.get_xlim()[1]
+
+                    # make annotations inside the plot
+                    histplot.text(0.4 * xlim_max, 0.9 * histplot.get_ylim()[1], f"Not affected by MDS-ICL: {smaller_than_mds_fco}", fontsize=34, fontweight="normal", color='#a33c3c', fontname='Calibri')
+                    histplot.text(0.4 * xlim_max, 0.8 * histplot.get_ylim()[1], f"Affected by MDS-ICL: {num_between_thresholds}", fontsize=34, fontweight="normal", color='b', fontname='Calibri')
+                    histplot.text(0.4 * xlim_max, 0.7 * histplot.get_ylim()[1], f"Different Analysis: {larger_than_different_analysis}", fontsize=34, fontweight="normal", color='#3c9642', fontname='Calibri')
+
+                    # make background shade for the different regions
+                    histplot.axvspan(0, affected_by_mds_fco_threshold, color='r', alpha=0.1)
+                    histplot.axvspan(affected_by_mds_fco_threshold, different_analysis_threshold, color='b', alpha=0.1)
+                    histplot.axvspan(different_analysis_threshold, xlim_max * 1.2, color='g', alpha=0.1)
+
+                    # set x-lim between 0 and the maximal bin upper bound
+                    histplot.set_xlim(0, xlim_max)
+
+                    # histplot.legend()
+                    # histplot.set_xlim(0, 3000)
+                    hist_plot_path = os.path.join(dataset_insights_path, f"{dataset_name}_{key}_count_histogram_zoomed-full.pdf")
+                    plt.savefig(hist_plot_path)
+                else:
+                    histplot.axvline(different_analysis_threshold, color='g', linestyle='--',
+                                     label="Different Analysis")
+
+                    # count the number of affected articles
+                    smaller_than_different_analysis = len(
+                        datasets[dataset_name][datasets[dataset_name][key] < different_analysis_threshold])
+                    larger_than_different_analysis = len(
+                        datasets[dataset_name][datasets[dataset_name][key] > different_analysis_threshold])
+
+                    # format all three numbers to use the same number of characters, left pad with whitespace
+                    max_num_digits = max(len(str(smaller_than_different_analysis)),
+                                         len(str(larger_than_different_analysis)))
+                    smaller_than_different_analysis = f"{smaller_than_different_analysis:>{max_num_digits}}"
+                    larger_than_different_analysis = f"{larger_than_different_analysis:>{max_num_digits}}"
+
+                    xlim_max = histplot.get_xlim()[1]
+
+                    # RED: #a33c3c
+                    custom_red = "#a33c3c"
+                    # GREEN: #3c9642
+                    custom_green = "#3c9642"
+                    # make annotations inside the plot
+                    histplot.text(0.55 * xlim_max, 0.9 * histplot.get_ylim()[1],
+                                  f"Small: {smaller_than_different_analysis}", fontsize=34, fontweight="normal",
+                                  color=custom_green, fontname='Calibri')
+                    histplot.text(0.55 * xlim_max, 0.8 * histplot.get_ylim()[1],
+                                  f"Large: {larger_than_different_analysis}", fontsize=34,
+                                  fontweight="normal", color=custom_red, fontname='Calibri')
+
+                    # make background shade for the different regions
+                    histplot.axvspan(0, different_analysis_threshold, color='g', alpha=0.1)
+                    histplot.axvspan(different_analysis_threshold, xlim_max * 1.2, color='r', alpha=0.1)
+
+                    # set x-lim between 0 and the maximal bin upper bound
+                    histplot.set_xlim(0, xlim_max)
+
+                    # histplot.legend()
+                    # histplot.set_xlim(0, 3000)
+                    hist_plot_path = os.path.join(dataset_insights_path,
+                                                  f"{dataset_name}_{key}_count_histogram_zoomed.pdf")
+                    plt.savefig(hist_plot_path)
+
             plt.close()
 
             # also save the histogram as a table (latex)
@@ -1621,107 +1712,7 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
             df[metric_name] = df[metric_name].astype(float, copy=True)
 
     # Make an aggregated overview table with medians with all relevant metrics in the same table
-    for name, relevant_metrics in OVERVIEW_TABLE_merged_table_relevant_metric_groups:
-        filtered_merged_metric_names = [metric_name for metric_name in relevant_metrics if
-                                        metric_name in df.columns]
-        if any([True for el in ["Attribution (Avg. Score)", "Main Ideas (Avg. Score)"] if
-                el in filtered_merged_metric_names]):
-            # remove the base values
-            filtered_merged_metric_names.remove("Attribution")
-            filtered_merged_metric_names.remove("Main Ideas")
-        # agg_funcs_full = [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] * len(filtered_merged_metric_names)
-        # agg_funcs_median = [np.median] * len(filtered_merged_metric_names)
-        gblList_List = [groupbyList, [groupbyList[0]], [groupbyList[1]]]
-        gblList_Extension = []
-        for gbl in gblExtension:
-            gblList_Extension.append([gbl[0]])
-            gblList_Extension.append([gbl[1]])
-            gblList_Extension.append(gbl)
-        gblList_List = gblList_List + gblList_Extension
-        if "Model" in groupbyList:
-            # get other entry
-            other_entry = [el for el in groupbyList if el != "Model"][0]
-            gblList_List = gblList_List + [[other_entry], [other_entry, "Model Type"],
-                                           [other_entry, "Model Type", "Model"], ["Model Type"]]
-        # remove duplicate entries in gblList_List
-        gblList_List = list(set([tuple(gblList) for gblList in gblList_List]))
-        for gblList in gblList_List:
-            merged_groupbyList = [gblElement for gblElement in groupbyList]
-
-            col_new_full = [gblElement for gblElement in gblList]
-            col_new_mean = [gblElement for gblElement in gblList]
-            col_new_median = [gblElement for gblElement in gblList]
-            orig_groupbyList = [gblElement for gblElement in gblList]
-            for metric_name in filtered_merged_metric_names:
-                if metric_name in OVERVIEW_TABLE_Rename_Map:  # rename if necessary
-                    metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
-
-                col_new_full.extend([f"{metric_name}", f"{metric_name} {ci_level_str}"])
-                col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
-                col_new_median.append(f"{metric_name}")
-            # Calculate multiple statistics + their CI and save them in a table
-            df_merged_full = df.groupby(orig_groupbyList).agg(
-                {metric_name: [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] for metric_name in
-                 filtered_merged_metric_names}).reset_index()
-            df_merged_mean = df.groupby(orig_groupbyList).agg(
-                {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
-            df_merged_median = df.groupby(orig_groupbyList).agg(
-                {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
-            df_merged_full.columns = col_new_full
-            df_merged_mean.columns = col_new_mean
-            df_merged_median.columns = col_new_median
-            df_merged_full = df_merged_full.round(3)
-            df_merged_mean = df_merged_mean.round(3)
-            df_merged_median = df_merged_median.round(3)
-
-            # make a nice table to copy the text directly from:
-            df_merged_full_NICE = df_merged_full.copy()
-            ci_columns = [col for col in df_merged_full_NICE.columns if ci_level_str in col]
-            for metric_name in filtered_merged_metric_names:
-                metric_col = OVERVIEW_TABLE_Rename_Map[
-                    metric_name] if metric_name in OVERVIEW_TABLE_Rename_Map else metric_name
-                metric_ci_col = f"{metric_col} {ci_level_str}"
-                round_func = lambda x: round(x, 3) if not math.isnan(x) else "NaN"
-                CI_niceify = lambda x: f"({ci_level_str}: {round_func(x[0])}-{round_func(x[1])})" if not math.isnan(
-                    x[0]) else "NaN"
-                df_merged_full_NICE[metric_col] = df_merged_full_NICE.apply(
-                    lambda row: f"{row[metric_col]} {CI_niceify(row[metric_ci_col])}", axis=1)
-            # remove the ci columns
-            df_merged_full_NICE = df_merged_full_NICE.drop(columns=ci_columns)
-
-            # save as csv and latex table
-            gblString = "_".join(gblList)
-            df_merged_full.to_csv(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_median_CI_{name}____{gblString}.csv"),
-                index=False)
-            df_merged_full.to_latex(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_median_CI_{name}____{gblString}.tex"),
-                float_format="%.3f", index=False)
-            df_merged_median.to_csv(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_median_only_{name}____{gblString}.csv"),
-                index=False)
-            df_merged_median.to_latex(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_median_only_{name}____{gblString}.tex"),
-                float_format="%.3f", index=False)
-            df_merged_mean.to_csv(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_mean_only_{name}____{gblString}.csv"),
-                index=False)
-            df_merged_mean.to_latex(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_mean_only_{name}____{gblString}.tex"),
-                float_format="%.3f", index=False)
-            df_merged_full_NICE.to_csv(
-                os.path.join(experiment_path, "overview_merged",
-                             f"merged_overview_table_median_CI_NICE_{name}____{gblString}.csv"),
-                index=False)
-
-    # Make similar tables for each metric, but for all passed groupbylists in gblExtension (only medians)
-    for gbl in gblExtension:
+    if True:
         for name, relevant_metrics in OVERVIEW_TABLE_merged_table_relevant_metric_groups:
             filtered_merged_metric_names = [metric_name for metric_name in relevant_metrics if
                                             metric_name in df.columns]
@@ -1732,57 +1723,159 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
                 filtered_merged_metric_names.remove("Main Ideas")
             # agg_funcs_full = [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] * len(filtered_merged_metric_names)
             # agg_funcs_median = [np.median] * len(filtered_merged_metric_names)
-            col_new_median = [gblElement for gblElement in gbl]
-            col_new_mean = [gblElement for gblElement in gbl]
-            orig_groupbyList = [gblElement for gblElement in gbl]
-            orig_groupbyList_First = [gbl[0]]
-            orig_groupbyList_First_median = [gbl[0]]
-            for metric_name in filtered_merged_metric_names:
-                if metric_name in OVERVIEW_TABLE_Rename_Map:  # rename if necessary
-                    metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
+            gblList_List = [groupbyList, [groupbyList[0]], [groupbyList[1]]]
+            gblList_Extension = []
+            for gbl in gblExtension:
+                gblList_Extension.append([gbl[0]])
+                gblList_Extension.append([gbl[1]])
+                gblList_Extension.append(gbl)
+            gblList_List = gblList_List + gblList_Extension
+            if "Model" in groupbyList:
+                # get other entry
+                other_entry = [el for el in groupbyList if el != "Model"][0]
+                gblList_List = gblList_List + [[other_entry], [other_entry, "Model Type"],
+                                               [other_entry, "Model Type", "Model"], ["Model Type"]]
+            # remove duplicate entries in gblList_List
+            gblList_List = list(set([tuple(gblList) for gblList in gblList_List]))
+            for gblList in gblList_List:
+                merged_groupbyList = [gblElement for gblElement in groupbyList]
 
-                col_new_median.append(f"{metric_name}")
-                col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
-                orig_groupbyList_First_median.append(f"{metric_name}")
-            # Calculate medians
-            df_merged_median = df.groupby(orig_groupbyList).agg(
-                {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
-            df_merged_mean = df.groupby(orig_groupbyList).agg(
-                {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
-            df_merged_firstGbl_median = df.groupby(orig_groupbyList_First).agg(
-                {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
-            df_merged_median.columns = col_new_median
-            df_merged_mean.columns = col_new_mean
-            df_merged_firstGbl_median.columns = orig_groupbyList_First_median
-            df_merged_median = df_merged_median.round(3)
-            df_merged_mean = df_merged_mean.round(3)
-            df_merged_firstGbl_median = df_merged_firstGbl_median.round(3)
+                col_new_full = [gblElement for gblElement in gblList]
+                col_new_mean = [gblElement for gblElement in gblList]
+                col_new_median = [gblElement for gblElement in gblList]
+                orig_groupbyList = [gblElement for gblElement in gblList]
+                for metric_name in filtered_merged_metric_names:
+                    if metric_name in OVERVIEW_TABLE_Rename_Map:  # rename if necessary
+                        metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
 
-            # save as csv and latex table
-            df_merged_median.to_csv(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_median_only_{name}__{gbl[0]}_{gbl[1]}.csv"),
-                index=False)
-            df_merged_median.to_latex(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_median_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
-                float_format="%.3f", index=False)
-            df_merged_mean.to_csv(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.csv"),
-                index=False)
-            df_merged_mean.to_latex(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
-                float_format="%.3f", index=False)
-            df_merged_firstGbl_median.to_csv(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_median_only_{name}__{gbl[0]}.csv"),
-                index=False)
-            df_merged_firstGbl_median.to_latex(
-                os.path.join(experiment_path, "overview_merged_gbl",
-                             f"merged_overview_table_median_only_{name}__{gbl[0]}.tex"),
-                float_format="%.3f", index=False)
+                    col_new_full.extend([f"{metric_name}", f"{metric_name} {ci_level_str}"])
+                    col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
+                    col_new_median.append(f"{metric_name}")
+                # Calculate multiple statistics + their CI and save them in a table
+                df_merged_full = df.groupby(orig_groupbyList).agg(
+                    {metric_name: [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] for metric_name in
+                     filtered_merged_metric_names}).reset_index()
+                df_merged_mean = df.groupby(orig_groupbyList).agg(
+                    {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
+                df_merged_median = df.groupby(orig_groupbyList).agg(
+                    {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
+                df_merged_full.columns = col_new_full
+                df_merged_mean.columns = col_new_mean
+                df_merged_median.columns = col_new_median
+                df_merged_full = df_merged_full.round(3)
+                df_merged_mean = df_merged_mean.round(3)
+                df_merged_median = df_merged_median.round(3)
+
+                # make a nice table to copy the text directly from:
+                df_merged_full_NICE = df_merged_full.copy()
+                ci_columns = [col for col in df_merged_full_NICE.columns if ci_level_str in col]
+                for metric_name in filtered_merged_metric_names:
+                    metric_col = OVERVIEW_TABLE_Rename_Map[
+                        metric_name] if metric_name in OVERVIEW_TABLE_Rename_Map else metric_name
+                    metric_ci_col = f"{metric_col} {ci_level_str}"
+                    round_func = lambda x: round(x, 3) if not math.isnan(x) else "NaN"
+                    CI_niceify = lambda x: f"({ci_level_str}: {round_func(x[0])}-{round_func(x[1])})" if not math.isnan(
+                        x[0]) else "NaN"
+                    df_merged_full_NICE[metric_col] = df_merged_full_NICE.apply(
+                        lambda row: f"{row[metric_col]} {CI_niceify(row[metric_ci_col])}", axis=1)
+                # remove the ci columns
+                df_merged_full_NICE = df_merged_full_NICE.drop(columns=ci_columns)
+
+                # save as csv and latex table
+                gblString = "_".join(gblList)
+                df_merged_full.to_csv(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_median_CI_{name}____{gblString}.csv"),
+                    index=False)
+                df_merged_full.to_latex(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_median_CI_{name}____{gblString}.tex"),
+                    float_format="%.3f", index=False)
+                df_merged_median.to_csv(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_median_only_{name}____{gblString}.csv"),
+                    index=False)
+                df_merged_median.to_latex(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_median_only_{name}____{gblString}.tex"),
+                    float_format="%.3f", index=False)
+                df_merged_mean.to_csv(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_mean_only_{name}____{gblString}.csv"),
+                    index=False)
+                df_merged_mean.to_latex(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_mean_only_{name}____{gblString}.tex"),
+                    float_format="%.3f", index=False)
+                df_merged_full_NICE.to_csv(
+                    os.path.join(experiment_path, "overview_merged",
+                                 f"merged_overview_table_median_CI_NICE_{name}____{gblString}.csv"),
+                    index=False)
+
+    # Make similar tables for each metric, but for all passed groupbylists in gblExtension (only medians)
+    if True:
+        for gbl in gblExtension:
+            for name, relevant_metrics in OVERVIEW_TABLE_merged_table_relevant_metric_groups:
+                filtered_merged_metric_names = [metric_name for metric_name in relevant_metrics if
+                                                metric_name in df.columns]
+                if any([True for el in ["Attribution (Avg. Score)", "Main Ideas (Avg. Score)"] if
+                        el in filtered_merged_metric_names]):
+                    # remove the base values
+                    filtered_merged_metric_names.remove("Attribution")
+                    filtered_merged_metric_names.remove("Main Ideas")
+                # agg_funcs_full = [np.median, bootstrap_CI(np.median, confidence_level=confidence_level)] * len(filtered_merged_metric_names)
+                # agg_funcs_median = [np.median] * len(filtered_merged_metric_names)
+                col_new_median = [gblElement for gblElement in gbl]
+                col_new_mean = [gblElement for gblElement in gbl]
+                orig_groupbyList = [gblElement for gblElement in gbl]
+                orig_groupbyList_First = [gbl[0]]
+                orig_groupbyList_First_median = [gbl[0]]
+                for metric_name in filtered_merged_metric_names:
+                    if metric_name in OVERVIEW_TABLE_Rename_Map:  # rename if necessary
+                        metric_name = OVERVIEW_TABLE_Rename_Map[metric_name]
+
+                    col_new_median.append(f"{metric_name}")
+                    col_new_mean.extend([f"{metric_name}", f"{metric_name} St.Dev."])
+                    orig_groupbyList_First_median.append(f"{metric_name}")
+                # Calculate medians
+                df_merged_median = df.groupby(orig_groupbyList).agg(
+                    {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
+                df_merged_mean = df.groupby(orig_groupbyList).agg(
+                    {metric_name: [np.mean, np.std] for metric_name in filtered_merged_metric_names}).reset_index()
+                df_merged_firstGbl_median = df.groupby(orig_groupbyList_First).agg(
+                    {metric_name: [np.median] for metric_name in filtered_merged_metric_names}).reset_index()
+                df_merged_median.columns = col_new_median
+                df_merged_mean.columns = col_new_mean
+                df_merged_firstGbl_median.columns = orig_groupbyList_First_median
+                df_merged_median = df_merged_median.round(3)
+                df_merged_mean = df_merged_mean.round(3)
+                df_merged_firstGbl_median = df_merged_firstGbl_median.round(3)
+
+                # save as csv and latex table
+                df_merged_median.to_csv(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_median_only_{name}__{gbl[0]}_{gbl[1]}.csv"),
+                    index=False)
+                df_merged_median.to_latex(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_median_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
+                    float_format="%.3f", index=False)
+                df_merged_mean.to_csv(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.csv"),
+                    index=False)
+                df_merged_mean.to_latex(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_mean_only_{name}__{gbl[0]}_{gbl[1]}.tex"),
+                    float_format="%.3f", index=False)
+                df_merged_firstGbl_median.to_csv(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_median_only_{name}__{gbl[0]}.csv"),
+                    index=False)
+                df_merged_firstGbl_median.to_latex(
+                    os.path.join(experiment_path, "overview_merged_gbl",
+                                 f"merged_overview_table_median_only_{name}__{gbl[0]}.tex"),
+                    float_format="%.3f", index=False)
 
     # make a table showing the median of each metric (one table per metric), grouped by groupbyList
     for metric_name in metric_names:
@@ -1870,12 +1963,17 @@ def statistics_overview(experiment_path, df, metric_names, groupbyList=["Model",
         for (a, b) in [(0, 1), (1, 0)]:
             hue_order = get_sorted_labels(df, groupbyList[b])
             x_order = get_sorted_labels(df, groupbyList[a])
-            sns.pointplot(data=df, x=groupbyList[a], y=metric_name, hue=groupbyList[b], hue_order=hue_order,
+            sns.set(rc={'figure.figsize': (14,8)})
+            pointplot = sns.pointplot(data=df, x=groupbyList[a], y=metric_name, hue=groupbyList[b], hue_order=hue_order,
                           order=x_order,
                           estimator=np.median, errorbar=('ci', 95), n_boot=1000, dodge=True,
                           linestyles='')  # , err_kws={"markersize": 10, "capsize": 0.1, "errwidth": 1.5, "palette": "colorblind"}
-            plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5)
-            plt.xticks(rotation=90)
+            plt.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.5, fontsize=18,
+                       title=groupbyList[b], title_fontsize=18)
+            pointplot.set_xlabel(groupbyList[a], fontsize=20)
+            pointplot.set_ylabel(metric_name, fontsize=20)
+            pointplot.tick_params(labelsize=18)
+            # plt.xticks(rotation=90)
             plt.tight_layout()
             save_path = os.path.join(experiment_path, "overview_plots",
                                      f"overview_seaborn_{groupbyList[a]}_{groupbyList[b]}_median_plot_{metric_name}.pdf")
@@ -2846,8 +2944,8 @@ def make_metric_distribution_figures(df, save_base_path, metric_names, groupbyLi
                     box_plot.set_ylim(0, 1)
                 # box_plot.axes.set_title("Title", fontsize=50)
                 box_plot.set_xlabel(gbl[0], fontsize=20)
-                box_plot.set_ylabel(metric_name, fontsize=20, rotation=0, labelpad=20)
-                box_plot.yaxis.set_label_coords(0.0, 1.0)
+                # box_plot.set_ylabel(metric_name, fontsize=20, rotation=0, labelpad=20)
+                # box_plot.yaxis.set_label_coords(0.0, 1.0)
                 box_plot.tick_params(labelsize=18)
                 # Set y-ticks to be 0.1 steps
                 if metric_name in metric_0_1_range:
@@ -4694,7 +4792,7 @@ def preprocessing_abbr(preprocessing_method) -> str:
         "Random": "Rand.",
         "Clustering": "Clust.",
         "Distance-MMR": "MMR",
-        "Distance-MMR (0.75)": "MMR 0.75",
+        "Distance-MMR (0.75)": "MMR", # MMR 0.75
         "Distance-MMR (0.9)": "MMR 0.9",
         "Clustering (SimDyn)": "Clust. SimDyn",
         "ClustDist 0.4 (SimDyn)": "CD 0.4 SimDym",

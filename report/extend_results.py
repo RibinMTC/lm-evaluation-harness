@@ -1211,9 +1211,7 @@ def postprocess_seahorse_results():
         "main-ideas": "../results/mtc-NousResearch-Llama-2-7b-hf-main-ideas-with-target-modules-qlora-4bit-merged",
     }
     only_process_filenames = [  # if list non-empty -> only process these files
-        "seahorse_missing8_100_write_out_info.json",
-        "seahorse_missing9_100_write_out_info.json",
-        "seahorse_missing10_100_write_out_info.json",
+        "seahorse_missing11_100_write_out_info.json",
     ]
     exclude_filenames = [
         # "seahorse_base_datasets_100_write_out_info.json",
