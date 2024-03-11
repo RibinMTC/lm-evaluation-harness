@@ -475,6 +475,7 @@ class Task(abc.ABC):
             self.prompt_sample_template = prompt_template["prompt_sample_template"]
             self.prompt_template = self.prompt_only + self.prompt_sample_template
         else:
+            self.prompt_sample_template = None
             self.prompt_template = prompt_template
 
     def download(self, data_dir=None, cache_dir=None, download_mode=None):
