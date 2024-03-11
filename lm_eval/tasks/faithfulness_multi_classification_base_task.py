@@ -9,7 +9,7 @@ from pandas import DataFrame
 
 from lm_eval.metrics import complex_metric_agg, complex_metric_agg_with_class_labels
 from lm_eval.tasks.base_plotter import Plotter
-from lm_eval.base import MultipleChoiceTask
+from lm_eval.base import MultipleChoiceTask, rf
 import pandas as pd
 
 from lm_eval.tasks.faithfulness_classification_base_task import \
@@ -39,6 +39,13 @@ class FaithfulnessMultiClassificationBaseTask(MultipleChoiceTask, Plotter):
     )
 
     task_results_info_list = []
+
+    def construct_requests(self, doc, ctx):
+        lls = [
+            rf.loglikelihood(ctx, "{}".format(choice))[0] for choice in doc["choices"]
+        ]
+
+        return lls
 
     def has_training_docs(self):
         return True
