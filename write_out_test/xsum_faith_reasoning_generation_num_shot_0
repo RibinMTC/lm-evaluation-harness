@@ -1,0 +1,453 @@
+!!@@##@@!! -- Example 0
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: France's Dubuisson carded a 67 to tie with overnight leader Van Zyl of South Africa on 16 under par.
+McIlroy carded a third straight five under-par 67 to move to 15 under par with Thailand's Kiradech Aphibarnrat.
+The world number three's round included an eagle on the 12th as he bids to win his first title since May.
+"The 67s I've shot this week have all been a little different and I feel like I've played within myself for all of them, " said four-time major winner McIlroy of Northern Ireland. "I feel there's a low round out there for me and hopefully it's tomorrow."
+McIlroy was level par for the day after 10 holes, dropping his first shots of the week by three-putting the third and 10th, the latter mistake prompting the 26-year-old to throw his putter at his bag.
+But he hit back with a birdie on the par-five 11th and a towering four iron from 229 yards on the 13th set up an eagle from just four feet.
+The former world number one ruptured a ligament in his left ankle during a game of football with friends in July, ruling him out of several tournaments.
+But he returned in time to unsuccessfully defend his US PGA title at Whistling Straits in August and played in three of the FedEx Cup play-off events before starting the new PGA Tour season with a tie for 26th in the Frys.com Open in California.
+He is targeting a third Race to Dubai title in four years and leads England's Danny Willett by 271, 214 points with three events remaining after the Turkish Open.
+English pair Chris Wood (-13) and Richard Bland (-12) who were tied for second overnight are fifth and seventh respectively.
+Sentence: rory mcilroy will take a one-shot lead into the final round of the wgc-hsbc champions after carding a three-under
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 1
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: The Cherries went down 2-1 at Sunderland on Saturday, becoming the first team to lose to the Black Cats in the Premier League this season.
+Dan Gosling's goal, which gave them the lead, was their first for three games.
+"It shouldn't be down to a lack of confidence," Howe told BBC Radio Solent. "We scored six goals against Hull prior to these two games."
+He continued: "A couple of weeks later, if you were to put the chances we've created together into a clip sequence, the fact that we haven't even scored one goal is difficult to take."
+Bournemouth were stunned by goals for Sunderland from Victor Anichebe and a Jermain Defoe penalty and they were unable to find an equaliser, even against 10 men following Steven Pienaar's dismissal.
+"We've had enough chances to win three games today," Howe added.
+"Sometimes football pans out that way and you have to accept it. It's how you move on from that which is key."
+Sentence: bournemouth manager eddie howe says his side are " struggling " after losing 2-0 to hull on saturday.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 2
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Gareth Colfer-Williams, 25, died last week at his home in Swansea, the city at the centre of an epidemic of the disease which has reached 942 cases.
+But the examination was unable to establish whether measles was the main cause of his death.
+An inquest will be opened and adjourned on Tuesday to allow further tests.
+Since the outbreak began in November, 83 people have needed hospital treatment for the illness.
+Mr Colfer-Williams' mother, Angela Colfer said her son had recently been treated at Swansea's Morriston Hospital for asthma.
+A few days after he was discharged he became unwell and developed a rash.
+Mrs Colfer said her son went to see an out-of-hours GP on 17 April with a rash "from head to foot" but not on his arms.
+The following morning, Mr Colfer-Williams was found dead at his flat.
+Public Health Wales said on Friday that laboratory tests confirmed a diagnosis of measles but further tests were needed to determine the cause of death.
+The family said they had no idea how Mr Colfer-Williams got measles as no close family member has it, including his three-year-old daughter who has been vaccinated.
+Sentence: a post-mortem examination has concluded that a man died from measles and measles.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 3
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Neil Aspin's promotion-chasing hosts have not lost in nine National League matches while Adam Lockwood's side are unbeaten in five.
+Guiseley went ahead on 15 minutes against the run of play when a throw-in found James Hurst who squared to Jake Lawlor to stroke into an empty net.
+Gateshead defender Liam Hogan superbly blocked Jordan Preston's effort and Guiseley keeper Jonny Maxted then saved well from Wesley York's shot just before the break.
+The hosts, who started the second half well, levelled on 62 minutes when a slip by half-time substitute Derek Asamoah let York curl sweetly into the top-right corner from the edge of the box.
+Match report supplied by the Press Association.
+Match ends, Gateshead 1, Guiseley 1.
+Second Half ends, Gateshead 1, Guiseley 1.
+Substitution, Guiseley. Michael Rankine replaces Jordan Preston.
+Substitution, Gateshead. Luke Hannant replaces Gus Mafuta.
+Gus Mafuta (Gateshead) is shown the yellow card.
+Substitution, Guiseley. Adam Boyes replaces Jake Cassidy.
+Goal!  Gateshead 1, Guiseley 1. Wes York (Gateshead).
+Substitution, Guiseley. Derek Asamoah replaces Kevan Hurst.
+Second Half begins Gateshead 0, Guiseley 1.
+First Half ends, Gateshead 0, Guiseley 1.
+Simon Walton (Guiseley) is shown the yellow card.
+Goal!  Gateshead 0, Guiseley 1. Jake Lawlor (Guiseley).
+First Half begins.
+Lineups are announced and players are warming up.
+Sentence: gateshead remain unbeaten in the national league after being held to a draw by guiseley.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 4
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Cuadrilla, the firm behind the tests, said drilling had been suspended as a precaution after the 1.5 magnitude tremor - the second in two months.
+It will now examine the data collected by the British Geological Survey (BGS) before deciding whether to resume.
+A tremor centred on Poulton-le-Fylde on 1 April shared a "similar location and mechanism", the BSG said.
+Shale gas drilling, known as "fracking", involves shattering hard shale rocks underground to release gas using either hydraulic pressure or tiny explosions.
+Mark Miller, chief executive of Cuadrilla Resources, said: "We take our responsibilities very seriously and that is why we have stopped fracking operations to share information and consult with the relevant authorities and other experts.
+"We expect that this analysis and subsequent consultation will take a number of weeks to conclude and we will decide on appropriate actions after that."
+The process has proved controversial in the US with environmentalists alleging that shale gas leaking into their drinking supply could cause tap water to ignite.
+But earlier this month the Commons energy select committee called on ministers to support the process in the UK arguing that environmental problems associated with it in the US could be overcome by tight regulation and good industry practice.
+The BGS said it was also monitoring fracking as a precaution. There have been two small earthquakes in Lancashire since fracking began in the county in March, including the latest on Friday.
+In an analysis of the April quake published on its website the BGS said: "Any process that injects pressurised water into rocks at depth will cause the rock to fracture and possibly produce earthquakes.
+"It is well known that injection of water or other fluids during the oil extraction and geothermal engineering, such as Shale gas, processes can result in earthquake activity."
+The BGS said the April tremor took place 1.2 miles (2km) away from the drilling site but said its monitoring instruments were 50 miles (80km) away.
+Speaking about the latest quake, Dr Brian Baptie, head of seismology at the BGS, said: "The earthquake was felt by at least one person in Poulton-Le-Fylde.
+"Our analysis places the epicentre of the event to within 2km of the Preese Hall site.
+"Data from two temporary instruments close to the drill site, installed after the magnitude 2.3 earthquake on 1 April, indicate that the event occurred at a depth of approximately 2km (1.2 miles).
+"The recorded waveforms are very similar to those from the magnitude 2.3 event last month, which suggests that the two events share a similar location and mechanism."
+Sentence: shale gas drilling in lancashire has been suspended after a magnitude-7. 5 earthquake struck.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 5
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Grant Ward's scuffed shot put Town ahead before Luke Varney rolled the ball into an empty net after QPR keeper Alex Smithies miscued a clearance.
+Cole Skuse's long-range shot fell to Tom Lawrence, who capped the scoring with a calm finish into the corner.
+Rangers offered little in attack, but sub Sandro headed Tjarron Cherry's corner against the post late on.
+Ipswich had failed to score in seven of their previous 10 Championship games, but could have had plenty more, with Christophe Berra heading wide from six yards, and Skuse firing a volley straight at Smithies.
+The Rs have won only once in their last six matches away from Loftus Road, and rarely looked like improving that record in Ian Holloway's second game in charge.
+The win lifted Mick McCarthy's Ipswich up four places to 14th and above Rangers, who slipped to 15th.
+Ipswich manager Mick McCarthy: "The irony was that poor old Alex Smithies cost them the second goal which set us up to win as comprehensively as we did. He then kept it from being an embarrassing scoreline, but I'll take three.
+"With Luke Varney and also Jonathan Douglas, I knew what I was going to get - even though I bet some people weren't thinking that when they saw the teamsheet. Luke epitomised everything what I want in this team.
+"We have not been bristling with confidence. I have had a couple of rotten weekends after Rotherham and Nottingham Forest. But hopefully Ipswich can be a happier place than it has been."
+QPR boss Ian Holloway:  "I am sure everyone will say everything hinged on the second goal, but it shouldn't have.
+"The goal was a calamity and after that we were awful and it could have been four or five.
+"Everyone will blame my keeper but I won't as my defenders should have made an angle for him. Even with my legs, I would have ran back and tried to help him.
+"My players need to be mentally tougher as a group. I am disappointed with how we finished today. We have got to try and be a bigger, braver and more solid team."
+Match ends, Ipswich Town 3, Queens Park Rangers 0.
+Second Half ends, Ipswich Town 3, Queens Park Rangers 0.
+Attempt saved. Yeni N'Gbakoto (Queens Park Rangers) right footed shot from outside the box is saved in the bottom left corner.
+Yeni N'Gbakoto (Queens Park Rangers) wins a free kick in the attacking half.
+Foul by Luke Chambers (Ipswich Town).
+Attempt saved. Freddie Sears (Ipswich Town) right footed shot from the centre of the box is saved in the bottom left corner. Assisted by Jonathan Douglas.
+Offside, Ipswich Town. Leon Best tries a through ball, but Jonathan Douglas is caught offside.
+Attempt saved. David McGoldrick (Ipswich Town) right footed shot from the centre of the box is saved in the top centre of the goal. Assisted by Leon Best.
+Attempt saved. Freddie Sears (Ipswich Town) right footed shot from outside the box is saved in the centre of the goal. Assisted by Cole Skuse.
+Karl Henry (Queens Park Rangers) wins a free kick in the defensive half.
+Foul by Jonathan Douglas (Ipswich Town).
+Offside, Queens Park Rangers. Alex Smithies tries a through ball, but Idrissa Sylla is caught offside.
+Sandro (Queens Park Rangers) wins a free kick in the defensive half.
+Foul by David McGoldrick (Ipswich Town).
+Attempt blocked. Cole Skuse (Ipswich Town) right footed shot from outside the box is blocked.
+Corner,  Ipswich Town. Conceded by Grant Hall.
+Karl Henry (Queens Park Rangers) wins a free kick in the attacking half.
+Foul by Cole Skuse (Ipswich Town).
+Attempt missed. Jonathan Douglas (Ipswich Town) header from the centre of the box is close, but misses to the left. Assisted by Freddie Sears with a cross following a corner.
+Corner,  Ipswich Town. Conceded by Alex Smithies.
+Attempt saved. Grant Ward (Ipswich Town) right footed shot from the centre of the box is saved in the bottom left corner. Assisted by Freddie Sears with a through ball.
+Alex Smithies (Queens Park Rangers) wins a free kick in the defensive half.
+Foul by Jonathan Douglas (Ipswich Town).
+Corner,  Ipswich Town. Conceded by Alex Smithies.
+Attempt saved. David McGoldrick (Ipswich Town) right footed shot from the right side of the box is saved in the bottom left corner. Assisted by Grant Ward.
+Attempt missed. David McGoldrick (Ipswich Town) right footed shot from more than 35 yards misses to the left. Assisted by Cole Skuse following a set piece situation.
+Substitution, Ipswich Town. Leon Best replaces Tom Lawrence.
+Foul by Nedum Onuoha (Queens Park Rangers).
+Grant Ward (Ipswich Town) wins a free kick in the attacking half.
+Corner,  Queens Park Rangers. Conceded by Grant Ward.
+Corner,  Queens Park Rangers. Conceded by Adam Webster.
+Sandro (Queens Park Rangers) wins a free kick in the defensive half.
+Foul by Jonathan Douglas (Ipswich Town).
+Sandro (Queens Park Rangers) hits the right post with a header from the right side of the six yard box. Assisted by Tjaronn Chery with a cross following a corner.
+Corner,  Queens Park Rangers. Conceded by Christophe Berra.
+Attempt missed. David McGoldrick (Ipswich Town) right footed shot from outside the box misses to the right. Assisted by Tom Lawrence.
+Foul by Sandro (Queens Park Rangers).
+Jonathan Douglas (Ipswich Town) wins a free kick in the defensive half.
+Foul by Karl Henry (Queens Park Rangers).
+Cole Skuse (Ipswich Town) wins a free kick on the left wing.
+Sentence: ipswich town ended qpr\'s seven-game winning run in the championship with a comfortable win at carrow road.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 6
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: The Reds, who are fifth in National Two South, beat third-placed Chinnor 29-12 for a second win in a row.
+"Tommy Phillips, Ben Priddey and Craig Williams really led the team from the front," Churcher told BBC Cornwall.
+"If your front row and front five are making 70-plus tackles in a game you're going to be doing well and that's what happened against Chinnor."
+The Reds face seven teams who are below them in the table in their next eight games, as well as league leaders Old Elthamians.
+Churcher believes his side still has a lot of room for improvement, adding: "Chinnor wasn't the complete performance, but emotionally it was a really dogged performance.
+"We've got to build on what we did last weekend, because if we don't, last weekend will have been a waste of time."
+Sentence: truro city head coach marek churcher has praised his side\'s performance in the first half of their national rugby league campaign.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 7
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: We are aware that this interactive video may not work on some older browsers. You can find a non-interactive version of the content below.
+In this interactive video, Robert Opie - the founder of the Museum of Brands, Packaging and Advertising in London - outlines some of the main reasons why we change what we buy.
+The arrival of the domestic freezer, of washing powder, and of cheaper imports all affected the sort of items on sale and popular among UK consumers.
+The interactive elements to this video also explore how ownership and ranking of some of the biggest brands in the UK is changing.
+The video works best in full screen
+Click on the links below to read the extra information used in this video in a non-interactive format:
+What in the world does China own?
+Top tips on freezing food, BBC Good Food
+Annual survey ranking the top 20 consumer brands in the UK
+Museum of Brands, Packaging and Advertising
+Sentence: the bbc has released a series of information about the uk\'s food market and how they have changed since the start of the decade.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 8
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Duffy, 37, has joined the third-placed Championship side on a one-year contract after leaving Swinton Lions.
+The Scotland assistant coach will lead Featherstone in their final league game against Toulouse on Saturday before the upcoming Super 8 Qualifiers.
+"He is a fantastic coach and we are very excited to see how his reign here unfolds," chairman Mark Campbell said.
+"We believe he has done a remarkable job in extremely difficult circumstances at Swinton and he deserves a great deal of credit for his efforts there."
+Duffy, who played for Leigh, Widnes and Salford during a 16-year playing career, has been replaced by his former assistant Stuart Littler at fellow Championship side Swinton.
+Sentence: castleford tigers have appointed former scotland international kevin duffy as their new head coach.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 9
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: The decision to dedicate part of the radio spectrum to a global flight tracking system was taken at a UN conference in Geneva on Wednesday.
+The conference aimed to improve on the current tracking system which relies on ground-based radars.
+MH370 disappeared in March 2014 with 239 people on board.
+Representatives from more than 160 countries decided to set aside a radio frequency for the satellite tracking of planes at the World Radiocommunication Conference (WRC), organised by the UN's International Telecommunication Union (ITU).
+The deal will enable satellites to receive transmissions, known as automatic dependent surveillance-broadcast (ADS-B), that aircraft currently only send to other aircraft and to ground stations.
+This will allow "real-time tracking of aircraft anywhere in the world," said Francois Rancy, head of the ITU's Radiocommunication Bureau.
+The disappearance of flight MH370 exposed weaknesses in worldwide air navigation systems.
+The current system leaves around 70% of the world's airspace uncovered.
+Soon after the plane disappeared, Malaysia's communication minister urged the ITU to help find new ways of transmitting flight data in real-time.
+The Malaysia Airlines flight was en route from Kuala Lumpur to Beijing when air traffic control staff lost contact with it.
+The plane is long believed to have crashed into the southern Indian Ocean.
+In July part of an aircraft wing was found on Reunion Island. Malaysian authorities later confirmed the debris to be from the missing MH370 plane.
+Following Wednesday's decision, ITU Secretary-General Houlin Zhao said the agency had "responded in record time to the expectations of the global community on the major issue concerning global flight tracking."
+The UN's aviation arm, the International Civil Aviation Organisation (ICAO), has set a November 2016 deadline for adopting new tracking guidelines.
+These will include aircraft sending their position at least every 15 minutes, or more in case of emergency, reported Reuters.
+Sentence: the world\'s first satellite to track flight data from the missing malaysia airlines flight mh370 has been given the go-ahead.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 10
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Firefighters spent several days at the site in Duncan Street following the blaze on 2 March, which reduced train services and caused travel delays.
+The Environment Agency (EA) suspended Recovered Fuels Shipping Limited from accepting waste after the fire.
+The firm was "broadly compliant" with fire safety law, the fire service said.
+Recovered Fuels Shipping Limited, whose site was run by Asset and Land Group, could not be contacted for a comment. It has until 7 August to appeal the decision.
+Greater Manchester Fire and Rescue Service (GMFRS) visited the premises nine times in the last 12 months.
+Geoff Harris, GMFRS area manager, said: "The site operators, Asset and Land, have been broadly compliant with fire safety legislation throughout that time."
+The fire service raised concerns to the EA in February over the impact a fire could have on nearby residents, transport and the environment.
+"The EA were very interested in our concerns, which resulted in our fire safety officers conducting joint visits to the site with EA staff, the EA decided to take enforcement action against the site operators," Mr Harris said.
+An EA spokesman said: "After consideration of all the facts relating to the company and the site, the EA has now decided to revoke the environmental permit.
+"Subject to any appeal, the revocation takes effect on 7 August, which means after that date the company will no longer be able to operate from that site. The company is still required to remove all the waste."
+The cause of the fire remains undetermined.
+Sentence: the owners of a recycling plant destroyed by fire in greater manchester have been stripped of their environmental permit.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 11
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: It says something for the way the team have fallen from past greatness that the result they are talking about is the fourth row of the grid - or the third if things go especially well - and some decent points.
+This, from a team that has won 182 grands prix, at a win rate of 23.18%, 12 drivers' world championships, and eight constructors' titles. And which still, despite its dire current results, has two world champions in the cockpit - one of them, Fernando Alonso, arguably the best on the grid.
+Listen: Dennis on Alonso, loyalty & mentality
+The slump started in 2013, when McLaren lost its way on chassis design, but still had the best engine.
+Now, the team seem to have got their mojo back with the car but the problems lie with the Honda power-unit.
+This is a far cry from the previous era of one of the most famous partnerships in F1 - it is with Honda that McLaren achieved their greatest successes of an illustrious history.
+In 1988, they swept a season like no-one has since, even Mercedes. With the two best drivers in the world in their cars, Ayrton Senna and Alain Prost, they won 15 of the 16 races.
+They dominated the next four years, before spending several years in the doldrums - a dip at times as bad as the latest one - before more resounding success, with Mika Hakkinen and Mercedes engines in 1998-99.
+Amazingly, the team's last constructors' title was in the first of those two years of victories with the 'flying Finn'.
+They should have won it again, in 2007, when Alonso and Lewis Hamilton were team-mates and finished agonisingly tied in the championship, a single point behind the winner, Kimi Raikkonen of Ferrari.
+But although the team scored more points than any other, McLaren were kicked out of the constructors' championship that year - and fined $100m - after being found guilty of benefitting from their illegal possession of reams of Ferrari technical information.
+There was another scandal two years later - this time dubbed 'lie-gate' - after Hamilton and  sporting director Dave Ryan were found to have misled the stewards at the Australian Grand Prix. This led to a humiliating public apology from Hamilton, and the sack for Ryan.
+Until 2012, when Hamilton and team-mate Jenson Button won seven races between them, the victories kept coming, but other than Hamilton's in 2008, the titles dried up - and now the wins have, too.
+In many ways, their current predicament is nothing surprising. McLaren's F1 history has, like those of many long-term participants, been a cycle of triumph and decline.
+Their first decade, following the team's establishment by the New Zealand F1 driver Bruce McLaren was spent building up the team into an increasingly powerful force, a process that continued despite the founder's death in a testing crash in 1970.
+Their maiden title came in 1974, with the Brazilian Emerson Fittipaldi. Another followed two years later, courtesy of James Hunt in his now-famous battle with Ferrari's Niki Lauda.
+But then the team began to slip backwards, left behind by the technology of the time. Rather like now.
+So alarming was the dip in form that main sponsor Marlboro engineered a coup, bringing on board Ron Dennis, first as co-team boss. He took complete control shortly afterwards and has held it ever since, in one role or another.
+Dennis built the team up to its first period of real domination in 1984-5, followed by the Honda era, then a partnership with Mercedes, before stepping back in 2009, only to take back control after the team's disastrous 2013 season.
+So far, his return has not had its intended effect. But is McLaren in a period of slow - some would even say terminal - decline? Or are the good times around the corner again?
+Dennis insists it is only a matter of time before success will return.
+It is McLaren, he told BBC Sport in an interview to mark the team's golden anniversary, who will break Mercedes' hegemony in F1, and become the next team after the German giants to win the title.
+This, after all, is why Alonso returned to the team in 2015 - a decision widely questioned at the time because of the difficult relationship he had with Dennis when they worked together in 2007.
+The Spanish two-time champion left Ferrari because he felt they would never get there; joined McLaren partly because there was nowhere else to go, but also because he felt the renewed Honda partnership was his best chance to win an elusive third title in the end.
+Dennis and his lieutenants believe they are in the process of arresting the slide, that the car is among the very best this year, and that next year Honda - who last year re-entered F1 too soon - will ensure their engine is, too.
+They can see the progress, they say, and it is only a matter of time before they again deliver "championships, plural", as Dennis puts it.
+But right now, belief is all they have. And on it rests not only a successful end to the career of one of the sport's greatest ever drivers, but also the reputation of one of its greatest names.
+Subscribe to the BBC Sport newsletter to get our pick of news, features and video sent to your inbox.
+Sentence: mclaren have a lot to do with them this year.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 12
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Let's not forget the traditional argument with your other half about whose job it was to buy all the batteries for the children's new toys - which are currently a source of tension because nobody can turn them on.
+Am I right?
+If that sounds all too familiar and you fancy keeping the whole thing a bit more spiritual this year without giving up your gadgets, here are five ways to enjoy Christmas online:
+Everyday Church Online, which launched in the UK in September, runs virtual services every Sunday for a net-based congregation from around the world. Everyone's invited to log on and chat while a recorded sermon is streamed.
+So far, people from 61 different countries have logged on, according to online pastor Darren Parker.
+"There are lots of reasons why people can't get to church on a Sunday so we thought we would bring the church to them," he says.
+"The chat room is like the foyer of a church."
+Virtual prayer requests received from the global congregation have included:
+Its first Christmas theme is Star Wars, the subject of three festive sermons.
+"We found some real truths [in the franchise] which compare to Christmas," says Mr Parker.
+"The new Star Wars is called The Force Awakens. Our sermons are called The Hope Awakens - it's about awakening hope for humanity."
+The Star Wars sermon will be running throughout the day on the church's website.
+Guardians of Ancora is a recently launched, free-to-play fantasy game available on Android, iPhone and Kindle platforms. It's developed by the same people behind the young people's group the Scripture Union.
+The game is aimed at eight to 11-year-olds and director Terry Clutterham says 45,000 were playing within four months of its release.
+"Ancora is a weird, wonderful, amazing place but it is a fictional space where children enter as guardians," he says.
+"The problem with Ancora is that the light has been stolen from that world, so there is darkness around.
+"It's the role of the guardians to rediscover the lost treasured stories which are the stories of the Bible... and those stories help to light up the world."
+You get the idea.
+Special content created for Christmas includes two new Bible-themed quests in which players find the birth of the baby Jesus.
+There are lots of very charming nativity videos out there but it's not easy to rack up the hits.
+German marketing company Viral.de had huge success with its 2010 video The Digital Story of Nativity, which has so far been viewed almost six million times.
+There are no actors, no animals, and not even a stable.
+The whole story is told in the form of Facebook status updates, tweets, Google searches and Foursquare check-ins.
+Highlights include one "Joseph Carpenter" buying a cow and a donkey on Farmville before uploading a baby picture, which looks suspiciously like a Christmas card.
+The Churches Advertising Network also had a respectable go - Christmas Starts with a Baby's Giggle, which features a modern-day couple sitting in a trendy living room with their baby, only for the scenery behind them to keep changing eras until they are Mary and Joseph in the stable. So far, it has been viewed about 250,000 times.
+"It's pretty good - we're not John Lewis, we're a group of Christians with a very small budget," explains Frances Goodwin, who chairs the network.
+"The message is that Christmas is the same today as it was 2,000 years ago."
+However, according to a report in the Daily Mail, the charity's attempt to get the ad screened at cinemas was thwarted when the organisation that sells screen rejected it for being "too religious".
+After distributing more than three million printed books and nearly five million booklets telling Old Testament stories in the genre of Japanese cult cartoon form Manga, the company Next Manga has just launched its work in app and e-book form - so far, only in the English language.
+The book containing its version of the nativity is called the Manga Messiah.
+It is available in 33 different languages - 25,000 copies of the Arabic version were recently sent to Syrian and Libyan refugees.
+"We see it as a unique opportunity to share a message of hope and peace with these people who have suffered so much," says founder Roald Lidal.
+"One third of all publications are in Manga form in Japan," adds Mr Lidal, who lived in the country for 45 years.
+"There is a Manga for every age and every type of person. It seemed very difficult to proclaim the message of the Bible without using Manga."
+As if you needed the excuse. But lots of groups are using platforms like Facebook, Twitter and Instagram to connect with their communities, especially at this time of year.
+"I don't see that much these days of trying to share the Gospel in 140 characters," says Kevin Bennett of Christian media group Premier.
+"The Church is mostly trying to just drop thoughts in, get people to fix their gaze on something a little bit higher for a second and maybe consider things that are a bit more spiritual rather than earthly."
+"Jesus would definitely be on Twitter," adds Jules Middleton, blogger and mission pastor at The Point Church in Burgess Hill, West Sussex.
+"He was a great communicator."
+Sounds like a seal of approval to me.
+Sentence: it\'s one of the most common stories of the festive season.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 13
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Chechen Muslim clerics met on 3 April, two days after the paper's revelations, and said the report had insulted their faith and the dignity of Chechen men.
+"Retribution will catch up with the true instigators, wherever and whoever they are," their resolution said.
+Novaya Gazeta says it amounts to a call for "reprisals against journalists".
+"We urge the Russian authorities to do everything possible to prevent actions aimed at inciting hatred and enmity towards journalists, who are doing their professional duty," the paper said.
+On 1 April it reported that more than 100 people had been detained in Chechnya on suspicion of being homosexual, and that at least three had been killed.
+The Russian LGBT Network, in touch with victims in Chechnya, told the BBC that the report was true.
+Homophobia is rife in the mainly Muslim North Caucasus republic. Authoritarian leader Ramzan Kadyrov is fiercely loyal to Russian President Vladimir Putin.
+A spokeswoman for the LGBT Network said detainees were tortured with electric shocks and beatings at a prison near Argun, 20km (13 miles) from the city of Grozny.
+"All the people arrested are homosexual men or perceived as being gay," said Natalia Poplevskaya.
+Ramzan Kadyrov has denied the allegations, calling them "lies". His spokesman Alvi Karimov said there were no gay people in Chechnya.
+The Chechens' spiritual leader, Mufti Salah-haji Mezhiev, confirmed that "retribution" was part of the resolution adopted at the special Muslim meeting in Grozny on 3 April.
+"There will be retribution!" he told the Russian news website RBC. "Allah will punish those who slandered the whole Chechen nation and Chechen Republic's clerics."
+Novaya Gazeta's 1 April report said the detainees included some influential Muslim clerics close to Mr Kadyrov, and two well-known Chechen TV presenters.
+In an open letter to the mufti, the paper's chief editor Dmitry Muratov said his journalists would continue investigating human rights abuses in Chechnya.
+"We did not insult - nor had we the slightest intention to insult - the Chechen people," he wrote, urging dialogue.
+Chechens have been linked to two murders of Novaya Gazeta reporters who investigated crimes in Chechnya - Anna Politkovskaya and Natalia Estemirova.
+But much remains unclear about those contract killings, and that of Boris Nemtsov, an opposition politician who was shot dead in Moscow in 2015 and also exposed corruption and organised crime in Chechnya.
+The LGBT Network says it is helping people to flee the persecution in Chechnya and accuses the Russian authorities of ignoring the abuses.
+If Russia fails to prosecute anyone, it says it will file a case at the International Criminal Court in The Hague.
+Sentence: a newspaper in the russian republic of chechnya has passed a resolution to condemn the publication of a report by chechnya\'s state news agency
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 14
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: London 2012 Olympian Andrew Lawrence scored 14 points while NBA player Ben Gordon added 13.
+Coach Joe Prunty's team led for most of the first three quarters before being overhauled by their guests in the last 10 minutes of a well-contested game.
+GB now begin their Eurobasket qualifying campaign with a game in Hungary in midweek.
+"The key to the qualifiers will be completing on every play. We have to make sure that we're going as hard as we can on both ends of the floor," Prunty told BBC Sport.
+"I think at times tonight we lost a little of our fire."
+Prunty turned to his strongest line-up in the final warm-up match before he cuts the roster for the six-game qualifying programme.
+GB led 35-24 on Lawrence's three in the second quarter but the Dutch took the lead early in the third. Gordon then hit three threes in a row - his first points of the game - to restore GB's advantage.
+Netherlands, who were led by 18 points from Worthy De Jong, scored the first 10 points of the fourth quarter to lead 71-60 and held on to win despite the hosts' comeback in the last six minutes.
+Prunty was pleased with the contribution of Gordon, a player who has joined the team despite missing out on the place available to him for London 2012.
+He said: "You're always trying to find to your rhythm as a player and with one another. I thought he [Gordon] had a good showing tonight, he certainly had a very good stretch in the third quarter."
+Sentence: great britain\'s men lost their opening eurobasket finals warm-up warm-up match against the netherlands in amsterdam.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 15
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: The former five-weight world champion submitted a necessary waiver to the Nevada Athletic Commission (NAC) on Wednesday, hours before the deadline.
+The NAC, which sanctioned the bout, told BBC Sport it expected to receive a request from McGregor on Wednesday.
+NAC rules state fights at 154 lbs require 10oz gloves and the matter will now be debated on 16 August.
+Lighter gloves offer less cushioning for the hands but theoretically lead to punches being more punishing.
+Last week Mayweather posted an Instagram message stating: "I'll be wearing 8oz Grant gloves."
+But the undefeated fighter - who will come out of retirement for the bout - had not submitted a necessary waiver document at that stage. Instead, his team had asked the authorities what the process of using lighter gloves entailed.
+At the time, NAC executive director Bob Bennett told BBC Sport he had never seen a move to 8oz gloves at 154lbs before.
+Rules state that 10oz gloves are used from 135lbs upwards but bouts between 135lbs and 147lbs can use 8oz gloves if waivers are signed and the NAC feels the move is justified.
+"Even if they are both in agreement, our number one policy is the health and safety of the fighters," said Bennett. "To deviate from our regulations at a difference of 7lbs would be for the chairman and commissioners to determine."
+During his UFC career, McGregor has used 4oz gloves and he welcomed Mayweather's Instagram post last week, stating: "I am coming sprinting at you with bricks. Know that. Brittle hands."
+The NAC will debate the matter publicly before announcing its decision.
+McGregor, 29, will make his boxing debut in what could be the richest fight in history. The UFC lightweight champion's move from the octagon to the ring to face Mayweather, 40, has prompted criticism from major boxing personalities such as Oscar De La Hoya and Gennady Golovkin.
+But Bennett says he studied a "litany of information" on the Irishman before telling his chairman there were "several reasons to approve the fight".
+Bennett said that McGregor's UFC rival Nate Diaz played a role in him forming his opinion.
+"I spoke to Virgil Hunter, who trains many top fighters and has worked with the likes of Andre Ward," said Bennett. "He used Nate Diaz a dozen times for sparring and said he rated him as an outstanding boxer.
+"Then you put Nate in the ring with Conor and Conor knocks him down with several shots. Add in that Conor has a granite-like chin, add in that he's 12 years younger than Floyd, and add in that he's taller and longer.
+"Floyd is probably one of the smartest fighters, he has the art of getting in getting shots and getting out. But he hasn't knocked anyone out in 10 years. Ricky Hatton was probably the last one in 2007 because when he KO'd Victor Ortiz in 2010, he wasn't defending himself.
+"That in essence is it. There were several reasons to approve this fight."
+McGregor floored Diaz three times on his way to a points win in August 2016, avenging a defeat via submission five months earlier.
+Since sanctioning the fight, Bennett has had access to three videos showing McGregor's progress and told BBC Sport: "He's good to go."
+He also advised McGregor's camp to employ a boxing referee in order to feel comfortable with the rules, advice which led to the hiring of Hall of Fame official Joe Cortez, 73.
+Cortez said he oversaw an "out of control" sparring session between McGregor and Paulie Malignaggi. The former two-weight world champion has since left the camp after reacting angrily to images of him on the canvas during a sparring session.
+Sentence: conor mcgregor\'s fight against ufc champion conor mcgregor in las vegas on 9 august will be discussed by the nevada authorities.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 16
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Their comments, she wrote, "reminds me how big the world is and how many more decent people there are than not".
+The Harry Potter author previously tweeted that her "personal line [had] been crossed" by some abusive comments.
+"It isn't always fun being a famous woman on Twitter and I believe in standing up to bullies," she wrote.
+Rowling faced a flood of criticism on Twitter last year after it emerged she had donated Â£1m to the campaign for a No vote in the Scottish independence referendum.
+In 2008, she donated the same amount to the Labour party.
+On Friday the author revealed she had been called "a traitor" for her political views and had blocked some abusive Twitter users she believed had been supporters of the Scottish National Party (SNP).
+"I feel no responsibility to hush up that kind of behaviour to protect the image of any political party," she told one Twitter user.
+The 49-year-old also revealed she had "responded to other really nice SNP supporters" and had discussed "how much I had in common politically with many of them".
+The writer also joked she would "bring marshmallows" after a Twitter user suggested her books should be burned in public.
+The SNP took 56 of the 59 seats in Scotland in Thursday's election and is now the third largest party in the UK.
+Sentence: author jk rowling has said she has been blocked from posting abusive messages on twitter.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 17
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: Hawick Knitwear, which employs more than 230 staff, has also increased its production of sweaters to meet demand.
+Production has been boosted by better than expected sales of the Hawick Knitwear-branded range which launched in January.
+The company, which dates back to 1874, was bought by managing director Benny Hartop in November last year.
+As well as the new range, the firm has seen growth of its longer-established business of supplying customers who sell the garments under their private labels.
+In Europe, Hawick Knitwear sells into Sweden, Finland, Ireland, Germany, the Netherlands, Belgium, France, Italy and Spain.
+Markets outside Europe include the USA, Canada, Mexico, and Japan.
+The knitwear firm has increased its production to 9,500 sweaters each week, from about 7,500 last year, to keep up with demand.
+Mr Hartop said: "The increase in production is in direct response to a surge in orders from both home and abroad for our private label clients and now for our own brand too.
+"There will always be challenges but thankfully our future is looking very good and this is a testament to the dedicated staff working at all levels of the business.
+"I have no doubt this success will continue for us into the future."
+Sentence: a borders knitwear firm has announced a new production range, following a rise in demand for its clothing.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 18
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: It is seen as a response to the growing threat from Russian submarines which have stepped up their own patrols in these very same waters.
+It has also highlighted a gaping hole in Britain's own defences.
+For now though it is the hunt for U33, not Red October. The German U-boat is acting as the unseen enemy below the waves.
+U33's commander Kai Nicklesdorf and his 28 crew, who live in cramped conditions, are trying to avoid detection by 10 Nato warships.
+Their task, for this exercise, is to try to take out the command ship, the USS Vicksburg, and an oil tanker.
+When they dive the only visible sign of their presence will be the brief sight of a periscope breaking the waves for a matter of seconds.
+Up on the bridge of the USS Vicksburg, Rear Admiral Brad Williamson prepares his fleet of 10 warships, including the Royal Navy Frigate HMS Portland, to begin the search.
+He says this is important training and that his crews are all aware of Russian submarine activity.
+There have been recent reports of Russian submarines off the coast of Sweden, Finland and the UK.
+He says the training "focuses our minds and for the guys in combat it's not theoretical that we might have to do anti-submarine warfare".
+For the surface ships the task of locating an invisible enemy under vast stretches of ocean is not that easy.
+It has been likened to looking for a needle in a haystack.
+Up on the bridge of the USS Vicksburg, the crew scan the horizon looking out for a periscope.
+Down below, in a darkened room in the bowels of the ship, sailors listen in and monitor the results from the ships sonar and sensors.
+Lieutenant Colin Ryan, Vicksburg's anti-submarine warfare officer, admits that it is much easier for a submarine to hide than a surface ship.
+He says there have been incidents on this deployment when they have identified submarines.
+But when I ask whether they have been Russian, he replies nervously: "I wouldn't want to comment on that," before adding: "In general, we're always on the lookout."
+Nato members rarely comment on the activities of their own submarines, let alone the movements of any potential enemy.
+But this exercise is proof there is growing concern about Russia's increasing military strength.
+While many European nations have been cutting their defence budgets and the capabilities, Russian President Vladimir Putin has been heavily investing in his.
+Russia now has a fleet of around 60 submarines - the larger nuclear powered ones and smaller diesel electric submarines which can operate in shallow waters.
+Earlier this month Russia launched what it claims is the "quietest submarine in the world".
+Peter Roberts, a former Royal Navy officer, and now a senior fellow at the defence think tank RUSI, says it now leads the world in submarine development.
+He describes them as technologically advanced and their crews as highly skilled.
+They are, he says, the "quietest and most challenging adversary in the world".
+When out on patrol they can go undetected for months at a time.
+Often the first time a Nato warship will be aware of their presence is when a periscope briefly pops above the waves.
+They lie silent and stationary at the bottom of the ocean listening to and "fingerprinting" other nations' submarines and warships.
+For this exercise, curiously named "Dynamic Mongoose", as well as the warships there are anti-submarine warfare helicopters helping in the search.
+For the first time, a Nato research vessel has also deployed underwater unmanned vehicles or drones to help track the ocean.
+Scientists on board listen to the familiar pings as the two robots shaped like torpedoes scan the seabed.
+It is not always easy to distinguish between the shipwrecks, whales, fish shoals and rocky outcrops in the sea.
+Ryan Goldhahn, scientist-in-charge at Nato's Centre for Maritime Research and Experimentation, says the underwater robots, which appear on their monitors as Harpo and Groucho, have several advantages to the warships and aircraft involved in the exercise.
+They are cheaper to operate, take the person out of harm's way and can offer persistent surveillance.
+Underwater drones are for the future.
+But for now one of the most important assets in any nation's armoury to conduct anti-submarine warfare is the long-range maritime patrol aircraft.
+These are able to fly long distances while scanning hundreds of miles beneath the ocean.
+For this exercise, the top cover is being provided by a French Atlantique maritime patrol aircraft.
+Inside in a darkened cabin, half a dozen crew stare at the monitors that can help pinpoint submarines below.
+Britain no longer has any of its own maritime patrol aircraft and this exercise is a reminder of a significant gap in the UK's defences.
+Several times over the past year Britain has had to call on its Nato allies to provide eyes in the sky when there have been reported Russian submarines in or near Britain's waters.
+RUSI's Mr Roberts says it is a "key vulnerability".
+He says the lack of any maritime patrol aircraft, that used to be provided by the Nimrod, means a Russian submarine could sit off the UK and track the nuclear deterrent as it leaves Faslane naval base in Scotland.
+Britain, he says, should be "exceptionally worried" that it is seen as a "soft touch", because Russia will continue to test its defences, just as they have by flying long range bombers near UK airspace.
+The purpose of this exercise is to ensure Nato is ready to conduct anti-submarine warfare.
+But it is also a reminder that some nations - including Britain - cannot do it alone.
+The lack of any UK maritime patrol aircraft will have to be addressed in the government's forthcoming defence and security review.
+The search for Russian submarines will not be as easy as the hunt for U33.
+Sentence: the uk\'s navy and nato warships have begun a major exercise in the waters off britain\'s west coast.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)
+!!@@##@@!! -- Example 19
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label. Think step by step.
+Article: McKenzie, 38, will take on Jahmaine Smyle at York Hall on 12 November for the English super-middleweight championship.
+The ex-Norwich and Peterborough man became a professional boxer in 2013 having quit football two years previously.
+He has a record of eight wins and one draw from his nine fights.
+McKenzie is the son of former British and European champion Clinton and is trained by his uncle, former three-time world champion Duke McKenzie.
+Sentence: former england under-21 world champion shaun mckenzie will fight for the vacant wbc world title at york\'s alexandra palace on 29 april.
+Answer ONLY in the following format: Explanation: .. 
+ Label: (Faithful/Contradiction/Neutral)

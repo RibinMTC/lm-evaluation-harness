@@ -32,7 +32,33 @@ python -m scripts.write_out \
         --num_fewshot 0 \
         --num_examples 1
 
+python -m scripts.write_out \
+        --output_base_path "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label" \
+        --model_id ehartford/dolphin-2.2.1-mistral-7b \
+        --tasks "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label" \
+        --prompt_version_per_task all_labels_english_with_explanation \
+        --sets "test" \
+        --num_fewshot 1 \
+        --num_examples 1
 
+python -m scripts.write_out \
+        --output_base_path "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label" \
+        --model_id ehartford/dolphin-2.2.1-mistral-7b \
+        --prompt_template: configs/prompt_templates/faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json
+    prompt_version: all_labels_english_with_explanation
+    task_name: faithfulness_benchmark_final_swisstext23_with_explanation_multi_label
+        --tasks "faithfulness_benchmark_final_swisstext23_with_explanation_multi_label" \
+        --prompt_version_per_task all_labels_english_with_explanation \
+        --sets "test" \
+        --num_fewshot 1 \
+        --num_examples 1
+
+python -m scripts.write_out \
+        --output_base_path "arxiv_domain_adaptation_summarization" \
+        --tasks "arxiv_domain_adaptation_summarization" \
+        --sets "test" \
+        --num_fewshot 0 \
+        --num_examples 1
 
 
 python main.py \

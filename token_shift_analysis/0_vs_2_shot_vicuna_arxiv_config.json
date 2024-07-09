@@ -1,0 +1,5 @@
+{
+  "dataset": "arxiv",
+  "samples_to_compute": 10,
+  "model_name": "lmsys-vicuna-7b-v1.5-16k"
+}

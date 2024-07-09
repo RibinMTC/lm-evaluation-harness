@@ -1,18 +1,22 @@
-model: hf-seq2seq #hf-seq2seq #hf-causal-experimental
-#tiiuae-falcon-7b tiiuae/falcon-40b-instruct google/flan-ul2 psmathur/orca_mini_13b mosaicml/mpt-30b-instruct h2oai/h2ogpt-gm-oasst1-en-2048-falcon-40b-v2
-model_args: "pretrained=google/flan-t5-base,trust_remote_code=True,use_accelerate=True" #load_in_8bit=True,temperature=0.2,do_sample=True"
-tasks: "newsum2021_summarization" #"germanquad_open_qa,x_stance_de,pawsx_de"
-prompt_version_per_task: "1"
-num_fewshot: 0
-batch_size: "1"
-device: null
-output_path: null
-limit: 1
+batch_size: '1'
+check_integrity: false
 data_sampling: null
-no_cache: true
 decontamination_ngrams_path: null
 description_dict_path: null
-check_integrity: false
-write_out: true
-output_base_path: "results"
+device: null
+end_range: 1
+fewshot_sampling: stratified
+model: hf-causal-experimental
+model_args: pretrained=mtc/LeoLM-leo-mistral-hessianai-7b-xnli-with-explanation-1000-3-epoch-finetuned,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,attn_implementation=flash_attention_2,max_length=2048
+no_cache: true
+num_fewshot: 0
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json
+    prompt_version: xnli_german_with_explanation
+    task_name: xnli_with_explanation_multi_label
 wandb_on: false
+write_out: false

@@ -214,7 +214,7 @@ class ArxivDomainAdaptationSummarizationTask2kWindow(DomainAdaptationSummarizati
 
 
 class Arxiv2ShotDomainAdaptationSummarizationTask(ArxivDomainAdaptationSummarizationTask):
-    DATASET_PATH = "anumafzal94/arxiv-2shot-4096"
+    DATASET_PATH = "mtc/arxiv-2shot-full-test"
     DATASET_NAME = None
     article_key = "text"
     summary_key = "summary"
@@ -238,7 +238,7 @@ class PubmedDomainAdaptationSummarizationTask2kWindow(DomainAdaptationSummarizat
 
 
 class Pubmed2ShotDomainAdaptationSummarizationTask(PubmedDomainAdaptationSummarizationTask):
-    DATASET_PATH = "anumafzal94/pubmed-2shot-4096"
+    DATASET_PATH = "mtc/pubmed-2shot-full-test"
     DATASET_NAME = None
     article_key = "text"
     summary_key = "summary"

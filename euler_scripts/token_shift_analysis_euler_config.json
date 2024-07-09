@@ -1,0 +1,14 @@
+{
+    "load_modules": "gcc/8.2.0 python_gpu/3.11.2 eth_proxy",
+    "project_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness",
+    "code_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness",
+    "log_file_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness/euler_outputs/",
+    "num_cpus": 4,
+    "run_duration_hours": "04:00",
+    "shareholder_group": "es_mtc",
+    "memory_per_cpu_gb": 12,
+    "gpu": "a100-pcie-40gb",
+    "num_gpus": 1,
+    "config_file": "token_shift_analysis/2_shot_llama-7b_arxiv_vs_llama-7b-chat_config.json",
+    "main_command": "python3 token_shift_analysis/token_dist_shift_2shot_model_param.py --config "
+}

@@ -1,3 +1,4 @@
+import subprocess
 import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import List, Any
@@ -40,7 +41,6 @@ EULER_CONFIG_FIELD_MAPPING = {
     'num_cpus': 'num_cpus',
     'memory_per_cpu_gb': 'memory_per_cpu_gb'
 }
-
 
 EULER_JSON_CONFIG_PATH = "euler_scripts/lm_eval_euler_config.json"
 
@@ -87,6 +87,11 @@ class EulerConfigRunUIManager:
 
         self.run_euler_jobs_button = ttk.Button(self.root, text="Run euler jobs",
                                                 command=self.execute_run_euler_jobs_script)
+        self.run_euler_jobs_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
+        self.current_ui_row += 1
+
+        self.run_euler_jobs_button = ttk.Button(self.root, text="Write out sample prompt",
+                                                command=self.execute_write_out_sample_prompt)
         self.run_euler_jobs_button.grid(row=self.current_ui_row, column=0, columnspan=3, pady=20)
         self.current_ui_row += 1
 
@@ -197,9 +202,31 @@ class EulerConfigRunUIManager:
                 for config_file in config_files:
                     self.configs_listbox.insert(tk.END, config_file)
 
+    @staticmethod
+    def get_euler_code_path() -> str:
+        # Read the existing JSON configuration
+        with open(EULER_JSON_CONFIG_PATH, 'r') as file:
+            config = json.load(file)
+            return config["code_path"]
+
+    def copy_prompt_template_to_euler(self, config_file_paths: List):
+        euler_code_path = self.get_euler_code_path()
+        prompt_template_paths = set()
+        for config_file_path in config_file_paths:
+            yaml_config = read_yaml(config_file_path)
+            prompt_template_paths.add(yaml_config["task_configs"][0]["prompt_template"])
+        for prompt_template_path in prompt_template_paths:
+            scp_command = ["scp",
+                           prompt_template_path,
+                           f"euler:{euler_code_path}/{prompt_template_path}"]
+            subprocess.run(scp_command, check=True)
+            print(f"Copied prompt template to euler: {prompt_template_path}")
+
     def execute_run_euler_jobs_script(self):
         config_file_paths = [self.config_name_to_path_map[self.configs_listbox.get(i)] for i in
                              self.configs_listbox.curselection()]
+
+        self.copy_prompt_template_to_euler(config_file_paths)
 
         self.update_euler_json_config()
 
@@ -210,6 +237,20 @@ class EulerConfigRunUIManager:
         configs_str = " ".join(config_file_paths)
         # Call the bash script with the values as arguments
         call(['euler_scripts/euler_run_scheduler_v2.sh', configs_str])
+
+    def execute_write_out_sample_prompt(self):
+        config_file_paths = [self.config_name_to_path_map[self.configs_listbox.get(i)] for i in
+                             self.configs_listbox.curselection()]
+        if len(config_file_paths) == 0:
+            messagebox.showwarning("Warning", "Please select at least one config file!")
+            return
+        command = "python3"
+        script = "scripts/write_out.py"
+        arg = "--config"
+        for config_file in config_file_paths:
+            cmd = [command, script, arg, config_file]
+            subprocess.run(cmd)
+            # call([f"python3 scripts/write_out.py --config {config_file}"])
 
     def get_selected_euler_config_values(self):
         # This method should return a dictionary of the selected values for each field

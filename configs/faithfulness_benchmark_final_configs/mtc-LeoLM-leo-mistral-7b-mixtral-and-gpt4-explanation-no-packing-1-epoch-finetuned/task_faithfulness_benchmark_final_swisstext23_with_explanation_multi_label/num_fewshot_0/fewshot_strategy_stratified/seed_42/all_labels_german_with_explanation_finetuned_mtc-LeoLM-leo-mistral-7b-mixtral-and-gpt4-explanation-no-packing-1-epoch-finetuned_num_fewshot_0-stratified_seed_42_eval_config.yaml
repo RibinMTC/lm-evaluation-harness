@@ -1,0 +1,22 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: null
+fewshot_sampling: stratified
+model: hf-causal-experimental
+model_args: pretrained=mtc/LeoLM-leo-mistral-7b-mixtral-and-gpt4-explanation-no-packing-1-epoch-finetuned,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,attn_implementation=flash_attention_2
+no_cache: true
+num_fewshot: 0
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json
+    prompt_version: all_labels_german_with_explanation_finetuned
+    task_name: faithfulness_benchmark_final_swisstext23_with_explanation_multi_label
+wandb_on: true
+write_out: true

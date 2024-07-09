@@ -1,0 +1,6 @@
+{
+  "dataset": "arxiv",
+  "samples_to_compute": 2,
+  "model_1": "stabilityai/stablelm-2-1_6b",
+  "model_2": "stabilityai/stablelm-2-1_6b"
+}

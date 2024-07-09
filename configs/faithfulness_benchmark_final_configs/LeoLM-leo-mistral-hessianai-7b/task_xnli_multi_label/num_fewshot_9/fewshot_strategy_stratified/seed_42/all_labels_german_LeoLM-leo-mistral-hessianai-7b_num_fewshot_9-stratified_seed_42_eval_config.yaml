@@ -1,0 +1,22 @@
+batch_size: '8'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: null
+fewshot_sampling: stratified
+model: hf-causal-experimental
+model_args: pretrained=LeoLM/leo-mistral-hessianai-7b,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,attn_implementation=flash_attention_2,max_length=2048
+no_cache: true
+num_fewshot: 9
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/faithfulness_benchmark_final_swisstext23_multi_label.json
+    prompt_version: all_labels_german
+    task_name: xnli_multi_label
+wandb_on: true
+write_out: true

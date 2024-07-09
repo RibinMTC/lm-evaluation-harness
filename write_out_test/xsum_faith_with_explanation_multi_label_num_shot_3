@@ -1,0 +1,161 @@
+!!@@##@@!! -- Example 0
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label.
+
+Article: Wayne Maycock, Paul Bromwich and Admi Headley were last seen at HMP Leyhill at about 16:45 GMT on Sunday.
+Avon and Somerset Police has appealed for anyone who sees them, or knows of their whereabouts, to make contact.
+HMP Leyhill in South Gloucestershire is the only minimum-security prison in the South West.
+Headley was sentenced in 2006 for rape and robbery, Maycock was jailed in the same year for GBH, while Bromwich was sentenced in 2001 for rape.
+Earlier, the police force suggested all three were convicted of rape but this information was later amended.
+A Prison Service spokesperson said: "Public protection is our top priority. We take absconds from custody extremely seriously. We are working closely with the police and are urgently investigating this incident."
+According to Avon and Somerset Police:
+Leyhill, near Wotton-under-Edge, is a category D prison housing more than 500 inmates, including some on life sentences.
+Sentence: a convicted rapist has absconded from an open prison, police have said.
+Explanation and Label:
+Explanation: The sentence accurately conveys the information from the article that a convicted rapist has absconded from an open prison, as stated by the police.
+Label: Faithful
+
+Article: A Gareth Anscombe drop-goal edged Blues 23-20 ahead after Gloucester Josh Hohneck was yellow carded.
+Alex Cuthbert had helped level the scores after the sin-binning, scoring his second try after Ross Moriarty and Tom Marshall scores put the hosts up.
+But unanswered second-half tries from Jonny May, Marshall, Mark Atkinson and Henry Purdy sealed Gloucester's win.
+The Cherry and Whites, who went out at home at the quarter-final stage last year, won the competition in 2015.
+Defeat for the Blues means they have failed to progress beyond the last eight of any European Cup competition since winning the continent's second-tier title in 2010.
+In a seesawing opening 40 minutes, scores were locked on four separate occasions, with Cuthbert and Moriarty trading tries before Blues' Steven Shingler and Gloucester's Billy Burns swapped penalties.
+More of the same followed when Billy Twelvetrees took over kicking duties from Burns, following a head injury, as both sides landed further penalties and Marshall's first try put Gloucester 20-13 up.
+However, Blues racked up 10 points while Gloucester were a man down to take a three-point advantage into the break.
+Shingler extended that lead to six, but that is as good as it would get for the Pro12 side, who had Wales' Sam Warburton at blind-side flanker after impressing in the position for Wales during the Six Nations Championship.
+England coach Eddie Jones was in the stands at Kingholm to see May, the only Gloucester player he called upon for their triumphant Six Nations campaign, cross for the first of the hosts' four second-half scores to seal an ultimately convincing win that sees them progress to play La Rochelle - a side they met twice and beat once in the group stage this term.
+Gloucester: Marshall; Sharples, Trinder, Twelvetrees, May; Burns, Heinz (capt); McAllister, Hibbard, Hohneck, Savage, Thrush, Moriarty, Rowan, Morgan.
+Replacements: Matu'u, Thomas, Afoa, Galarza, Ludlow, Braley, Atkinson, Purdy.
+Cardiff Blues: Morgan; Cuthbert, Lee-Lo, Shingler, Scully; Anscombe, Williams; Jenkins (capt), Dacey, Filise, Earle, Hoeata, Warburton, Navidi, Williams.
+Replacements: Rees, Domachowski, Assiratti, Cook, Bennett, Williams, Halaholo, Summerhill.
+Referee: Pascal Gauzere (France)
+For the latest rugby union news follow @bbcrugbyunion on Twitter.
+Sentence: cardiff blues suffered their first european challenge cup defeat of the season as gloucester came from behind to beat gloucester at kingsholm.
+Explanation and Label:
+Explanation: The sentence introduces information that is not explicitly mentioned in the article. The article does not mention that this was Cardiff Blues' first European Challenge Cup defeat of the season. Also, the sentence is incoherent as it states that Gloucester came from behind to beat Gloucester, which is not possible.
+Label: Neutral
+
+Article: Temperton died in London last week at the age of 66 after "a brief aggressive battle with cancer", Jon Platt of Warner/Chappell music publishing said.
+Temperton's other hits included Off The Wall and Baby Be Mine for Jackson and Boogie Nights for his band Heatwave.
+Chic guitarist Nile Rodgers was among those paying tribute, tweeting: "Your genius gave us a funkier world!"
+Michael Jackson's sister LaToya wrote: "A brilliant prolific #songwriter Rod Temperton may you #RIP one of my favorite #songs Rock With You #Thriller #legend #Music #MichaelJackson"
+Producer and DJ Mark Ronson wrote: "So devastated to hear that Rod Temperton has passed away. a wonderful man & one of my favourite songwriters ever. thank you for the magic x"
+Temperton, whose private funeral has taken place, was nicknamed The Invisible Man because of his low profile.
+Born in Cleethorpes, North East Lincolnshire, Temperton traced his songwriting ability back to his father's influence.
+"My father wasn't the kind of person who would read you a story before you went off to sleep," he once said.
+"He used to put a transistor radio in the crib and I would go to sleep listening to Radio Luxembourg, and I think somehow that had an influence."
+In the 1970s, after a spell working in a frozen food factory in Grimsby, he answered an advert in Melody Maker magazine for a keyboardist.
+The band he joined was disco group Heatwave, and his songs like Boogie Nights, Always & Forever and Groove Line became big hits for the band in the 1970s.
+By the time he left the band in 1978, his tunes had caught the attention of producer Quincy Jones, who was looking for songwriters for a new Michael Jackson LP.
+Temperton penned three songs for Off The Wall, which became Jackson's breakthrough solo album - the title track, Rock With You and Burn This Disco Out.
+He went on to write three more for follow-up Thriller - the title track, which became one of Jackson's signature smashes, plus Baby Be Mine and The Lady in My Life.
+They helped make Thriller the best-selling album of all time in the US, with 32 million copies sold.
+His tunes have also been recorded by artists including Anita Baker, Donna Summer, Aretha Franklin and The Brothers Johnson.
+Temperton won a Grammy Award in 1990 for his work on Birdland, from Quincy Jones's album Back on the Block.
+He was nominated for two Oscars in 1986 for his work with Jones on the soundtrack for The Color Purple.
+He once summed up his approach to songwriting: "The first criteria is write something you love first, and once you feel those hairs standing up on the back of your hand, you can go to the world."
+In a statement released on Wednesday, Warner/Chappell's Jon Platt said: "His family is devastated and request total privacy at this, the saddest of sad times."
+Vocalist Chaka Khan, who recorded Temperton's tracks with the funk band Rufus, paid tribute, writing on Twitter: "Thank u 4 your superlative songwriting @RodTemperton. U will always Live in Me. Rest in power."
+BBC radio presenter Gilles Peterson wrote: "Apart from Lennon and McCartney no one from the UK has written more gold plated songs than Sir Rod Temperton... a huge loss. RIP"
+Follow us on Twitter @BBCNewsEnts, on Instagram at bbcnewsents, or if you have a story suggestion email entertainment.news@bbc.co.uk.
+Sentence: singer rod temperton, who wrote the hit album michael jackson, has died at the age of 89.
+Explanation and Label:
+Explanation: The sentence contradicts the article in two ways. First, the article states that Rod Temperton died at the age of 66, not 89. Second, the sentence implies that Temperton wrote an entire album for Michael Jackson, while the article specifies that he wrote several songs for Jackson's albums, not an entire album.
+Label: Contradiction
+
+Article: Sheikh Ali Salman told the BBC that for national dialogue to be meaningful, the government had to show its willingness to offer "concrete solutions".
+"We want someone who can speak for the royal family," he said.
+Crown Prince Salman al-Khalifa is seen as a reformist in a court divided on how to respond to opposition demands.
+Hardliners - centred around the unelected Prime Minister Sheikh Khalifa bin Salman al-Khalifa, who has been in his post since 1971 - are said to be opposed to a dialogue process which has only just been agreed between the government and six opposition societies.
+They fear that any concessions will only serve to encourage more demands from opposition leaders they deeply distrust.
+However, speaking to the BBC during a visit to London, Sheikh Salman insisted that now was the time for dialogue.
+"We welcome it, we are ready for it," he said. "We believe that dialogue and negotiations are necessary."
+The al-Wefaq leader acknowledged that many young protesters had lost faith in the main opposition parties.
+"A lot of young people do not believe that we should ask for permission to go on a demonstration, or that we should call for a constitutional monarchy with this family, which until now is still killing people".
+But he believed that the only way forward was to work with reformists within the Sunni Muslim royal family, including the US- and UK-educated Crown Prince Salman, who has has long been considered a proponent of accommodation with the country's Shia majority.
+Sheikh Salman noted that hours before King Hamad brought in Gulf Co-operation Council (GCC) troops to restore order and crush dissent on 14 March 2011, the crown prince and opposition had agreed a seven-point plan that would have moved Bahrain towards a constitutional monarchy.
+"We had an agreement with the crown prince," he said. "The seven principles were announced and then 12 hours later, GCC troops came in and severed the dialogue."
+Asked about the appointment of Senator John Kerry as US secretary of state, Sheikh Salman said he was "hopeful" that he would "do more than his predecessor", Hillary Clinton.
+"US policy needs to be more clear and direct. The United States government needs to pressure harder for human rights and democratic practices.  We are told that Mr Kerry has more interest in Bahrain and so we hope he will achieve more."
+On the UK's approach to the crisis in Bahrain, the al-Wefaq leader was more blunt.
+"If the UK government and [Prime Minister David] Cameron are serious about putting an end to violence and human rights abuses, then they have to speak out publically.
+"It is not enough to say: 'We are privately urging reform.' That has been done for years. Unfortunately, the Bahrain government is not listening to these private conversations.
+"So, the question I would ask the British government is: 'Shall you continue to say it privately and not put public pressure?' This is not, I think, a good policy."
+Sheikh Salman also reiterated al-Wefaq's position that it would continue to call for "peaceful demonstrations", even though all public gatherings and rallies are currently banned in Bahrain.
+"It is the only way open to us to put pressure on the government."
+He also called for the release of 13 opposition leaders and human rights activists who have been sentenced to between five years and life in prison on evidence widely accepted as having been obtained under torture. They were convicted of plotting to overthrow the government.
+"These people have a lot of followers in the street.  If they are not part of the dialogue than the dialogue will fail."
+Sentence: the leader of bahrain\'s main opposition party has said there needs to be dialogue between the kingdom\'s crown prince and government.
+Explanation and Label:
+
+!!@@##@@!! -- Example 1
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Contradiction'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Neutral'. First provide a short explanation if the sentence is faithful or not and afterwards the corresponding label.
+
+Article: Hospital radiographer Aidan McNicholl, 36, died following the collision on the A5 at Cerrigydrudion on Sunday.
+Andreas Werner, 46, of Leipzig, failed to spot the motorcyclist as he turned his VW Transporter right causing the fatal crash.
+The father-of-four pleaded guilty to causing death by careless driving at Llandudno Magistrates' Court.
+He was fined Â£1,000 and also banned from driving in the UK for two years.
+Prosecutor Sarah Marsh told the court the victim's family saw no value in Werner, who was staying in a cottage with his family near Bala, being sent to jail.
+She said: "They accept it was a momentary lapse and nothing will bring him back."
+Craig Hutchinson, defending, said Werner was remorseful and could offer no explanation for the crash.
+Sentence: a driver who killed a motorcyclist in conwy county has been jailed for six months.
+Explanation and Label:
+Explanation: The sentence states that the driver has been jailed for six months, which is not mentioned in the article. The article only mentions that the driver was fined £1,000 and banned from driving for two years. Therefore, the sentence introduces information that is not explicitly mentioned in the article, making it 'Neutral'.
+Label: Neutral
+
+Article: Pte Matthew Boyd, 20, was off-duty on a night out in Brecon when he was punched and beaten by Jake Vallely.
+But the jury cleared Vallely's friend Aaeron Evans of manslaughter after Cardiff Crown Court was told he was not present during the attack.
+Vallely, 24, will be sentenced on 8 December.
+The unconscious body of Pte Boyd, who served with the Royal Gibraltar Regiment, was found by police in the town in the early hours of 8 May.
+Pte Boyd, who is originally from Carrickfergus, County Antrim, had been in the town for training exercises at the infantry battle school.
+During the trial, the court heard Pte Boyd was making his way back to the barracks when he was attacked outside a bar called The Cellar.
+CCTV footage showed the soldier being punched, going to the ground and being beaten until he no longer moved.
+Vallely then dragged his body from the scene before fleeing.
+The trial was told the killer had been on a seven hour drinking binge and in the hour before the attack was boasting he was the "hardest man in Brecon".
+His friend Mr Evans was cleared of any involvement in the attack, after the jury was told he had left the scene before the start of any violence.
+Senior investigating officer Det Supt David Guiney, from Dyfed-Powys Police, called the attack "a despicable act" that "shocked" the community of Brecon.
+"I plead with anyone who plans a night out drinking with their friends to please, walk away from any conflict, do not resort to violence," he said.
+A family tribute described Pte Boyd as an "all-rounder" who had "a promising career ahead of him which has been cut short".
+The tribute read: "Matthew was full of life. He was loving, caring and loyal. He was always playing jokes on his peers and family, and always brought smiles to our faces."
+It said Vallely had created "a void in our family that will never be filled", adding the "unbearable pain" was something they will have to live with for the rest of their lives.
+"During this trial, it has been mentioned that Jake Vallely called himself the 'hardest man in Brecon' on the night that he murdered Matthew," the tribute said.
+"He couldn't have been more wrong. There has been such a massive outpouring of love from the community in Brecon towards our family; in our mind, those are the strongest people in Brecon."
+Sentence: a killer who boasted he was the ``hardest man\'\'in town has been found guilty of murdering a soldier in powys.
+Explanation and Label:
+Explanation: The sentence accurately conveys the information from the article. It mentions that a killer who boasted he was the 'hardest man' in town has been found guilty of murdering a soldier in Powys, which is consistent with the information provided in the article.
+Label: Faithful
+
+Article: Mr Gustafsson, 42, is being flown back to Sweden from Africa, Sweden's Foreign Minister Margot Wallström said in a statement on Monday.
+He was seized by al-Qaeda in the Islamic Maghreb (AQIM) along with two other men, one of whom was freed in a dawn raid in 2015.
+Ms Wallström said Mr Gustafsson was "in good spirits", local media report.
+"It is with great pleasure that I can announce that Johan Gustafsson has been released," Ms Wallström added.
+She said that the Swede's release was thanks to "extensive efforts" and co-operation between the Swedish foreign ministry, police and "foreign authorities".
+Ms Wallström said she had spoken with Mr Gustafsson, who she described as being "happy" and "overwhelmed" by Monday's events.
+"I cannot say more at the current time," she added.
+Sweden's former Foreign Minister Carl Bildt said that Mr Gustafsson's kidnapping weighed heavily on his mind during his time in the role, which ended in 2014.
+He tweeted on Monday: "Extremely gratifying that Johan Gustafsson is free. No single case concerned me more as foreign minister."
+Mr Gustafsson was kidnapped along with South African Stephen McGown and Dutchman Sjaak Rijke.
+Mr Rijke was freed by French special forces in April 2015 after he was discovered by chance in a dawn raid in northern Mali.
+AQIM took a number of Western hostages before the French military deployed its forces in January 2013.
+In a separate incident in December 2014, French hostage Serge Lazarevic was freed after a prisoner swap.
+Sentence: sweden\'s foreign minister johan gustsson has been freed after being kidnapped by islamist militants in mali.
+Explanation and Label:
+Explanation: The sentence is mostly faithful to the article, but it contains a mistake. The person who was freed is not Sweden's foreign minister, but a man named Johan Gustafsson. The foreign minister is Margot Wallström, who announced Gustafsson's release.
+Label: Contradiction
+
+Article: In the year to the end of March, 57 victims of homicide (murders and culpable homicides) were recorded - down five on the previous 12 months.
+This is the lowest number of recorded homicide cases for a single 12-month period since 1976 and half the figure of nine years ago.
+As of 31 March 2016, only one case of homicide recorded in 2015-16 was unresolved.
+The report Homicide in Scotland showed that a sharp instrument remained the most common method of killing in Scotland and accounted for 51% of homicides (29 cases) in 2015-16.
+Nearly all of these cases (26 out of 29) involved a knife.
+While the majority of the accused had an unknown status for alcohol and drugs, 31% (20 people) were identified by the police as being under the influence of alcohol or alcohol and drugs.
+Justice Secretary Michael Matheson said: "While it is encouraging to see continued falls in homicide cases alongside the long-term decline in violent crime, the sustained efforts that have helped achieve this - through education and enforcement - must continue, because each of the lives lost is one life too many.
+"There is a clear role across a range of public services, in addition to the critical work of our police, to continue to support communities that may remain at risk from violent crime and to challenge irresponsible attitudes both to alcohol misuse and to so-called 'casual' violence.
+"We will continue to work with partners and invest in a range of projects to help steer our young people away from the risks of a life of violence and crime, while also ensuring our law enforcement agencies and the courts have the powers and resources needed to deal with those who do harm to others."
+Scottish Labour's justice spokeswoman Claire Baker said: "Whilst I welcome the overall downward trend in homicides in Scotland we have to take these statistics with a note of caution.
+"Last year when the Scottish government were heralding 'record low' homicide figures after a supposed similar drop, the actual figures were being revised upwards to show an increase.
+"Meanwhile, sexual crime in Scotland sits at a 45-year high and in the past year we have seen an increase in violent crime with attempted murder and serious assault rising by a staggering 27%."
+The number of homicide victims for 2014-15 stood at 59 last year but later increased to 62, after three cases were reclassified following deaths.
+Sentence: the number of homicides recorded by police in scotland has fallen to its lowest level since 2009.
+Explanation and Label:
+

@@ -1,0 +1,23 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: 100
+fewshot_sampling: random
+model: hf-causal-experimental
+model_args: pretrained=mtc/meta-llama-Llama-2-7b-hf-pubmed-summarization-5000-finetuned-no-quantization-final,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,attn_implementation=flash_attention_2,max_length=4096
+no_cache: true
+num_fewshot: 0
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/domain_adaptation_finetuned.json
+    prompt_version: prompt_v3_summarization_finetuned
+    task_name: pubmed_domain_adaptation_summarization
+wandb_on: true
+wandb_project_name: domain_adaptation
+write_out: true

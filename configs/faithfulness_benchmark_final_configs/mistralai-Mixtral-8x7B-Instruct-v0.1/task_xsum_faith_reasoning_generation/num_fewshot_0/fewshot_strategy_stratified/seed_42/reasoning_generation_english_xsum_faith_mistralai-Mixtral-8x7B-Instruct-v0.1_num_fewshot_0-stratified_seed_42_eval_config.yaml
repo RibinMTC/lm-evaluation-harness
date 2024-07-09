@@ -1,0 +1,22 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: 20
+fewshot_sampling: stratified
+model: hf-causal-experimental
+model_args: pretrained=mistralai/Mixtral-8x7B-Instruct-v0.1,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,attn_implementation=flash_attention_2,max_length=4096
+no_cache: true
+num_fewshot: 0
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/absinth_reasoning_generation.json
+    prompt_version: reasoning_generation_english_xsum_faith
+    task_name: xsum_faith_reasoning_generation
+wandb_on: true
+write_out: true

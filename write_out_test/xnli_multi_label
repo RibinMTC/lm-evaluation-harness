@@ -1,0 +1,7 @@
+!!@@##@@!! -- Example 0
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Faithful'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Intrinsic Hallucination'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Extrinsic Hallucination'.
+
+Artikel: Nun, daran dachte ich nicht einmal, aber ich war so frustriert, dass ich am Ende doch mit ihm redete.
+Satz: Ich habe nicht wieder mit ihm gesprochen.
+Label:
+

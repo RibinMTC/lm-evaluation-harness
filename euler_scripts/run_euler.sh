@@ -35,6 +35,7 @@ scp "$1" euler:$CODE_PATH/euler_scripts
 #scp ../lm_eval/tasks/swisstext23_faithfulness_classification.py euler:$CODE_PATH/lm_eval/tasks/swisstext23_faithfulness_classification.py
 #scp ../lm_eval/tasks/swisstext23_summarization.py euler:$CODE_PATH/lm_eval/tasks/swisstext23_summarization.py
 #scp ../lm_eval/tasks/faithfulness_classification_base_task.py euler:$CODE_PATH/lm_eval/tasks/faithfulness_classification_base_task.py
+#scp ../lm_eval/models/huggingface.py euler:$CODE_PATH/lm_eval/models/huggingface.py
 #scp ../lm_eval/evaluator.py euler:$CODE_PATH/lm_eval/evaluator.py
 #scp ../configs/prompt_templates/swisstext23_summarization.json euler:$CODE_PATH/configs/prompt_templates/swisstext23_summarization.json
 #scp ../configs/prompt_templates/seahorse_classification.json euler:$CODE_PATH/configs/prompt_templates/seahorse_classification.json
@@ -87,6 +88,8 @@ ssh euler ARG1=\"$1\" \
     echo "### Activating environment..."
     source env/bin/activate
     echo ""
+
+    export CONSUL_HTTP_ADDR=""
 
     # Change to code dir
     echo "### Changing to code dir..."

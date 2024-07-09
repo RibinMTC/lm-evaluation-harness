@@ -1,0 +1,14 @@
+{
+    "load_modules": "gcc/8.2.0 python_gpu/3.11.2 eth_proxy",
+    "project_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness",
+    "code_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness",
+    "log_file_path": "/cluster/home/cribin/faithful-summarization/lm-evaluation-harness/euler_outputs/",
+    "num_cpus": 4,
+    "run_duration_hours": "08:00",
+    "shareholder_group": "es_mtc",
+    "memory_per_cpu_gb": 12,
+    "gpu": "a100_80gb",
+    "num_gpus": 3,
+    "config_file":"configs/domain_adaptation_configs/arxiv_test_eval_config.yaml",
+    "main_command": "python3 main.py --config "
+}

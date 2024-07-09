@@ -1,0 +1,24 @@
+!!@@##@@!! -- Example 0
+### Anweisung:
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Faithful'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Intrinsic Hallucination'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Extrinsic Hallucination'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label.
+Artikel: 
+Satz: Von den Giftködern sind wahrscheinlich auch Vögel betroffen, was von der lokalen Vogelschutzorganisation bestätigt wurde.
+
+### Erklärung und Label:
+
+!!@@##@@!! -- Example 1
+### Anweisung:
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Faithful'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Intrinsic Hallucination'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Extrinsic Hallucination'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label.
+Artikel: 
+Satz: Die Vorbereitungen waren aufwändig.
+
+### Erklärung und Label:
+
+!!@@##@@!! -- Example 2
+### Anweisung:
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Faithful'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Intrinsic Hallucination'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Extrinsic Hallucination'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label.
+Artikel: 
+Satz: Sein Sohn Wolfgang, der bei Van Halen seit 2006 Bass spielt und auch ein begabter Pianist ist, verkündete den Tod seines Vaters auf Twitter.
+
+### Erklärung und Label:
+

@@ -1,0 +1,25 @@
+!!@@##@@!! -- Example 0
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Antworte NUR auf Deutsch. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label.
+
+Artikel: Beweise für Betrug , illegale Handlungen oder sonstige Verstöße
+Satz: Die Beweise zeigen illegale Handlungen oder andere Verstöße .
+Erklärung und Label:
+Erklärung: Der Satz gibt Informationen wieder, die direkt aus dem Artikel stammen.
+Label: Treu
+
+Artikel: Aber ich hätte besser darauf achten sollen .
+Satz: Ich war abgelenkt vom Fernsehen .
+Erklärung und Label:
+Erklärung: Der Satz gibt Informationen wieder, die im Artikel nicht erwähnt werden.
+Label: Neutral
+
+Artikel: Theorysia nicht die Stirn , ihre Stirn falten .
+Satz: Theorysia lächelte weit und schuf tiefe Lächeln .
+Erklärung und Label:
+Erklärung: Der Satz enthält Informationen, die im direkten Widerspruch zum Artikel stehen.
+Label: Widerspruch
+
+Artikel: Nun, daran dachte ich nicht einmal, aber ich war so frustriert, dass ich am Ende doch mit ihm redete.
+Satz: Ich habe nicht wieder mit ihm gesprochen.
+Erklärung und Label:
+

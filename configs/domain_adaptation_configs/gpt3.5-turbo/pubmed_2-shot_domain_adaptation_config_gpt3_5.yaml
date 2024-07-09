@@ -1,0 +1,23 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+fewshot_sampling: random
+start_range: null
+end_range: null
+model: gpt3.5
+model_args: engine=gpt-3.5-turbo
+no_cache: true
+num_fewshot: 2
+output_base_path: results
+output_path: null
+seed: 42
+task_configs:
+-   prompt_template: null
+    prompt_version: default
+    task_name: pubmed_2shot_domain_adaptation_summarization
+wandb_on: true
+wandb_project_name: "domain_adaptation"
+write_out: true

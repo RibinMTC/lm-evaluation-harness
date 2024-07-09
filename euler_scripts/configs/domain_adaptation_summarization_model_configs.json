@@ -7,16 +7,27 @@
     "meta-llama/Llama-2-13b-chat-hf",
     "meta-llama/Llama-2-7b-chat-hf",
     "mistralai/Mistral-7B-Instruct-v0.1",
-    "lmsys/vicuna-13b-v1.5-16k"
+    "lmsys/vicuna-13b-v1.5-16k",
+    "lmsys/vicuna-7b-v1.5-16k",
+    "mtc/meta-llama-Llama-2-7b-hf-pubmed-summarization-1000-finetuned-no-quantization",
+    "mtc/meta-llama-Llama-2-7b-hf-pubmed-summarization-5000-finetuned-no-quantization-final",
+    "mtc/meta-llama-Llama-2-7b-hf-pubmed-summarization-10000-finetuned-no-quantization",
+    "mtc/meta-llama-Llama-2-7b-hf-arxiv-summarization-1000-finetuned-no_quantization",
+    "mtc/meta-llama-Llama-2-7b-hf-arxiv-summarization-5000-finetuned-no_quantization-final",
+    "mtc/meta-llama-Llama-2-7b-hf-arxiv-summarization-10000-finetuned-no_quantization"
   ],
   "few_shot_values": {"lower_range":  0,
     "upper_range": 7
   },
+  "max_context_length_values" : [1024, 2048, 4096, 8192],
   "tasks_with_prompt_templates": {
-    "arxiv_domain_adaptation_summarization": "default",
-    "arxiv_2shot_domain_adaptation_summarization": "default",
-    "pubmed_domain_adaptation_summarization": "default",
-    "pubmed_2shot_domain_adaptation_summarization": "default"
+    "arxiv_domain_adaptation_summarization": "configs/prompt_templates/domain_adaptation_finetuned.json",
+    "arxiv_2k_domain_adaptation_summarization": "configs/prompt_templates/domain_adaptation_finetuned.json",
+    "arxiv_2shot_domain_adaptation_summarization": null,
+    "pubmed_domain_adaptation_summarization": "configs/prompt_templates/domain_adaptation_finetuned.json",
+    "pubmed_2k_domain_adaptation_summarization": "configs/prompt_templates/domain_adaptation_finetuned.json",
+    "pubmed_2shot_domain_adaptation_summarization": null,
+    "govreport_domain_adaptation_summarization": null
   },
   "seeds": [42],
   "few_shot_sampling_strategies" : ["random"]

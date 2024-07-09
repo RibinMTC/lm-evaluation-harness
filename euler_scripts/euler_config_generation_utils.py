@@ -26,7 +26,8 @@ MODEL_NAME_TO_TYPE_MAP = {
     "mtc/microsoft": "hf-causal-experimental",
     "mtc/mistralai": "hf-causal-experimental",
     "mtc/upstage": "hf-causal-experimental",
-    "mtc/leo-mistral-absinth-finetuned-3-epochs-GGUF": "ctransformers-casual"
+    "mtc/leo-mistral-absinth-finetuned-3-epochs-GGUF": "ctransformers-casual",
+    "/cluster/scratch/cribin/llm_finetuning": "hf-causal-experimental"
 }
 
 

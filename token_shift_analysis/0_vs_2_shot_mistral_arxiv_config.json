@@ -1,0 +1,5 @@
+{
+  "dataset": "arxiv",
+  "samples_to_compute": 10,
+  "model_name": "mistralai-Mistral-7B-Instruct-v0.1"
+}

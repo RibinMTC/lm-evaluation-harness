@@ -1,0 +1,23 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: null
+fewshot_sampling: random
+model: hf-causal-experimental
+model_args: pretrained=mistralai/Mistral-7B-Instruct-v0.1,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,use_flash_attention_2=True
+no_cache: true
+num_fewshot: 2
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: null
+    prompt_version: default
+    task_name: pubmed_2shot_domain_adaptation_summarization
+wandb_on: true
+wandb_project_name: domain_adaptation
+write_out: true

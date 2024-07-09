@@ -49,8 +49,8 @@ def prepare_context(df, context: str = '0-shot', row: int = None, idx: int = Non
     if not idx:
         idx = [random.randint(0, len(pred.split())) for i in range(10)]
 
-    pred_idx = [' '.join(map(str, pred.split()[:i])) for i in idx]
-    model_input = [f"{prompt} SUMMARY: {p}" for p in pred_idx]
+    # pred_idx = [' '.join(map(str, pred.split()[:i])) for i in idx]
+    model_input = f"{prompt} SUMMARY: {pred}"
     return model_input, idx
 
 
@@ -131,32 +131,33 @@ def get_token_idx(df, row_idx: int, input_dir: str, ds, num_items_to_select=None
     return idx
 
 
-def get_token_distribution(inputs, model: AutoModelForCausalLM, tokenizer: AutoTokenizer, top_k=5, max_len=2048,
-                           truncation=True, ):
+def get_token_distribution(input, model: AutoModelForCausalLM, tokenizer: AutoTokenizer, selected_token_idx: List[int],
+                           top_k=5, max_len=2048,
+                           truncation=True):
     top_k_values_all = []
     predicted_tokens_all = []
     probability_distribution_all = []
 
-    for input in tqdm(inputs):
-        # Tokenize input text
-        input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation)
+    # Tokenize input text
+    input_ids = tokenizer.encode(input, return_tensors="pt", max_length=max_len, truncation=truncation)
 
-        # Generate probabilities for the next token
-        with torch.no_grad():
-            outputs = model(input_ids)
-            logits = outputs.logits[:, -1, :]  # Take the logits for the last token
-            probabilities = torch.nn.functional.softmax(logits, dim=-1)
-            probability_distribution_all.append(probabilities)
+    # Generate probabilities for the next token
+    with torch.no_grad():
+        outputs = model(input_ids)
+        all_output_logits = outputs.logits
 
-        # Get the top-k predicted tokens and their probabilities
+    probabilities = torch.nn.functional.softmax(all_output_logits[:, selected_token_idx, :], dim=-1)
+    probability_distribution_all.append(probabilities)
 
-        top_k_values, top_k_indices = torch.topk(probabilities, k=top_k)
+    # Get the top-k predicted tokens and their probabilities
 
-        # Convert indices back to tokens
-        predicted_tokens = tokenizer.convert_ids_to_tokens(top_k_indices[0].tolist())
+    top_k_values, top_k_indices = torch.topk(probabilities, k=top_k)
 
-        top_k_values_all.append(top_k_values)
-        predicted_tokens_all.append(predicted_tokens)
+    # Convert indices back to tokens
+    predicted_tokens = tokenizer.convert_ids_to_tokens(top_k_indices[0].tolist())
+
+    top_k_values_all.append(top_k_values)
+    predicted_tokens_all.append(predicted_tokens)
 
     return top_k_values_all, predicted_tokens_all, probability_distribution_all
 
@@ -177,23 +178,27 @@ def token_dist_model1_model2(input_dir: str, model_1: AutoModelForCausalLM, mode
                         use_all_tokens=use_all_tokens, use_domain_words=use_domain_words, row_idx=row_idx)
 
     # prepare input for the model
-    inputs, token_idx = prepare_context(df=df_after, context=context, row=row_idx, idx=idx)
+    input_prompt, token_idx = prepare_context(df=df_after, context=context, row=row_idx, idx=idx)
 
     # Getting the token distribution
-    top_k_values_before, predicted_tokens_before, probability_distribution_all_before = get_token_distribution(inputs,
-                                                                                                               model=model_1,
-                                                                                                               tokenizer=tokenizer,
-                                                                                                               top_k=50,
-                                                                                                               max_len=4096,
-                                                                                                               truncation=True)
+    top_k_values_before, predicted_tokens_before, probability_distribution_all_before = get_token_distribution(
+        input_prompt,
+        model=model_1,
+        selected_token_idx=token_idx,
+        tokenizer=tokenizer,
+        top_k=50,
+        max_len=4096,
+        truncation=True)
 
     # Getting the token distribution
-    top_k_values_after, predicted_tokens_after, probability_distribution_all_after = get_token_distribution(inputs,
-                                                                                                            model=model_1,
-                                                                                                            tokenizer=tokenizer,
-                                                                                                            top_k=50,
-                                                                                                            max_len=4096,
-                                                                                                            truncation=True)
+    top_k_values_after, predicted_tokens_after, probability_distribution_all_after = get_token_distribution(
+        input_prompt,
+        model=model_1,
+        tokenizer=tokenizer,
+        selected_token_idx=token_idx,
+        top_k=50,
+        max_len=4096,
+        truncation=True)
 
     # Automatic Evaluation for Token Distribution Shift
     eval_scores = dict()
@@ -364,13 +369,13 @@ def main():
     args = parse_args()
 
     load_dotenv()
-    connect_to_wandb()
+    # connect_to_wandb()
 
     ds = args.dataset
     context = '2-shot'
     samples_to_compute = args.samples_to_compute
     # Set the folder path
-    input_dir = 'token_shift_analysis/token_shift_analysis_config'
+    input_dir = 'token_shift_analysis_config'
     model_1_name = args.model_1
     model_2_name = args.model_2
 
@@ -380,7 +385,7 @@ def main():
     tokenizer.pad_token = tokenizer.eos_token
 
     model_1 = load_model(model_key[model_1_name])
-    model_2 = load_model(model_key[model_2_name])
+    model_2 = None  # load_model(model_key[model_2_name])
 
     # Call the function to find and print the matching CSV file names
     two_shot_runs = find_csv_files(input_dir, context=context)
@@ -419,11 +424,11 @@ def main():
         row_idx = i
         print(ds, row_idx)
 
-        eval_scores = token_dist_model1_model2(input_dir=input_dir, model_1=model_1, model_2=model_2,
+        eval_scores = token_dist_model1_model2(input_dir=input_dir, model_1=model_1, model_2=model_2_name,
                                                tokenizer=tokenizer, ds=ds,
                                                df_runs=df_runs,
                                                row_idx=row_idx, use_domain_words=True)
-        push_to_wandb(eval_scores, ds=ds, model_1=model_1_name, model_2=model_2_name, row_idx=row_idx)
+        # push_to_wandb(eval_scores, ds=ds, model_1=model_1_name, model_2=model_2_name, row_idx=row_idx)
 
 
 if __name__ == "__main__":

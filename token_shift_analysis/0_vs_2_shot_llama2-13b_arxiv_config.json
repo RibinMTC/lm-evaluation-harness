@@ -1,0 +1,5 @@
+{
+  "dataset": "arxiv",
+  "samples_to_compute": 10,
+  "model_name": "meta-llama-Llama-2-13b-chat-hf"
+}

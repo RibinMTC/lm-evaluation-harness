@@ -1,0 +1,113 @@
+!!@@##@@!! -- Example 0
+Analyze whether the given sentence is faithful to the article. If the sentence solely conveys information that comes directly from the article, without any additions or omissions, respond with 'Faithful'. If the sentence contains information that is in direct contradiction to the article, respond with 'Intrinsic Hallucination'. If the sentence introduces information or details that are not explicitly mentioned in the article itself, respond with 'Extrinsic Hallucination'.
+
+Article: The limb was found in a garden in Cranwells Park on Wednesday and has been sent for forensic analysis, Avon and Somerset Police said.
+A force spokesman said detectives were "keeping an open mind" as to whether it was linked to two similar incidents in the city.
+All three feet have been found within a few hundred yards of each other.
+Tests showed the first foot found in Weston Park East in February was  "probably" a medical teaching aid. The second foot, found last month in the same area, is still undergoing tests.
+"The same officers are looking into the latest discoveries and will look to confirm beyond all reasonable doubt that they are linked and if there are any new lines of inquiry which can be taken forward," the spokesman added.
+Sentence: a suspected human foot has been found in a park in bristol, police have said.
+Label:
+ Intrinsic Hallucination
+
+Article: Webb has not played since suffering a serious foot injury in a World Cup warm-up with Italy in September.
+The 27-year-old says he is close to a return, giving him time to get fit before the Six Nations in February.
+"I'm back up and running now and going through a pre-season sort of stage at the moment. It's all coming along well," he said.
+"I'm going to take each week as it comes now and see where I am then.
+"It's been talked about [returning] at the beginning of February, but I did ask the physios if they could scrape a couple of weeks off that and they said 'yes'."
+Wales begin their Six Nations campaign away to Ireland in Dublin on Sunday, 7 February.
+Webb, capped 16 times by Wales, has renewed his national dual contract with Ospreys and the Welsh Rugby Union.
+He turned down offers from elsewhere to stay at the region for whom he made his debut in 2007.
+"It's my home region and I enjoy the club," Webb told BBC Wales' Scrum V Live.
+"I want to put myself in the best possible position to play for my country and I'm not going to give that up that easy.
+"Wales and the Ospreys came together and I'm happy to get it done."
+Sentence: wales and ospreys scrum-half rhys webb says he is still waiting to be fit for wales \'pre-season tour.
+Label:
+ Extrinsic Hallucination
+
+Article: He told Reuters that the EU should not interfere with "domestic issues".
+He said he had already won backing from Poland that it would veto any move to strip Hungary of its EU voting rights.
+The EU objects to Hungary's tight controls on asylum seekers and non-governmental organisations (NGOs), as well as a higher education law.
+Critics say the education law could lead to the closure of the prestigious Central European University, founded by philanthropist George Soros.
+Thousands of Hungarians have held protest rallies against the laws in recent months.
+Asked by Reuters on Monday whether Hungary would backtrack on any of the three issues, Mr Szijjarto answered: "No. Why should we?
+"These laws belong to national competence, so I think European institutions should refrain from making attempts at interfering with domestic issues."
+The minister added that "my Polish colleague" had made it very clear that Warsaw would veto any EU sanctions against Hungary.
+EU rules envisage that such decisions as stripping a member country of its voting rights should be approved unanimously.
+Hungary's right-wing Fidesz government of Prime Minister Viktor Orban is under sustained pressure from European institutions to withdraw the three laws, two of which have already been passed, the BBC's Nick Thorpe in Budapest reports.
+Hungary is currently forcibly housing asylum seekers in secured shipping containers, raising serious questions whether it is compatible with EU law.
+Hungary's Higher Education Law, signed in April, could force the closure of the Budapest-based CEU, which ranks among the top 200 universities in the world in eight disciplines.
+Meanwhile, draft legislation on NGOs is expected to go before parliament soon.
+Human rights groups say it would stigmatise them as "foreign-backed" organisations.
+Last month, the deputy head of the bloc's executive Commission, Frans Timmermans, warned action would be taken in coming weeks if there were no positive developments.
+Hungary passes bill targeting Central European University
+Hungarian attack on George Soros prompts NGO anger
+The university built to defend democracy
+Sentence: hungary\'s prime minister, viktor orban, has warned that a new european law on human rights should be lifted.
+Label:
+ Intrinsic Hallucination
+
+Article: The incident occurred on the A9 north of Berriedale in Caithness at about 14:00.
+Several other people received minor injuries in the crash.
+The road was closed and diversions were put in place via the A897 Helmsdale to Melvich road. Police Scotland said inquiries into the incident were ongoing.
+Sentence: one person has died following a two-vehicle crash on the a9 in the highlands.
+Label:
+ Extrinsic Hallucination
+
+Article: A team from Glasgow University studied recorded speech of Glaswegians from the early 20th Century to the present.
+They found evidence of common UK accent changes, such as the use of "f" for "th" in words like think, and a dropped letter 'l', as in people to peopo.
+Overall though, the researchers said the Scots accent remained distinctive.
+The three-year Sounds of the City study, was led by Professor Jane Stuart-Smith, director of the university's laboratory of phonetics.
+"We were quite surprised by what we found," she said.
+"The assumption is that traditional dialects generally across the UK are being eroded and some are dying out altogether, but what we have learned, particularly with the Glasgow accent, is that Scots accents are actually flourishing.
+"Interestingly, what is not happening in Scotland is the dilution of accents to a more homogenised anglicised accent on the scale that we are seeing in England, and in fact the Scots accent remains very distinctive."
+As part of its study, the Glasgow team built up a digitised body of recorded speech sounds.
+The team said its work suggested the distinctive Scots accent had undergone two kinds of changes.
+One set are common accent changes, which have spread right across the UK, such as the "f" and "l" examples.
+The team said this change was being spread partly by dialect contact and partly by the popularity of TV shows set in London.
+The project also uncovered a second set of finer changes local to Scotland.
+These included how vowels were pronounced in words such as boat, goat and coat, or stop sounds that are pronounced in words like pin, top and cat.
+The researchers anticipated these sounds either to be stable over time, or perhaps to be changing in the same way as in Anglo-English accents.
+Their evidence suggested, however, that these features and others were all changing, the changes were local to Scotland and not affected by Anglo-English changes, and that they had been happening for 100 years or more.
+The Glasgow team said the trigger for some of these changes appeared to be the period around the First World War.
+The study focused on six audio recordings, made in 1916 and held by the British Library, of Scots soldiers from German Prisoner of War camps.
+From those recordings researchers found evidence to show that even a century ago, and perhaps even earlier, Scottish accents were already changing.
+The research and findings of the project will be made available to students and other researchers via an online resource.
+Sentence: a new study of scots accent has found that it has changed many times over the last century.
+Label:
+ Faithful
+
+Article: The man died in Inverness on 27 October this year.
+The Police Investigations and Review Commissioner (Pirc), Kate Frame, has been asked to scrutinise the initial police response to the man's call.
+Police Scotland said it was "fully engaging" with the investigation and awaited its findings.
+A spokesman for Pirc said: "The Crown Office and Procurator Fiscal Service (COPFS) has instructed the Police Investigations and Review Commissioner to undertake an investigation into the initial police response to a call from a 72-year-old man who was later found dead at a sheltered housing complex in Inverness.
+"A report on the commissioner's findings will be submitted to the COPFS in due course."
+Sentence: a police watchdog has ordered an investigation after a 72-year-old man was found dead in a housing housing complex.
+Label:
+ Faithful
+
+Article: Sheikh Ali Salman told the BBC that for national dialogue to be meaningful, the government had to show its willingness to offer "concrete solutions".
+"We want someone who can speak for the royal family," he said.
+Crown Prince Salman al-Khalifa is seen as a reformist in a court divided on how to respond to opposition demands.
+Hardliners - centred around the unelected Prime Minister Sheikh Khalifa bin Salman al-Khalifa, who has been in his post since 1971 - are said to be opposed to a dialogue process which has only just been agreed between the government and six opposition societies.
+They fear that any concessions will only serve to encourage more demands from opposition leaders they deeply distrust.
+However, speaking to the BBC during a visit to London, Sheikh Salman insisted that now was the time for dialogue.
+"We welcome it, we are ready for it," he said. "We believe that dialogue and negotiations are necessary."
+The al-Wefaq leader acknowledged that many young protesters had lost faith in the main opposition parties.
+"A lot of young people do not believe that we should ask for permission to go on a demonstration, or that we should call for a constitutional monarchy with this family, which until now is still killing people".
+But he believed that the only way forward was to work with reformists within the Sunni Muslim royal family, including the US- and UK-educated Crown Prince Salman, who has has long been considered a proponent of accommodation with the country's Shia majority.
+Sheikh Salman noted that hours before King Hamad brought in Gulf Co-operation Council (GCC) troops to restore order and crush dissent on 14 March 2011, the crown prince and opposition had agreed a seven-point plan that would have moved Bahrain towards a constitutional monarchy.
+"We had an agreement with the crown prince," he said. "The seven principles were announced and then 12 hours later, GCC troops came in and severed the dialogue."
+Asked about the appointment of Senator John Kerry as US secretary of state, Sheikh Salman said he was "hopeful" that he would "do more than his predecessor", Hillary Clinton.
+"US policy needs to be more clear and direct. The United States government needs to pressure harder for human rights and democratic practices.  We are told that Mr Kerry has more interest in Bahrain and so we hope he will achieve more."
+On the UK's approach to the crisis in Bahrain, the al-Wefaq leader was more blunt.
+"If the UK government and [Prime Minister David] Cameron are serious about putting an end to violence and human rights abuses, then they have to speak out publically.
+"It is not enough to say: 'We are privately urging reform.' That has been done for years. Unfortunately, the Bahrain government is not listening to these private conversations.
+"So, the question I would ask the British government is: 'Shall you continue to say it privately and not put public pressure?' This is not, I think, a good policy."
+Sheikh Salman also reiterated al-Wefaq's position that it would continue to call for "peaceful demonstrations", even though all public gatherings and rallies are currently banned in Bahrain.
+"It is the only way open to us to put pressure on the government."
+He also called for the release of 13 opposition leaders and human rights activists who have been sentenced to between five years and life in prison on evidence widely accepted as having been obtained under torture. They were convicted of plotting to overthrow the government.
+"These people have a lot of followers in the street.  If they are not part of the dialogue than the dialogue will fail."
+Sentence: the leader of bahrain\'s main opposition party has said there needs to be dialogue between the kingdom\'s crown prince and government.
+Label:
+

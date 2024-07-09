@@ -1,0 +1,700 @@
+!!@@##@@!! -- Example 0
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Andere Programme konzentrieren sich auf geschlagene Frauen und Kinder , behinderte , tages Arbeiter , Gruppen von Gruppen zur Verbesserung der Gemeinschaft und Opfer von Straftaten .
+Satz: Unser Programm konzentriert sich auf das nur von den Behinderten .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 1
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie nannten ein Gefälschtes Dokument , die Spende von Konstantin , das angeblich die politische Autorität über ganz Italien hinterließ .
+Satz: Die Fälschung wurde entdeckt , und ihre Regel wurde beendet .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 2
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ich habe zwei Mädchen und einen jungen .
+Satz: Ich habe drei Kinder , zwei Mädchen und einen jungen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 3
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Der größte Unterschied zwischen den Republikanern im Kongress und Pat Buchanan ist , dass keiner von Ihnen nachdenklich genug war , ihren Glauben auf den Zweiten Weltkrieg anzuwenden , oder politisch dumm genug , es zu erwähnen , wenn sie es haben .
+Satz: Die größte Ähnlichkeit zwischen den Republikanern im Kongress und Pat Buchanan war ihre Fähigkeit , ihren Glauben auf den Zweiten Weltkrieg anzuwenden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 4
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie haben Programme für Haus Reparaturen und wie man Dinge baut und sie haben eine Kalligraphie-Show und ich mache kalligraphie , damit ich das sehe .
+Satz: Ich sehe gerne " Do-IT-Yourself-Programme " an .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 5
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Nun , ich lasse dich gehen , wenn du weiter gehen willst , um das zu nehmen , ja , es scheint nur , wenn du siehst , was für eine Menge , die anfangen zu laufen und irgendwie mit dem zu tun , was ihre Freunde sind , das ist der Beste Weg , um das zu tun . Vermeiden Sie Ärger von dem , was ich sammeln kann .
+Satz: Ich beobachte , was für eine Menge du laufen und bist der Beste Weg , um Ärger zu vermeiden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 6
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: 188 Kapitel 23 ein Rennen gegen die Zeit nach dem klingeln von Sir James , Tommys nächste Prozedur war , einen Anruf in South aud Ley Villen zu machen .
+Satz: Tommy war rennen um alles rechtzeitig fertig zu machen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 7
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Wenn isikoff so ein verwerfliche Sleazemonger war , warum sollte cover dann ein Buch mit ihm schreiben wollen ?
+Satz: Iskikoff war bekannt dafür , das Gesetz zu verbiegen und die Wahrheit zu strecken .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 8
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ich glaube , du hast recht , ich sage nur , dass ich nicht denke , dass das amerikanische Volk an dieser Stelle rebellischen genug ist , dass es in meinem Leben passieren wird . Ja , ich denke , irgendwann wird sich das System ändern . Ich glaube , wir haben das beste System mit den gewählten Beamten . Ich bin mir nicht sicher , ob es gerade funktioniert .
+Satz: Ich bin mir nicht sicher , ob unser aktuelles politisches System effektiv ist .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 9
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Um 5 Uhr findet dorcas ihre geliebte in einem Zustand der großen Aufregung , mit einem Zettel " ' ein Brief , ' dorcas denkt " in ihrer Hand , und es ist dann , dass 158 sie das Feuer in der Hand , in dem Sie das Feuer in der Hand hat . Ihr Zimmer soll angezündet werden .
+Satz: Dorcas versucht , ihre geliebte zu trösten und fragt , wie sie ihr helfen kann .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 10
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Rajasthan ist zweifellos eine der meisten Regionen in Indien .
+Satz: Ohne Zweifel ist einer der meisten Teile Indiens Rajasthan .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 11
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Entschuldigung , kennen wir uns ? Die Stimme gehörte einer roten Blutkörperchen , die zu beschäftigt war mit den Steuern , die sie dem Bindegewebe Schuldete .
+Satz: Eine rote Blutkörperchen war damit beschäftigt , seine Steuern zu Steuern .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 12
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Der Online-Ruhestand der Social Security Administration
+Satz: Die Verwaltung der sozialversicherung verfügt über online-Ressourcen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 13
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie ist auch in den Anti-Reed-Streit gesprungen und kritisiert ihn , weil er nicht hart genug für die Abtreibung war .
+Satz: Sie kritisierte ihn für seine Haltung zur Abtreibung .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 14
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Am wenigsten bin ich bei Ihnen geblieben . Ich bin loyal .
+Satz: Sie sind loyal zu den Patrioten , ihrem Lieblings-Football-Team .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 15
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: 4. Die Abschnitte 1 und 2 dieses Gesetzes gelten für Werbeartikel , die vor dem tatsächlichen Datum dieses Gesetzes eingegangen sind .
+Satz: Die Abschnitte gelten für die zuvor erhaltenen Gegenstände .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 16
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie hatten sie vor langer Zeit in Frankreich . "
+Satz: Vor langer Zeit , hatten sie sie in Frankreich .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 17
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Wir haben auch umfangreiche Internet-suchen durchgeführt , um Programme in jeder dieser Einrichtungen zu identifizieren , in denen Maßnahmen ergriffen wurden , um unangemessene Zahlungen zu reduzieren .
+Satz: Die Maßnahmen waren wirksam , um unangemessene Zahlungen zu reduzieren .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 18
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Und das habe ich mir selbst gesagt .
+Satz: Das dachte ich mir .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 19
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Zusammenfassungen der Bekanntmachungen dieser vorgeschlagenen Gesetzgebungsvorhaben wurden im Bundes Register veröffentlicht .
+Satz: Die Zusammenfassungen enthalten eine verkürzte , aber vollständig detaillierte Beschreibung der Inhalte jedes einzelnen Inhalts .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 20
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie bemerkten auch den Gestank von verrotten Fleisch aus seiner Wohnung , und sie hörten Klänge des Sägen aus seiner Wohnung Tag und Nacht .
+Satz: Seine Wohnung roch sehr nach verrotten Fleisch .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 21
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Und uh er hat es mir gezeigt und wir schauen unter die Haube und alles ist schön und sauber und du weißt du kannst die drei Zündkerzen da vorne sehen und ich sagte gut wo sind die anderen drei ?
+Satz: Wir ' unter dem Auto und sahen vier Zündkerzen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 22
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Es ist nicht David ist es .
+Satz: Ist es David oder nicht ?
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 23
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Hilfreiche Guides führen sie durch die langen Gänge und durch die interessantesten Zimmer .
+Satz: Die Tour ist von selbst geleitet .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 24
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Im Norden würde sie vom Auge gefangen werden .
+Satz: Das Auge würde sie gefangen nehmen , wenn sie zwei Meilen nördlich reiste .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 25
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Sie refinanziert im August 1998 mit Advanta , einem Subprime-Kreditgeber , der 10 Prozent Zinsen berechnet hat .
+Satz: Die Refinanzierung war ein schlechter finanzieller Schritt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 26
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Union und o ' connell
+Satz: O ' Connell und die Insel .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 27
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Nicht letzte Nacht , Sir , ich weiß , dass sie es nicht war .
+Satz: Sie hat es nicht letzte Nacht getan , soweit ich weiß .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 28
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ähm-Summen bist du ein Einheimischer Texaner oh gut gut für dich warst du schon mal in Austin
+Satz: Hat dir Austin gefallen ?
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 29
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Es muss hunderte von Plätzen geben , die auf diese Weise genutzt werden können .
+Satz: Es gibt 3 Plätze , die so genutzt werden können .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 30
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Andere geschmackvoll erbaute Gebäude aus dem 17 Jahrhundert , wie das Außenministerium und das Rathaus , zeigen , dass die Hauptstadt endlich ernst genommen wurde .
+Satz: Das Außenministerium und das Rathaus waren eines der Gaudier Gebäude .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 31
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ebenso berühmt für seine Riesling-Weine und seine Renaissance-Häuser , ist der malerische Riquewihr während der touristischen Saison oft überfüllt .
+Satz: Riqurwihr ist für viele Dinge berühmt , so dass es oft überfüllt ist .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 32
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Und das ganze Geschäft Geigen aus .
+Satz: Es gab viele Gründe , warum das Geschäft manipuliert wurde .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 33
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Überreste des Turmes werden zur Zeit wieder restauriert .
+Satz: Die Restaurationen Zielen darauf ab , den Original-Look wieder zu bringen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 34
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Aber auch wenn sie keine Stunden damit verbringen wollen , die Kunst Sammlung zu bewundern , das Gebäude selbst ' ein ehemaliges Zuhause der französischen Könige ' hat viel zu bieten und , wenn sie ihren Besuch gut planen , wird es sicher angenehm sein .
+Satz: Der König lebte in einem Schloss .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 35
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Oh , nur indem sie ihre Fragen stellte , antwortete Sir James leicht .
+Satz: Sir James schlug vor , Ihre Fragen zu stellen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 36
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Im Jahr 1927 war der Kaufmann James Oviatt mit dem neuen Architektonischen Stil , den er in Paris sah , verzaubert .
+Satz: Die Architektur von Paris hat noch nie jemanden beeindruckt , es ist zu einfach .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 37
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Daher sind die Abschnitte 203 und 204 des Gesetzes nicht anwendbar .
+Satz: Zwei Abschnitte des Gesetzes sind nicht anwendbar .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 38
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Aus all diesen Gründen muss sich die Regierung gegen s. 556 .
+Satz: Aus diesen Gründen muss die Verwaltung s bestehen . 566 .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 39
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Und ich denke jetzt , dass es häufiger passiert , als wir wissen , dass es nicht so viel Reißer ist , zumindest in Texas , weil ich ab und zu höre , dass ich etwas in den Nachrichten hören werde .
+Satz: Ich denke , es passiert mehr , als wir wissen , es ist einfach nicht so sensationell .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 40
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Glashütte enthält , was redakteure begehren -- Geschichten mit Energie , Phantasie und Originalität .
+Satz: Die Glashütte geht an einzigartige und kreative Autoren , um neue Geschichten zu drucken .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 41
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Das Geheimnis dieser Fische ist so gut gehalten , dass kein Kaiser es gewagt hat , die Kontrolle zu übernehmen , damit dieses Geheimnis nicht verloren geht .
+Satz: Die Führer haben versucht , das Geheimnis der Fische zu schützen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 42
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Der Süden wird von der kosmopolitischen Insel Hauptstadt , Palma de Mallorca , seiner hübschen Bucht und den überfüllten Stränden dominiert , die sich aus dem Meer entfernt haben .
+Satz: Der Süden wird von der spanischen Hauptstadt Madrid und seiner fantastischen Architektur dominiert .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 43
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Auf der Pressekonferenz erläuterte Ballmer die Herausforderungen von Microsoft und stellte mehrere Mitglieder des Unternehmen des Unternehmens auf , die mit Chief Architekten Gates zusammenarbeiten würden , um die Produkte und Dienstleistungen des Unternehmens zu integrieren .
+Satz: Gates wurde als Lead-Architekt gefeuert , und Janet Lane wurde dazu gebracht , ihn zu ersetzen und mit Microsoft zu arbeiten .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 44
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Der in dieser Regel zulässige Kind für Kinder fördert die Zahlung der Unterstützung für Kinder durch Erhöhung der Zuteilung eines Haushalts für den Haushalt , wenn ein Mitglied die Unterstützung für Kinder zahlt .
+Satz: Die Regel hält die Menschen davon ab , ihre Kinder Unterstützung zu bezahlen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 45
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Alle Hausarbeit und Mütter-Treffen !
+Satz: Voll der Hausarbeit und der Mütter-Treffen !
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 46
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Natürlich besteht immer die Chance , dass das Management des Unternehmens einfach verrückt geworden ist .
+Satz: Es ist möglich , dass das Management des Unternehmens verrückt geworden ist .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 47
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Subia versteckt seine Identität nie .
+Satz: Subia will nicht so tun , als wäre er jemand anderes .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 48
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Frau , entschied , kniete nieder zu Susan und ihre Augen trafen sich .
+Satz: Entschied kniete nieder zu ihrem geliebten Hund Susan , weil sie wusste , dass sie stirbt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 49
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Diese Risiken würden angemessen gemildert , wenn der Statistische Stichproben Plan ( 1 ) den Umfang oder das Ausmaß der Rechnungs Prüfung dem Risiko für die Regierung entspricht , 14 ( 2 ) Stichproben aus dem Universum aller Rechnungen. unter $ 2,500 , die nicht einer vollständigen Prüfung unterzogen werden , ( 3 ) wirksame Überwachung , um sicherzustellen , dass der Plan wirksam umgesetzt wird und die Risiken für die Regierung innerhalb der zulässigen Grenzen bleiben , und ( 4 ) eine kontinuierliche Beziehung zum Verkäufer , so dass das Risiko des Verlustes minimiert wird .
+Satz: Sie haben keine Risiken vorhergesehen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 50
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: In Patton , George C. Scott als General Patton schaut über eine bevorstehende Schlacht und sagt so etwas wie Gott mir helfen -- ich liebe es so !
+Satz: George C. Scott gab eine überzeugende Leistung als der General .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 51
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Eine regelmäßige Vorsichtsmaßnahme , bevor er in die Provinz fuhr , war ein riesiger Fernseher mit Klebeband auf den Rücken-und Seite , von dem wir glaubten , dass er leicht zu Ort ist , um nicht zu schießen , ich bin Reporter .
+Satz: Reporter haben Klebeband in Ihre Auto gesteckt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 52
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Während des Krieges gab es keine Rennen . "
+Satz: Während des Krieges hat sich die Zahl der Rassen wirklich erhöht .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 53
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ja ich habe einen Brunnen meine Rosen sind auf der Westseite des Hauses ich habe meine Nachbarn gefragt was sie vor ihrer Haustür sehen wollten .
+Satz: Die Rosen sind auf der westlichen Seite des Hauses .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 54
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Preis Angabe ist für ein Doppelzimmer , mit Frühstück , inklusive Service und Steuern ( derzeit 5 Prozent des Zimmer ) in der Hochsaison ( im allgemeinen April Oktober ) .
+Satz: Der Service und die Steuern werden eine zusätzliche Gebühr sein .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 55
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die meisten Straße in der Altstadt , über die Gleisanlagen nördlich des fort ( ein Gebiet einst als schwarze Stadt bekannt ) , ist die Armenische Straße .
+Satz: Die Armenische Straße ist westlich des fort .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 56
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Buchanan bemitleidet der einsame Adler , der für den Rest seines Lebens gelitten hat -- und darüber hinaus , um drei kurze Absätze zu sagen .
+Satz: Der lange Adler litt lange Zeit .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 57
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Also , wie fühlst du dich über das metrische System ?
+Satz: Was denken sie über das metrische System ?
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 58
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ein Indikator für den Mangel an tatsächlich verfügbaren Informationen über das denken von Beatty ist das folgende gleichzeitig eingereichte paar Beobachtungen .
+Satz: Beatty hatte nicht viele Informationen , und das spiegelt sich in dem Mangel an Informationen wider .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 59
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: In den ersten Jahren der Umsetzung haben die großen Statuten ein beträchtliches Versprechen zur Schaffung einer mehr und effektiven Bundesregierung gegeben .
+Satz: Es gibt große Statuen , die sich jetzt in den ersten Jahren der Umsetzung befinden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 60
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Alle arbeiten , die im Rahmen der Daten zuverlässigkeits Bewertung durchgeführt werden , sollten dokumentiert und in die Interaktion mit Workpapers einbezogen werden .
+Satz: Alle Daten bewertungs arbeiten sollten dokumentiert werden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 61
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Wir wussten nicht mal , wo die Mason-Dixon-Linie war , und außerdem weißt du , wenn mais nicht da wächst , ist es egal .
+Satz: Wir wussten nicht mal , wo die Mason-Dixon-Linie ist .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 62
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Gesetz über die Beschäftigung von Notfall von 1983 ,
+Satz: 1990-Gesetz über die Schaffung von Arbeitsplätzen im Bereich der Notfall
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 63
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ein Teil westlicher Investitionen könnte diese vielversprechenden Länder stabilisieren .
+Satz: Die westliche Einmischung wird diese Länder auf die Toilette bringen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 64
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ich kam gerade von einem Job in Washington zurück , wo ich zwei Dutzend sehr qualifizierte Junge Anwälte identifiziert habe .
+Satz: Ich war bereit , zur Messe in Washington zu gehen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 65
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Es wäre etwas zu tun , und sobald sie sich mit don ' s predigten gelangweilt haben , könnten sie ihn essen .
+Satz: Sie könnten don nach seinen Predigten nicht essen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 66
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ich bin für die Wahl und die Freiheit , und ihr Artikel ermutigt die Leser nicht gerade dazu , ihre Wahl und Freiheit auszuüben .
+Satz: Ich glaube , ihr Artikel hält die Leute davon ab , das zu tun , was sie tun wollen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 67
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Poirot schien meinen Gedanken zu folgen .
+Satz: Poirot schien meine Gedanken nicht zu verstehen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 68
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Das stimmt , weil ich glaube , dass sie nach Arizona ziehen werden , wenn sie alt werden .
+Satz: Sie planen , nach Arizona zu ziehen , nachdem sie in Rente gehen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 69
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Im Jahr 2000 startete das Finanzministerium die nationalen Partner für die finanzielle Ermächtigung .
+Satz: Im Jahr 2000 hat das Finanzministerium die nationalen Partner für die finanzielle Ermächtigung auf den Weg gebracht , zu viel Erfolg !
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 70
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: So haben wir zum Beispiel über die Umsetzung von Management durch die Faa berichtet , einschließlich der Übertragung von Behörden an Teams , um ihre Hauptvertragswerken-Prozesse zu verbessern .
+Satz: Die Reformen der Faa wurden vor einem Jahr durchgeführt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 71
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Beachten Sie , dass die Beseitigung der Regel keine einfache Veränderung ist und einen Nachteil hat .
+Satz: Die Abschaffung der Regel ist eine völlig positive Veränderung .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 72
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Das Shogunat gründete eine große Anzahl von Zen-Tempeln in Kamakura .
+Satz: In Kamakura gibt es eine große Anzahl von Zen-Tempeln .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 73
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Um 8 Uhr am 8 Mai brach der Schmetterlingsarten Titanically aus .
+Satz: Schmetterlingsarten brach im Mai aus .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 74
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die einzige Verzierung auf seiner gewaltigen Fassade ist die anmutig Veranda von Bernini , aber seine Piazza ist den Aufstieg für den Blick über die Stadt und den Vatikan wert .
+Satz: Die anmutig Veranda von bernini fügt eine enorme Menge an Dekorativer hinzu .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 75
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Es ist nur , was tun sie für sie , sie wollen etwas für sie tun , aber sie wollen nicht so direkt daran beteiligt werden , dass sie das Land zu besetzen .
+Satz: Sie wollen sich nicht in das Land bekommen , indem sie sich direkt in ihr aufhalten .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 76
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: In den Auswärtigen Angelegenheiten , nachdem er die Armee des Herzogs von Mailand in Marignano zerstört hatte und eine auffällig Allianz mit Heinrich VIII. Von England bildete , wurden die europäischen Ambitionen von François I. Vom Deutschen Kaiser Karl V. Gestoppt . François litt sogar unter der Demütigung eines Jahres in Madrid , nach einer überwältigenden Niederlage in Pavia im Jahr 1525 .
+Satz: Obwohl ich einst sehr mächtig war , wurde ich von anderen Ländern schnell besiegt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 77
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Kirche Santa Maria Del Carmine ist ein wichtiger halt für jede künstlerische Pilgerreise nach Florenz .
+Satz: Die Kirche Santa Maria Del Carmine befindet sich in Florenz .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 78
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: So Absicht war er bei der Ankunft , dass er keinen Plan hatte , das zu adressieren , was er gesehen hatte .
+Satz: Er hatte nicht die Absicht , zu erkennen , was er gesehen hatte , da er dorthin gelangen muss , wo er gebraucht wird .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 79
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Jedes Floß wird von den Floß gebaut , um zwei Erwachsene zu tragen .
+Satz: Zwei Erwachsene sind das Maximum der Flöße , die die Kapitäne zu jeder Zeit tragen können .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 80
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Der Vize-Präsident von LSC , Randi Youells , lehnte diesen Vorschlag ab und nahm den Plan zur Fusion von Passaic und Bergen und Hudson an .
+Satz: Passaic ' s , die Pläne von Bergen und Hudson wurden zu einem zusammengefasst .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 81
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: In seinem ersten Jahr führte bay legal auch erfolgreich eine Region Kampagne für Fundraising-Bemühungen durch , die in allen ihren Büros beträchtliche Mittel zur Verfügung stellte .
+Satz: Die Mittel wurden für eine großzügige Büro-Weihnachtsfeier ausgegeben .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 82
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Darüber hinaus sieht die Analyse die Verwendung von Querneigung Zertifikaten vor , die in den Jahren 2002 bis 2006 ( wie im schreiben des Senats gefordert ) durch eine frühzeitige Reduzierung der Emissionen möglich sind .
+Satz: Wie im Senat später gefordert , sieht die Analyse vor , dass die in den Jahren 2002 bis 2006 erzielten früh durch die in den Jahren 2002 bis 2006 erzielten früh möglich sind .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 83
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Oh es ist sehr ruhig ich meine du kannst unser uh Bad District ich würde nicht raten gehen da alleine nachts allein zu gehen aber du könntest und wenn jemand dich belästigt könnte man so ein Theater machen wo Menschen zu deiner Hilfe kommen würden , auch wenn es dir nicht gut geht . Du bist im schlimmsten Teil der Stadt . Der einzige Unterschied ist , dass jedes Licht der Straße angezündet wird , statt jedes anderen Straße , also sind wir ein wirklich , wir haben uns hier richtig verwöhnen lassen .
+Satz: Du könntest nachts alleine gehen , obwohl ich es nicht raten würde .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 84
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die gleichen Verhaltensmuster , die du meinst , ja , ja .
+Satz: Nein , es ist nicht das gleiche Verhaltensmuster .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 85
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Nein es macht diese Verbindung besonders mit den mechanischen teilen davon ich war nie in der Lage all das zu meistern , in der Tat mein Bruder und Schwester beide waren Jahre älter als ich sie gingen durch das uh Eltern Ding , wo sie haben . Ich muss üben , oder du gehst nicht raus , um zu spielen .
+Satz: Ich war in der Lage , die mechanischen Teile davon zu beherrschen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 86
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Aber die Daten wurden schnell slack , Einspruch , korrupt und am Ende völlig erbärmlich .
+Satz: Die Daten wurden in eine bewundernswerte Person umgewandelt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 87
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ja , sie haben nicht viel im Wege der Runden , aber wer weiß , ob sie keinen bekommen , vielleicht können Sie für einen tauschen , nach allem , was sie wissen , dass ich New Orleans den alten Steve Montana oder Walsh abgeholt habe .
+Satz: Sie haben immer eine Menge zu wählen , von der Art der Runden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 88
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Suchen Sie nach dem Cecil Hotel am westlichen Ende des Platzes .
+Satz: Suchen Sie nach dem West Hotel , es ist am östlichen Ende des Platzes .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 89
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Gebaut aus riesigen Granit Blöcken , verbunden ohne Mörtel in drei Ebenen von Bögen , 6 an der Basis , 11 auf der mittleren Ebene , und 35 an der Spitze , dieser hoch funktionale Bau ist auch bemerkenswert schön , in völliger Harmonie mit seine Landschaft .
+Satz: Die Landschaft befindet sich im Einklang mit dem wunderbaren Bau von Granit .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 90
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Er , nur wie er selbst , war an zweiter Stelle . Dessen Tod , obwohl das Leben , wir rue und Unrecht , und alle vergeblich stöhnen ; ihr Verlust , nicht er , klagen sie , die die Welt mit weinen füllen ; der Tod tötete nicht ihn , aber er machte den Tod seine Leiter in den Himmel .
+Satz: Er ist immer noch am Leben .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 91
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ein Auszug aus einer neuen Al-Gore-Biographie weist darauf hin , dass er mit dem Einsatz im Militär alles nur dafür sorgte , dass er Vietnam bekämpfen würde , aber er lehnt die Behauptung ab , dass gore eine besondere Behandlung oder Schutz erhalten habe .
+Satz: Al Gore hat biographien über ihn geschrieben .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 92
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Die Trespass eines Mo Gesamtzahl oder späten Nachmittags Besuch an heißen Tagen wird sichtbar , wenn man die drei Pyramiden Treppen der Treppen zu den Tor sieht .
+Satz: Abends besuche bei milden Wetter , die eine erfrischende Übung bieten .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 93
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Kleine , billige Souvenirs sind in den Formen von Keramik , Skulptur , Schmuck und Kleidung leicht erhältlich .
+Satz: Es gibt keine Kleidung für Souvenirs .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 94
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: 9 ) europäischer Nationalismus ?
+Satz: Faschismus in ganz Europa ?
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 95
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Er war nicht der Typ .
+Satz: Er war diese Art von Person .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 96
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Gedenkstätten , ein Dokumentationszentrum und eine detaillierte historische Ausstellung , die die Schrecken des Holocaust zeigt , schaffen einen Aufschrei gegen das menschliche Leid , das durch Hass verursacht wird , und hinterlassen einen bleibenden Eindruck auf alle , die Besuch haben .
+Satz: Es gibt eine detaillierte historische Ausstellung , in der die Schrecken des Holocaust dargestellt werden .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 97
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Ich kam aus dem Labor , auf die Straße , und betete für eine ruhige Nacht .
+Satz: Ich hoffte auf eine anstrengende Nacht nach der Arbeit .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 98
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Hilly Haifa hat sich dramatisch über die hänge des Mount Carmel Vorhänge .
+Satz: Das Hügelige Haifa befindet sich mehrere Tage vom Mount Carmel entfernt .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+
+!!@@##@@!! -- Example 99
+Analysiere ob der gegebene Satz dem Artikel treu ist. Wenn der Satz ausschließlich Informationen wiedergibt, die direkt aus dem Artikel stammen, ohne jegliche Ergänzungen oder Weglassungen, antworte mit 'Treu'. Wenn der Satz Informationen enthält, die im direkten Widerspruch zum Artikel stehen, antworte mit 'Widerspruch'. Wenn der Satz Informationen oder Details einführt, die im Artikel selbst nicht ausdrücklich erwähnt werden, antworte mit 'Neutral'. Gib zuerst ein kurze Erklärung ob der Satz treu ist oder nicht und danach das entsprechende Label. Antworte NUR auf Deutsch. Denke Schritt für Schritt.
+Artikel: Es deprimiert mich , sie zum ersten mal in der kämpfen zu sehen .
+Satz: Der Erzähler hat die Frau schon mal gesehen .
+Antworte NUR im folgenden Format: Erklärung: .. 
+Label: (Treu/Widerspruch/Neutral)
+

@@ -1,0 +1,22 @@
+batch_size: '1'
+check_integrity: false
+data_sampling: null
+decontamination_ngrams_path: null
+description_dict_path: null
+device: null
+end_range: null
+fewshot_sampling: stratified
+model: hf-causal-experimental
+model_args: pretrained=microsoft/Orca-2-7b,trust_remote_code=False,use_accelerate=True,dtype=bfloat16,load_in_8bit=False,use_flash_attention_2=True
+no_cache: true
+num_fewshot: 3
+output_base_path: results
+output_path: null
+seed: 42
+start_range: null
+task_configs:
+-   prompt_template: configs/prompt_templates/faithfulness_benchmark_final_swisstext23_with_explanation_multi_label.json
+    prompt_version: all_labels_english_with_explanation
+    task_name: faithfulness_benchmark_final_swisstext23_with_explanation_multi_label
+wandb_on: true
+write_out: true

@@ -10,3 +10,5 @@ lm_cache
 /results/
 /result_tables/
 /.env
+/token_shift_analysis/token_shift_analysis_config/*
+

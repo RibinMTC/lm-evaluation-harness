@@ -1,4 +1,4 @@
 {
   "dataset": "pubmed",
-  "samples_to_compute": 1
+  "samples_to_compute": 10
 }
